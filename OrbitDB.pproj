@@ -1,0 +1,14 @@
+<Project>
+<ProjectName>OrbitDB</ProjectName>
+
+<InputFiles>
+    <PFile>./PSrc/</PFile>
+    <PFile>./PSpec/</PFile>
+    <PFile>./PTst/</PFile>
+    <PFile>./PForeign/</PFile>
+    <PFile>./PForeign/Oplog/</PFile>
+    <PFile>./PForeign/Storage/</PFile>
+</InputFiles>
+
+<OutputDir>./PGenerated</OutputDir>
+</Project>
