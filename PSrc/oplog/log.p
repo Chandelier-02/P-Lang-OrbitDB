@@ -25,6 +25,10 @@ enum ShouldStopFnName {
     DEFAULT
 } 
 
+type tTraversalStopper;
+type tDefaultTraversalStopper;
+type tGetReferencesTraversalStopper;
+
 type tGetClockLastStateReq = (source: machine);
 type tGetClockLastStateResp = (status: tRequestStatus, lastTimestamp: tTimestamp);
 
@@ -195,14 +199,22 @@ machine Log {
         var totalNumReferences: int;
         var now: tTimestamp;
         var entrySet: set[tEntry];
+        var dictionary: map[string, tEntry];
 
         logHeads = GetHeadsFromLog();
+        send entries, eGetAllValuesFromStorageReq, (source = this, );
+        receive { 
+            case eGetDictionaryFromMemoryStorageResp: (resp: tGetDictionaryFromMemoryStorageResp) {
+                assert resp.status == SUCCESS, "Failed to get all values from entries storage";
+                dictionary = resp.dictionary as map[string, tEntry];
+            }
+        }
         foreach (itrEntry in logHeads) {
             nexts += (GetHash(itrEntry));
         }
 
         totalNumReferences = numReferences + sizeof(logHeads);
-        refs = GetReferences(logHeads, totalNumReferences, entries);
+        refs = GetReferences(logHeads, dictionary, totalNumReferences);
 
         send clock, eGetNowReq, (source = this, );
         receive {
@@ -283,5 +295,8 @@ machine Log {
     }
 }
 
-fun GetReferences(heads: set[tEntry], amount: int, memoryStorage: tMemoryStorage): set[string];
-fun Traverse(rootEntries: set[tEntry], nameOfStopFn: string, useRefs: bool): seq[tEntry];
+fun GetReferences(heads: set[tEntry], entryMap: map[string, tEntry], amount: int): set[string];
+fun Traverse(rootEntries: set[tEntry], entryMap: map[string, tEntry], stopper: tTraversalStopper, useRefs: bool): seq[tEntry];
+
+fun CreateDefaultTraversalStopper(): tDefaultTraversalStopper;
+fun CreateGetReferencesTraversalStopper(refs: set[string], referenceCount: int): tGetReferencesTraversalStopper;

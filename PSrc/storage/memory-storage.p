@@ -15,6 +15,9 @@ type tClearAllValuesFromStorageResp = (status: tRequestStatus);
 type tGetAllValuesFromStorageReq = (source: machine);
 type tGetAllValuesFromStorageResp = (status: tRequestStatus, retrivedValues: set[any]);
 
+type tGetDictionaryFromMemoryStorageReq = (source: machine);
+type tGetDictionaryFromMemoryStorageResp = (status: tRequestStatus, dictionary: map[string, any]);
+
 event ePutValueInStorageReq : tPutValueInStorageReq;
 event ePutValueInStorageResp : tPutValueInStorageResp;
 
@@ -29,6 +32,9 @@ event eClearAllValuesFromStorageResp : tClearAllValuesFromStorageResp;
 
 event eGetAllValuesFromStorageReq : tGetAllValuesFromStorageReq;
 event eGetAllValuesFromStorageResp : tGetAllValuesFromStorageResp;
+
+event eGetDictionaryFromMemoryStorageReq : tGetDictionaryFromMemoryStorageReq;
+event eGetDictionaryFromMemoryStorageResp : tGetDictionaryFromMemoryStorageResp;
 
 machine MemoryStorage {
     var memoryStorage: tMemoryStorage;
@@ -59,6 +65,10 @@ machine MemoryStorage {
 
         on eGetAllValuesFromStorageReq do (req: tGetAllValuesFromStorageReq) {
             goto GettingAllDataFromStorage, req;
+        }
+
+        on eGetDictionaryFromMemoryStorageReq do (req: tGetDictionaryFromMemoryStorageReq) {
+            goto GettingDictionayFromMemoryStorage, req;
         }
     }
 
@@ -103,6 +113,14 @@ machine MemoryStorage {
             goto WaitForRequest;
         }
     }
+
+    state GettingDictionayFromMemoryStorage {
+        entry (req: tGetDictionaryFromMemoryStorageReq) {
+            var dictionary: map[string, any];
+            dictionary = GetDictionaryFromMemoryStorage(memoryStorage);
+            send req.source, eGetDictionaryFromMemoryStorageResp, (status = SUCCESS, dictionary = dictionary);
+        }
+    }
 }
 
 fun CreateMemoryStorage(name: string): tMemoryStorage;
@@ -111,3 +129,4 @@ fun DeleteValueFromMemoryStorage(memoryStorage: tMemoryStorage, key: string): tM
 fun GetValueFromMemoryStorage(memoryStorage: tMemoryStorage, key: string): any;
 fun ClearMemoryStorage(memoryStorage: tMemoryStorage): tMemoryStorage;
 fun GetAllValuesFromMemoryStorage(memoryStorage: tMemoryStorage): set[any];
+fun GetDictionaryFromMemoryStorage(memoryStorage: tMemoryStorage): map[string, any];

@@ -12,6 +12,10 @@ namespace PImplementation {
             Name = name;
         }
 
+        public Dictionary<string, IPrtValue> GetDictionary() {
+            return memory;
+        }
+
         public bool Put(string hash, IPrtValue data) {
             return memory.TryAdd(hash, data);
         }
@@ -106,6 +110,16 @@ namespace PImplementation {
             machine.TryAssert(values.Length == returnSet.ToArray().Length, "There should not be duplicate entries in storage");
             machine.LogLine($"Got {values.Length} values from {memoryStorage.Name}");
             return returnSet;
+        }
+
+        public static PrtMap GetDictionaryFromMemoryStorage(tMemoryStorage memoryStorage, PMachine machine) {
+            PrtMap map = new PrtMap();
+            foreach (var kvp in memoryStorage.GetDictionary()) {
+                string key = kvp.Key;
+                IPrtValue value = (IPrtValue)kvp.Value;
+                map.Add(new KeyValuePair<IPrtValue, IPrtValue>((PrtString)key, value));
+            }
+            return map;
         }
     }
 }

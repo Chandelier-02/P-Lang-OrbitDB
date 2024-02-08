@@ -227,11 +227,11 @@ using Plang.CSharpRuntime.Values;
 namespace PImplementation {
     public static partial class GlobalFunctions {
         # nullable enable
-        public static async Task<PrtSeq> TraverseAsync(tEntry[] rootEntriesIn, Func<tEntry?, bool> shouldStopFn, bool useRefs, PMachine storageMachine, PMachine machine) {
+        public static PrtSeq Traverse(PrtSet rootEntriesIn, PrtMap dictionary, tTraversalStopper stopper, bool useRefs, PMachine machine) {
             PrtSeq traversedEntries = new PrtSeq();
 
             Func<tEntry, tEntry, int> SortFn = (entryA, entryB) => CompareTimestamps(entryA.Clock, entryB.Clock, machine);
-            tEntry[] rootEntries = rootEntriesIn;
+            tEntry[] rootEntries = (tEntry[])rootEntriesIn.ToArray();
             Array.Sort(rootEntries);
 
             tEntry[] stack = (tEntry[])rootEntries.Clone();
@@ -250,7 +250,7 @@ namespace PImplementation {
                 var (hash, next, refs) = entry;
                 if (!traversed.ContainsKey(hash)) {
                     traversedEntries.Append(entry);
-                    bool done = shouldStopFn(entry);
+                    bool done = stopper.ShouldStopFn(entry);
                     if (done) {
                         break;
                     }
@@ -261,33 +261,25 @@ namespace PImplementation {
                     toFetch = (string[])toFetch.Concat(next).Concat(useRefs ? refs : Array.Empty<string>()).Where(notIndexed);
 
                     # nullable enable
-                    Func<string, Task<tEntry?>> fetchEntries = async (hash) => {
-                        if (!traversed.ContainsKey(hash) && !fetched.ContainsKey(hash)) {
-                            fetched[hash] = true;
-                            PrtNamedTuple payload = new PrtNamedTuple(new string[]{ "source", "key" }, (IPrtValue)machine, (PrtString)hash);
-                            machine.TrySendEvent(storageMachine.self, new eGetValueFromStorageReq(), payload);
-                            var receivedEvent = await machine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
-                            tEntry? gotEntry = null;
-                            while (gotEntry == null) {
-                                switch (receivedEvent) {
-                                    case PHalt _hv: { machine.TryRaiseEvent(_hv); break; }
-                                    case eGetValueFromStorageResp respEvnt: {
-                                        PrtNamedTuple resp = (PrtNamedTuple)(respEvnt.Payload);
-                                        gotEntry = (tEntry)resp["value"];
-                                    } break;
-                                }
-                                if (gotEntry == null) {
-                                    receivedEvent = await machine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
-                                }
-                            }
-                            return gotEntry;
+                    Func<string, tEntry?> getEntry = (hash) => {
+                        if (dictionary.TryGetValue((PrtString)hash, out IPrtValue? value)) {
+                            return (tEntry)value;
                         } else {
                             return null;
                         }
                     };
 
-                    IEnumerable<Task<tEntry?>> fetchTasks = toFetch.Select(fetchEntries);
-                    tEntry?[] nexts = await Task.WhenAll(fetchTasks);
+                    # nullable enable
+                    Func<string, tEntry?> fetchEntries = (hash) => {
+                        if (!traversed.ContainsKey(hash) && !fetched.ContainsKey(hash)) {
+                            fetched[hash] = true;
+                            return getEntry(hash);
+                        } else {
+                            return null;
+                        }
+                    };
+
+                    tEntry[] nexts = (tEntry[])toFetch.Select(fetchEntries);
 
                     HashSet<tEntry> uniqueEntries = new HashSet<tEntry>();
                     var toFetchEntries = nexts
@@ -298,7 +290,7 @@ namespace PImplementation {
                                 combined.AddRange(acc.Refs);
                             return combined;
                         })
-                        .Where(entry => uniqueEntries.Add((tEntry)GetValueFromMemoryStorage(memoryStorage, hash, machine)))
+                        .Where(entry => uniqueEntries.Add((tEntry)dictionary[(PrtString)hash]))
                         .Where(notIndexed)
                         .ToArray();
 
@@ -309,58 +301,52 @@ namespace PImplementation {
             return traversedEntries;
         }
 
-        public static PrtSet GetReferences(tEntry[] heads, int referencesCount, tMemoryStorage memoryStorage, PMachine machine) {
+        public static PrtSet GetReferences(PrtSet heads, PrtMap dictionary, int referencesCount, PMachine machine) {
             PrtSet returnRefs = new PrtSet();
             string[] refs = new string[]{};
-            TraversalStopper stopper = new GetReferencesTraversalStopper(refs, referencesCount);
+            tGetReferencesTraversalStopper stopper = new tGetReferencesTraversalStopper(refs, referencesCount);
 
-            foreach (tEntry entry in Traverse(heads, stopper.ShouldStop, false, memoryStorage, machine)) {
+            foreach (tEntry entry in Traverse(heads, dictionary, stopper, false, machine)) {
                 refs.Append(entry.Hash);
             }
             Span<string> span = new Span<string>(refs);
-            refs = span.Slice(heads.Length + 1, referencesCount).ToArray();
+            refs = span.Slice(heads.Count + 1, referencesCount).ToArray();
             foreach (var reference in refs) {
                 returnRefs.Add((PrtString)reference);
             }
             return returnRefs;
         }
+
+        public static tDefaultTraversalStopper CreateDefaultTraversalStopper() {
+            return new tDefaultTraversalStopper();
+        }
+
+        public static tGetReferencesTraversalStopper CreateGetReferencesTraversalStopper(ref PrtSet refs, int referenceCount) {
+            return new tGetReferencesTraversalStopper(refs.Cast<string>().ToArray(), referenceCount);
+        }
     }
 
-    public interface TraversalStopper {
-        bool ShouldStop(tEntry? entry);
+    public interface tTraversalStopper {
+        bool ShouldStopFn(tEntry? entry);
     }
 
-    public class DefaultTraversalStopper {
-        public bool ShouldStop(tEntry? entry) {
+    public class tDefaultTraversalStopper {
+        public bool ShouldStopFn(tEntry? entry) {
             return false;
         }
     }
 
-    public class GetReferencesTraversalStopper : TraversalStopper {
+    public class tGetReferencesTraversalStopper : tTraversalStopper {
         private string[] refs;
         private int referencesCount;
 
-        public GetReferencesTraversalStopper(string[] refs, int referencesCount) {
+        public tGetReferencesTraversalStopper(string[] refs, int referencesCount) {
             this.refs = refs;
             this.referencesCount = referencesCount;
         }
 
-        public bool ShouldStop(tEntry? entry) {
+        public bool ShouldStopFn(tEntry? entry) {
             return referencesCount != -1 && refs.Length >= referencesCount;
         }
-    }
-
-    internal partial class eGetValueFromStorageReq : PEvent
-    {
-        public eGetValueFromStorageReq() : base() {}
-        public eGetValueFromStorageReq (PrtNamedTuple payload): base(payload){ }
-        public override IPrtValue Clone() { return new eGetValueFromStorageReq();}
-    }
-
-    internal partial class eGetValueFromStorageResp : PEvent
-    {
-        public eGetValueFromStorageResp() : base() {}
-        public eGetValueFromStorageResp (PrtNamedTuple payload): base(payload){ }
-        public override IPrtValue Clone() { return new eGetValueFromStorageResp();}
     }
 }
