@@ -8,7 +8,10 @@ using Plang.CSharpRuntime.Values;
 namespace PImplementation {
     public static partial class GlobalFunctions {
         public static PrtSet FindHeads(PrtSet entries, PMachine machine) {
-            tEntry[] entriesArray = (tEntry[])entries.ToArray();
+            tEntry[] entriesArray = new tEntry[]{};
+            foreach (var entry in entries) {
+                entriesArray.Append((tEntry)entry);
+            }
             HashSet<tEntry> entriesSet = new HashSet<tEntry>(entriesArray);
             Dictionary<string, string> items = new Dictionary<string, string>();
             foreach (var entry in entriesSet) {

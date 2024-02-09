@@ -114,5 +114,9 @@ namespace PImplementation {
         public static tTimestamp GetClock(tEntry entry, PMachine machine) {
             return entry.Clock;
         }
+
+        public static PrtString GetRandomString(PMachine machine) {
+            return (PrtString)Guid.NewGuid().ToString();
+        }
     }
 }

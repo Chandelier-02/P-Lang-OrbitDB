@@ -317,7 +317,7 @@ namespace PImplementation {
             return returnRefs;
         }
 
-        public static tDefaultTraversalStopper CreateDefaultTraversalStopper() {
+        public static tDefaultTraversalStopper CreateDefaultTraversalStopper(PMachine machine) {
             return new tDefaultTraversalStopper();
         }
 
@@ -326,19 +326,31 @@ namespace PImplementation {
         }
     }
 
-    public interface tTraversalStopper {
+    public interface tTraversalStopper : IPrtValue{
         bool ShouldStopFn(tEntry? entry);
     }
 
-    public class tDefaultTraversalStopper {
+    public class tDefaultTraversalStopper  : tTraversalStopper{
         public bool ShouldStopFn(tEntry? entry) {
             return false;
+        }
+
+        public IPrtValue Clone() {
+            return new tDefaultTraversalStopper();
+        }
+
+        public bool Equals(IPrtValue? other) {
+            if (other is tDefaultTraversalStopper otherTraversalStopper) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
     public class tGetReferencesTraversalStopper : tTraversalStopper {
-        private string[] refs;
-        private int referencesCount;
+        public string[] refs;
+        public int referencesCount;
 
         public tGetReferencesTraversalStopper(string[] refs, int referencesCount) {
             this.refs = refs;
@@ -347,6 +359,18 @@ namespace PImplementation {
 
         public bool ShouldStopFn(tEntry? entry) {
             return referencesCount != -1 && refs.Length >= referencesCount;
+        }
+
+        public IPrtValue Clone() {
+            return new tGetReferencesTraversalStopper(refs, referencesCount);
+        }
+
+        public bool Equals(IPrtValue? other) {
+            if (other is tGetReferencesTraversalStopper otherRefTraversalStopper) {
+                return otherRefTraversalStopper.refs == refs && otherRefTraversalStopper.referencesCount == referencesCount;
+            } else {
+                return false;
+            }
         }
     }
 }

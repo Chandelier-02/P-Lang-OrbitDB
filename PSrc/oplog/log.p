@@ -53,8 +53,8 @@ type tJoinLogResp = (status: tRequestStatus);
 type tJoinEntryReq = (source: machine, entryToJoin: tEntry);
 type tJoinEntryResp = (status: tRequestStatus, couldJoin: bool);
 
-type tTraverseLogReq = (source: machine, rootEntries: set[tEntry], nameOfStopFn: string, useRefs: bool);
-type tTraverseLogResp = (status: tRequestStatus, foundEntry: tEntry, done: bool);
+type tTraverseLogReq = (source: machine, rootEntries: set[tEntry], stopper: tDefaultTraversalStopper, useRefs: bool);
+type tTraverseLogResp = (status: tRequestStatus, traversedEntries: seq[tEntry]);
 
 event eGetClockLastStateReq : tGetClockLastStateReq;
 event eGetClockLastStateResp : tGetClockLastStateResp;
@@ -135,6 +135,7 @@ machine Log {
         }
     
         on eTraverseLogReq do (req: tTraverseLogReq) {
+            
         }
     }
 
@@ -293,6 +294,8 @@ machine Log {
 
         return true;
     }
+
+
 }
 
 fun GetReferences(heads: set[tEntry], entryMap: map[string, tEntry], amount: int): set[string];

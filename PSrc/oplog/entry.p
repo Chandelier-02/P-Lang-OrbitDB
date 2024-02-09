@@ -19,3 +19,4 @@ machine EntryMachine {
 fun CreateEntry(identity: string, id: string, entryData: string, clock: tTimestamp, next: set[string], refs: set[string]): tEntry;
 fun GetHash(entryToHash: tEntry): string;
 fun GetClock(entryToGetClock: tEntry): tTimestamp;
+fun GetRandomString(): string;
