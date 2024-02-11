@@ -5,20 +5,20 @@ using Plang.CSharpRuntime.Values;
 using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Generic;
 
-#pragma warning disable 162, 219, 414
 namespace PImplementation {
     public class tEntry : IPrtValue {
         public readonly string Identity;
         public readonly string Id;
         public readonly string Payload;
-        public readonly string[] Next;
-        public readonly string[] Refs;
+        public readonly List<string> Next;
+        public readonly List<string> Refs;
         public readonly tTimestamp Clock;
         public string Hash;
 
         #nullable enable
-        public tEntry(string identity, string id, string payload, tTimestamp clock, string[] next, string[] refs) {
+        public tEntry(string identity, string id, string payload, tTimestamp clock, List<string> next, List<string> refs) {
             Identity = identity;
             Id = id;
             Payload = payload;
@@ -29,14 +29,14 @@ namespace PImplementation {
         }
 
         #nullable enable
-        public static tEntry Create(string identity, string id, string payload, tTimestamp clock, string[] next, string[] refs) {
+        public static tEntry Create(string identity, string id, string payload, tTimestamp clock, List<string> next, List<string> refs) {
             tEntry entry = new tEntry(identity, id, payload, clock, next, refs);
             entry.Hash = ToHash(entry);
             return entry;
         }
 
         public IPrtValue Clone() {
-            return new tEntry(Identity, Id, Payload, (tTimestamp)Clock.Clone(), (string[])Next.Clone(), (string[])Refs.Clone());
+            return new tEntry(Identity, Id, Payload, (tTimestamp)Clock.Clone(), Next.ToList(), Refs.ToList());
         }
 
         public bool Equals(IPrtValue? other) {
@@ -65,8 +65,7 @@ namespace PImplementation {
             return ComputeSha256Hash(serializedEntry);
         }
 
-        internal void Deconstruct(out string hash, out string[] next, out string[] refs)
-        {
+        internal void Deconstruct(out string hash, out List<string> next, out List<string> refs) {
             hash = Hash;
             next = Next;
             refs = Refs;
@@ -86,15 +85,10 @@ namespace PImplementation {
     }
 
     public static partial class GlobalFunctions {
-        public static tEntry CreateEntry(string identity, string id, string entryData, tTimestamp clock, PrtSet next, PrtSet refs, PMachine machine) {
-            string[] nextArray = new string[]{};
-            string[] refsArray = new string[]{};
-            foreach (var value in next) {
-                nextArray = nextArray.Append(value.ToString()!).ToArray();
-            }
-            foreach (var value in refs) {
-                refsArray = refsArray.Append(value.ToString()!).ToArray();
-            }
+        public static tEntry CreateEntry(string identity, string id, string entryData, tTimestamp clock, PrtSet next, PrtSet refs, PMachine _) {
+            List<string> nextArray = new List<string>(next.Cast<string>());
+            List<string> refsArray = new List<string>(refs.Cast<string>());
+  
             var createdEntry = tEntry.Create(
                 identity,
                 id, 
@@ -103,19 +97,18 @@ namespace PImplementation {
                 nextArray,
                 refsArray
             );
-            machine.LogLine($"Created entry: {createdEntry}");
             return createdEntry;
         }
 
-        public static PrtString GetHash(tEntry entry, PMachine machine) {
+        public static PrtString GetHash(tEntry entry, PMachine _) {
             return (PrtString)tEntry.ToHash(entry);
         }
 
-        public static tTimestamp GetClock(tEntry entry, PMachine machine) {
+        public static tTimestamp GetClock(tEntry entry, PMachine _) {
             return entry.Clock;
         }
 
-        public static PrtString GetRandomString(PMachine machine) {
+        public static PrtString GetRandomString(PMachine _) {
             return (PrtString)Guid.NewGuid().ToString();
         }
     }

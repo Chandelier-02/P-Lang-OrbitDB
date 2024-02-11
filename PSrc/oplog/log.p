@@ -26,17 +26,15 @@ enum ShouldStopFnName {
 } 
 
 type tTraversalStopper;
-type tDefaultTraversalStopper;
-type tGetReferencesTraversalStopper;
 
 type tGetClockLastStateReq = (source: machine);
 type tGetClockLastStateResp = (status: tRequestStatus, lastTimestamp: tTimestamp);
 
 type tGetHeadsFromLogReq = (source: machine);
-type tGetHeadsFromLogResp = (status: tRequestStatus, heads: set[tEntry]);
+type tGetHeadsFromLogResp = (status: tRequestStatus, heads: seq[tEntry]);
 
 type tGetAllEntriesFromLogReq = (source: machine); // values in OrbitDB.cs
-type tGetAllEntriesFromLogResp = (status: tRequestStatus, entries: set[tEntry]);
+type tGetAllEntriesFromLogResp = (status: tRequestStatus, entries: seq[tEntry]);
 
 type tGetEntryFromLogReq = (source: machine, hash: string);
 type tGetEntryFromLogResp = (status: tRequestStatus, foundEntry: tEntry);
@@ -53,7 +51,7 @@ type tJoinLogResp = (status: tRequestStatus);
 type tJoinEntryReq = (source: machine, entryToJoin: tEntry);
 type tJoinEntryResp = (status: tRequestStatus, couldJoin: bool);
 
-type tTraverseLogReq = (source: machine, rootEntries: set[tEntry], stopper: tDefaultTraversalStopper, useRefs: bool);
+type tTraverseLogReq = (source: machine, rootEntries: seq[tEntry], stopper: tTraversalStopper, useRefs: bool);
 type tTraverseLogResp = (status: tRequestStatus, traversedEntries: seq[tEntry]);
 
 event eGetClockLastStateReq : tGetClockLastStateReq;
@@ -94,7 +92,7 @@ machine Log {
     var heads: Heads;
 
     start state Init {
-        entry (init: (identityIn: string, logIdIn: string, logHeads: set[tEntry])) {
+        entry (init: (identityIn: string, logIdIn: string, logHeads: seq[tEntry])) {
             identity = init.identityIn;
             logId = init.logIdIn;
             clock = new HybridLogicalClock(identity);
@@ -113,13 +111,41 @@ machine Log {
         }
     
         on eGetHeadsFromLogReq do (req: tGetHeadsFromLogReq) {
-            GetHeadsFromLog();
+            var heads: seq[tEntry];
+            heads = GetHeadsFromLog();
+            send req.source, eGetHeadsFromLogResp, (status = SUCCESS, heads = heads);
         }
     
         on eGetAllEntriesFromLogReq do (req: tGetAllEntriesFromLogReq) {
+            var entries: seq[tEntry];
+            var traversedEntries: seq[tEntry];
+            var rootEntries: seq[tEntry];
+            var dictionary: map[string, tEntry];
+            var stopper: tTraversalStopper;
+            var traversedEntry: tEntry;
+            stopper = CreateDefaultTraversalStopper();
+            rootEntries = GetHeadsFromLog();
+            traversedEntries = Traverse(rootEntries, dictionary, stopper, true);
+            foreach (traversedEntry in traversedEntries) {
+                entries += (0, traversedEntry);
+            }
+            send req.source, eGetAllEntriesFromLogResp, (status = SUCCESS, entries = entries);
         }
     
         on eGetEntryFromLogReq do (req: tGetEntryFromLogReq) {
+            var foundEntry: tEntry;
+            send entries, eGetValueFromStorageReq, (source = this, key = req.hash);
+            receive { 
+                case eGetValueFromStorageResp: (resp: tGetValueFromStorageResp) {
+                    if (resp.status == SUCCESS) {
+                        foundEntry = resp.value as tEntry;
+                        send req.source, eGetEntryFromLogResp, (status = SUCCESS, foundEntry = foundEntry);
+                        goto WaitForRequest;
+                    }
+                    send req.source, eGetEntryFromLogResp, (status = ERROR, foundEntry = foundEntry);
+                    goto WaitForRequest;
+                }
+            }
         }
     
         on eDoesLogHaveEntryReq do (req: tDoesLogHaveEntryReq) {
@@ -151,13 +177,13 @@ machine Log {
         return lastTimestamp;
     }
 
-    fun GetHeadsFromLog(): set[tEntry] {
-        var headsToReturn: set[tEntry];
+    fun GetHeadsFromLog(): seq[tEntry] {
+        var headsToReturn: seq[tEntry];
         send heads, eGetAllEntriesFromHeadsReq, (source = this, );
         receive {
             case eGetAllEntriesFromHeadsResp: (resp: tGetAllEntriesFromHeadsResp) {
                 assert resp.status == SUCCESS, "Failed to get heads from log.";
-                headsToReturn = resp.retrivedValues;
+                headsToReturn = Sorted(resp.retrivedValues, true);
             }
         }
         return headsToReturn;
@@ -192,24 +218,19 @@ machine Log {
     }
 
     fun AppendEntry(entryData: string, numReferences: int): tEntry {
-        var logHeads: set[tEntry];
+        var logHeads: seq[tEntry];
         var itrEntry: tEntry;
         var nexts: set[string];
         var refs: set[string];
         var createdEntry: tEntry;
         var totalNumReferences: int;
         var now: tTimestamp;
-        var entrySet: set[tEntry];
+        var entrySet: seq[tEntry];
         var dictionary: map[string, tEntry];
 
-        logHeads = GetHeadsFromLog();
-        send entries, eGetAllValuesFromStorageReq, (source = this, );
-        receive { 
-            case eGetDictionaryFromMemoryStorageResp: (resp: tGetDictionaryFromMemoryStorageResp) {
-                assert resp.status == SUCCESS, "Failed to get all values from entries storage";
-                dictionary = resp.dictionary as map[string, tEntry];
-            }
-        }
+        logHeads = GetHeadsFromLog() as seq[tEntry];
+        dictionary = GetDictionaryFromMemoryStorage();
+
         foreach (itrEntry in logHeads) {
             nexts += (GetHash(itrEntry));
         }
@@ -226,7 +247,7 @@ machine Log {
         }
         createdEntry = CreateEntry(identity, logId, entryData, now, nexts, refs);
 
-        entrySet += (createdEntry);
+        entrySet += (0, createdEntry);
         send heads, eSetEntriesInHeadsReq, (source = this, entries = entrySet);
         receive {
             case eSetEntriesInHeadsResp: (resp: tSetEntriesInHeadsResp) {
@@ -250,7 +271,7 @@ machine Log {
     }
 
     fun JoinLog(log: Log) {
-        var otherLogHeads: set[tEntry];
+        var otherLogHeads: seq[tEntry];
         var otherLogEntry: tEntry;
     }
 
@@ -270,7 +291,7 @@ machine Log {
         receive { 
             case eAddEntryToHeadsResp: (resp: tAddEntryToHeadsResp) {
                 assert resp.status == SUCCESS, "Failed to add entry to Heads";
-                if (resp.newHeads == GetHeadsFromLog()) {
+                if (Sorted(resp.newHeads, true) == GetHeadsFromLog()) {
                     returnBool = false;
                 }
             }
@@ -295,11 +316,21 @@ machine Log {
         return true;
     }
 
-
+    fun GetDictionaryFromMemoryStorage(): map[string, tEntry] {
+        var dictionary: map[string, tEntry];
+        send entries, eGetDictionaryFromMemoryStorageReq, (source = this, );
+        receive {
+            case eGetDictionaryFromMemoryStorageResp: (resp: tGetDictionaryFromMemoryStorageResp) {
+                dictionary = resp.dictionary as map[string, tEntry];
+            }
+        }
+        return dictionary;
+    }
 }
 
-fun GetReferences(heads: set[tEntry], entryMap: map[string, tEntry], amount: int): set[string];
-fun Traverse(rootEntries: set[tEntry], entryMap: map[string, tEntry], stopper: tTraversalStopper, useRefs: bool): seq[tEntry];
+fun GetReferences(heads: seq[tEntry], entryMap: map[string, tEntry], amount: int): set[string];
+fun Traverse(rootEntries: seq[tEntry], entryMap: map[string, tEntry], stopper: tTraversalStopper, useRefs: bool): seq[tEntry];
+fun Sorted(entriesToSort: seq[tEntry], reverse: bool): seq[tEntry];
 
-fun CreateDefaultTraversalStopper(): tDefaultTraversalStopper;
-fun CreateGetReferencesTraversalStopper(refs: set[string], referenceCount: int): tGetReferencesTraversalStopper;
+fun CreateDefaultTraversalStopper(): tTraversalStopper;
+fun CreateGetReferencesTraversalStopper(refs: set[string], referenceCount: int): tTraversalStopper;

@@ -1,17 +1,6 @@
 using System;
-using System.Runtime;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using Plang.CSharpRuntime;
 using Plang.CSharpRuntime.Values;
-using Plang.CSharpRuntime.Exceptions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Dynamic;
-using System.Runtime.InteropServices;
-using System.Collections;
 
 namespace PImplementation {
     public class tPhysicalTime : IPrtValue {
@@ -156,39 +145,41 @@ namespace PImplementation {
     }
 
     public static partial class GlobalFunctions {
-        public static tPhysicalTime CreatePhysicalTime(int offset, PMachine machine) {
-            machine.LogLine("Created new Physical Time");
+        public static tPhysicalTime CreatePhysicalTime(int offset, string id, PMachine _) {
             return new tPhysicalTime(offset);
         }
 
-        public static int GetPhysicalTimeNow(tPhysicalTime physicalTime, PMachine machine) {
-            return (int)physicalTime.Now();
+        public static int GetPhysicalTimeNow(tPhysicalTime physicalTime, PMachine _) {
+            long now = physicalTime.Now();
+            return (int)now;
         }
 
-        public static tTimestamp CreateNewTimestamp(int time, int counter, string id, PMachine machine) {
-            return new tTimestamp(time, counter, id);
+        public static tTimestamp CreateTimestamp(int time, int counter, string id, PMachine _) {
+            tTimestamp newTimestamp = new tTimestamp(time, counter, id);
+            return newTimestamp;
         }
 
-        public static tHybridLogicalClock CreateHybridLogicalClock(string id, tPhysicalTime physicalTime, tTimestamp timestamp, PMachine machine) {
-            return new tHybridLogicalClock(id, physicalTime, timestamp);
+        public static tHybridLogicalClock CreateHybridLogicalClock(string id, tPhysicalTime physicalTime, tTimestamp timestamp, PMachine _) {
+            tHybridLogicalClock hlc = new tHybridLogicalClock(id, physicalTime, timestamp);
+            return hlc;
         }
 
-        public static tTimestamp GetLastTimestamp(tHybridLogicalClock hlc, PMachine machine) {
+        public static tTimestamp GetLastTimestamp(tHybridLogicalClock hlc, PMachine _) {
+            tTimestamp last = hlc.Last();
             return hlc.Last();
         }
 
-        public static PrtNamedTuple GetHlcNow(tHybridLogicalClock hlc, PMachine machine) {
-            hlc.Now();
-            return new PrtNamedTuple(new string[]{ "newHlc", "timestamp" }, hlc, hlc.Last());
+        public static PrtNamedTuple GetHlcNow(tHybridLogicalClock hlc, PMachine _) {
+            tTimestamp now = hlc.Now();
+            return new PrtNamedTuple(new string[]{ "newHlc", "timestamp" }, hlc, now);
         }
 
-        public static PrtNamedTuple UpdateHlc(tHybridLogicalClock hlc, tTimestamp remoteTs, PMachine machine) {
-            hlc.Update(remoteTs);
-            machine.LogLine($"Updated HLC with id {hlc.Id} to have last timestamp: {hlc.Last()}");
-            return new PrtNamedTuple(new string[]{ "newHlc", "updatedTimestamp" }, hlc, hlc.Last());
+        public static PrtNamedTuple UpdateHlc(tHybridLogicalClock hlc, tTimestamp remoteTs, PMachine _) {
+            tTimestamp updatedTimestamp = hlc.Update(remoteTs);
+            return new PrtNamedTuple(new string[]{ "newHlc", "updatedTimestamp" }, hlc, updatedTimestamp);
         }
 
-        public static int CompareTimestamps(tTimestamp ts1, tTimestamp ts2, PMachine machine) {
+        public static int CompareTimestamps(tTimestamp ts1, tTimestamp ts2, PMachine _) {
             return tHybridLogicalClock.CompareTimestamps(ts1, ts2);
         }
     }

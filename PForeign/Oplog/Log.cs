@@ -220,14 +220,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Plang.CSharpRuntime;
 using Plang.CSharpRuntime.Values;
 
 namespace PImplementation {
     public static partial class GlobalFunctions {
         # nullable enable
-        public static PrtSeq Traverse(PrtSet rootEntriesIn, PrtMap dictionary, tTraversalStopper stopper, bool useRefs, PMachine machine) {
+        public static PrtSeq Traverse(PrtSeq rootEntriesIn, PrtMap dictionary, tTraversalStopper stopper, bool useRefs, PMachine machine) {
             PrtSeq traversedEntries = new PrtSeq();
 
             Func<tEntry, tEntry, int> SortFn = (entryA, entryB) => CompareTimestamps(entryA.Clock, entryB.Clock, machine);
@@ -301,10 +300,10 @@ namespace PImplementation {
             return traversedEntries;
         }
 
-        public static PrtSet GetReferences(PrtSet heads, PrtMap dictionary, int referencesCount, PMachine machine) {
+        public static PrtSet GetReferences(PrtSeq heads, PrtMap dictionary, int referencesCount, PMachine machine) {
             PrtSet returnRefs = new PrtSet();
             string[] refs = new string[]{};
-            tGetReferencesTraversalStopper stopper = new tGetReferencesTraversalStopper(refs, referencesCount);
+            tTraversalStopper stopper = new tTraversalStopper(refs, referencesCount);
 
             foreach (tEntry entry in Traverse(heads, dictionary, stopper, false, machine)) {
                 refs.Append(entry.Hash);
@@ -317,60 +316,69 @@ namespace PImplementation {
             return returnRefs;
         }
 
-        public static tDefaultTraversalStopper CreateDefaultTraversalStopper(PMachine machine) {
-            return new tDefaultTraversalStopper();
+        public static tTraversalStopper CreateDefaultTraversalStopper(PMachine machine) {
+            return new tTraversalStopper();
         }
 
-        public static tGetReferencesTraversalStopper CreateGetReferencesTraversalStopper(ref PrtSet refs, int referenceCount) {
-            return new tGetReferencesTraversalStopper(refs.Cast<string>().ToArray(), referenceCount);
+        public static tTraversalStopper CreateGetReferencesTraversalStopper(PrtSet refs, int referenceCount) {
+            return new tTraversalStopper(refs.Cast<string>().ToArray(), referenceCount);
+        }
+
+        public static PrtSeq Sorted(PrtSeq entries, bool reverse, PMachine machine) {
+            PrtSeq sortedValues = new PrtSeq();
+            Func<tEntry, tEntry, int> SortFn = (entryA, entryB) => CompareTimestamps(entryA.Clock, entryB.Clock, machine);
+            tEntry[] entriesArray = new tEntry[]{};
+            foreach (var entry in entries) {
+                entriesArray.Append((tEntry)entry);
+            }
+
+            if (reverse) {
+                Array.Sort(entriesArray, new Comparison<tEntry>(SortFn));
+                entriesArray = (tEntry[])entriesArray.Reverse();
+            } else {
+                Array.Sort(entriesArray, new Comparison<tEntry>(SortFn));
+            }
+
+            foreach (var entry in entriesArray) {
+                sortedValues.Add(entry);
+            }
+
+            return sortedValues;
         }
     }
 
-    public interface tTraversalStopper : IPrtValue{
+    public interface TraversalStopper : IPrtValue{
         bool ShouldStopFn(tEntry? entry);
     }
 
-    public class tDefaultTraversalStopper  : tTraversalStopper{
-        public bool ShouldStopFn(tEntry? entry) {
+    public class tTraversalStopper : TraversalStopper {
+    public string[]? refs { get; set; }
+    public PrtInt? referencesCount { get; set; }
+
+    public tTraversalStopper() {}
+
+    public tTraversalStopper(string[]? refs = null, PrtInt? referencesCount = null) {
+        this.refs = refs;
+        this.referencesCount = referencesCount;
+    }
+
+    public bool ShouldStopFn(tEntry? entry) {
+        return referencesCount.HasValue && refs != null && refs?.Length >= referencesCount.Value;
+    }
+
+    public IPrtValue Clone() {
+        return new tTraversalStopper(refs?.Clone() as string[], referencesCount);
+    }
+
+    public bool Equals(IPrtValue? other) {
+        if (other is tTraversalStopper otherTraversalStopper) {
+            bool refsEqual = (refs == null && otherTraversalStopper.refs == null) ||
+                             (refs != null && otherTraversalStopper.refs != null && refs.SequenceEqual(otherTraversalStopper.refs));
+            bool countEqual = referencesCount == otherTraversalStopper.referencesCount;
+            return refsEqual && countEqual;
+        } else {
             return false;
         }
-
-        public IPrtValue Clone() {
-            return new tDefaultTraversalStopper();
-        }
-
-        public bool Equals(IPrtValue? other) {
-            if (other is tDefaultTraversalStopper otherTraversalStopper) {
-                return true;
-            } else {
-                return false;
-            }
-        }
     }
-
-    public class tGetReferencesTraversalStopper : tTraversalStopper {
-        public string[] refs;
-        public int referencesCount;
-
-        public tGetReferencesTraversalStopper(string[] refs, int referencesCount) {
-            this.refs = refs;
-            this.referencesCount = referencesCount;
-        }
-
-        public bool ShouldStopFn(tEntry? entry) {
-            return referencesCount != -1 && refs.Length >= referencesCount;
-        }
-
-        public IPrtValue Clone() {
-            return new tGetReferencesTraversalStopper(refs, referencesCount);
-        }
-
-        public bool Equals(IPrtValue? other) {
-            if (other is tGetReferencesTraversalStopper otherRefTraversalStopper) {
-                return otherRefTraversalStopper.refs == refs && otherRefTraversalStopper.referencesCount == referencesCount;
-            } else {
-                return false;
-            }
-        }
-    }
+}
 }

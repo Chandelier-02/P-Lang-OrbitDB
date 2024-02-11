@@ -16,8 +16,10 @@ namespace PImplementation {
             return memory;
         }
 
-        public bool Put(string hash, IPrtValue data) {
-            return memory.TryAdd(hash, data);
+        public void Put(string hash, IPrtValue data) {
+            if (!memory.TryAdd(hash, data)) {
+                memory[hash] = data;
+            } 
         }
 
         public bool Del(string hash) {
@@ -71,52 +73,48 @@ namespace PImplementation {
     }
 
     public static partial class GlobalFunctions {
-        public static tMemoryStorage CreateMemoryStorage(string name, PMachine machine) {
-            machine.LogLine($"Created {name}  of type {typeof(IPrtValue).Name}");
+        public static tMemoryStorage CreateMemoryStorage(string name, PMachine _) {
             return new tMemoryStorage(name);
         }
         
-        public static tMemoryStorage PutValueInMemoryStorage(tMemoryStorage memoryStorage, string hash, IPrtValue element, PMachine machine) {
-            machine.TryAssert(memoryStorage.Put(hash, element), $"Failed to add element to {memoryStorage.Name} ");
-            machine.LogLine($"Put {element} in {memoryStorage.Name} ");
+        public static tMemoryStorage PutValueInMemoryStorage(tMemoryStorage memoryStorage, string hash, IPrtValue element, PMachine _) {
+            memoryStorage.Put(hash, element);
             return memoryStorage;
         }
 
-        public static tMemoryStorage DeleteValueFromMemoryStorage(tMemoryStorage memoryStorage, string hash, PMachine machine) {
-            machine.TryAssert(memoryStorage.Del(hash), $"Failed to delete element with key {hash} from {memoryStorage.Name} ");
-            machine.LogLine($"Deleted element with key {hash} from {memoryStorage.Name} ");
-            return memoryStorage;
+        public static PrtNamedTuple DeleteValueFromMemoryStorage(tMemoryStorage memoryStorage, string hash, PMachine _) {
+            bool couldDelete = memoryStorage.Del(hash);
+            return new PrtNamedTuple(new string[]{ "couldDelete", "memoryStorage" }, (PrtBool)couldDelete, memoryStorage);
         }
 
-        public static IPrtValue GetValueFromMemoryStorage(tMemoryStorage memoryStorage, string hash, PMachine machine) {
+        public static IPrtValue GetValueFromMemoryStorage(tMemoryStorage memoryStorage, string hash, PMachine _) {
             IPrtValue? value = memoryStorage.Get(hash);
-            machine.TryAssert(value != null, $"{memoryStorage.Name} does not have a value for key {hash}");
-            machine.LogLine($"Got value {value} from {memoryStorage.Name}");
-            return value!;
+            if (value == null) {
+                return (PrtBool)false;
+            }
+            return value;
         }
 
-        public static tMemoryStorage ClearMemoryStorage(tMemoryStorage memoryStorage, PMachine machine) {
+        public static tMemoryStorage ClearMemoryStorage(tMemoryStorage memoryStorage, PMachine _) {
             memoryStorage.Clear();
-            machine.LogLine($"Cleared all values from {memoryStorage.Name}");
             return memoryStorage;
         }
 
-        public static PrtSet GetAllValuesFromMemoryStorage(tMemoryStorage memoryStorage, PMachine machine) {
+        public static PrtSeq GetAllValuesFromMemoryStorage(tMemoryStorage memoryStorage, PMachine machine) {
             IPrtValue[] values = memoryStorage.All();
-            PrtSet returnSet = new PrtSet();
+            PrtSeq returnSet = new PrtSeq();
             foreach (var value in values) {
                 returnSet.Add(value);
             }
             machine.TryAssert(values.Length == returnSet.ToArray().Length, "There should not be duplicate entries in storage");
-            machine.LogLine($"Got {values.Length} values from {memoryStorage.Name}");
             return returnSet;
         }
 
-        public static PrtMap GetDictionaryFromMemoryStorage(tMemoryStorage memoryStorage, PMachine machine) {
+        public static PrtMap GetDictionaryFromMemoryStorage(tMemoryStorage memoryStorage, PMachine _) {
             PrtMap map = new PrtMap();
             foreach (var kvp in memoryStorage.GetDictionary()) {
                 string key = kvp.Key;
-                IPrtValue value = (IPrtValue)kvp.Value;
+                IPrtValue value = kvp.Value;
                 map.Add(new KeyValuePair<IPrtValue, IPrtValue>((PrtString)key, value));
             }
             return map;

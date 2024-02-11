@@ -33,15 +33,26 @@ machine HybridLogicalClock {
             var physicalTime: tPhysicalTime;
             var physicalTimeNow: int;
             var timestamp: tTimestamp;
+
             id = id;
-            physicalTime = CreatePhysicalTime(0);
+
+            physicalTime = CreatePhysicalTime(0, id);
+            print format("Created new Physical Time for Hybrid Logical Clock with id {0}", id);
+
             physicalTimeNow = GetPhysicalTimeNow(physicalTime);
-            timestamp = CreateNewTimestamp(physicalTimeNow, 0, id);
+            print format("Now for Hybrid Logical Clock with id {0} is {1}", id, physicalTimeNow);
+
+            timestamp = CreateTimestamp(physicalTimeNow, 0, id);
+            print format("Created timestamp {0} for Hybrid Logical Clock with id {1}", timestamp, id);
+
             hlc = CreateHybridLogicalClock(id, physicalTime, timestamp);
+            print format("Created new Hybrid Logical Clock {0}", hlc);
         }
 
         on eGetLastTimestampReq do (req: tGetLastTimestampReq) {
-            send req.source, eGetLastTimestampResp, (status = SUCCESS, lastTimestamp = GetLastTimestamp(hlc));
+            var lastTimestamp: tTimestamp;
+            print format("Got last timestamp {0} from Hybrid Logical Clock with id {1}", lastTimestamp, id);
+            send req.source, eGetLastTimestampResp, (status = SUCCESS, lastTimestamp = lastTimestamp);
         }
 
         on eGetNowReq do (req: tGetNowReq) {
@@ -49,8 +60,13 @@ machine HybridLogicalClock {
             var nowResponse: (newHlc: tHybridLogicalClock, timestamp: tTimestamp);
             var extractedTimestamp: tTimestamp;
             var comparisonToPrevious: int;
+
             previousTimestamp = GetLastTimestamp(hlc);
+            print format("Got last timestamp {0} from Hybrid Logical Clock with id {1}", previousTimestamp, id);
+
             nowResponse = GetHlcNow(hlc);
+            print format("Now for Hybrid Logical Clock with id {0} is {1}", id, nowResponse);
+
             hlc = nowResponse.newHlc;
             extractedTimestamp = nowResponse.timestamp;
             comparisonToPrevious = CompareTimestamps(extractedTimestamp, previousTimestamp);
@@ -62,8 +78,13 @@ machine HybridLogicalClock {
             var comparisonToPrevious: int;
             var updateResponse: (newHlc: tHybridLogicalClock, updatedTimestamp: tTimestamp);
             var timestamp: tTimestamp;
+
             previousTimestamp = GetLastTimestamp(hlc);
+            print format("Got last timestamp {0} from Hybrid Logical Clock with id {1}", previousTimestamp, id);
+
             updateResponse = UpdateHlc(hlc, req.remoteTs);
+            print format("Updated HLC with id {0} to have last timestamp: {1}", id, updateResponse.updatedTimestamp);
+
             hlc = updateResponse.newHlc;
             timestamp = updateResponse.updatedTimestamp;
             comparisonToPrevious = CompareTimestamps(timestamp, previousTimestamp);
@@ -72,10 +93,10 @@ machine HybridLogicalClock {
     }
 }
 
-fun CreatePhysicalTime(offset: int): tPhysicalTime;
+fun CreatePhysicalTime(offset: int, id: string): tPhysicalTime;
 fun GetPhysicalTimeNow(physicalTime: tPhysicalTime): int;
 
-fun CreateNewTimestamp(time: int, counter: int, id: string): tTimestamp;
+fun CreateTimestamp(time: int, counter: int, id: string): tTimestamp;
 
 fun CreateHybridLogicalClock(id: string, physicalTime: tPhysicalTime, timestamp: tTimestamp): tHybridLogicalClock;
 fun GetLastTimestamp(hlc: tHybridLogicalClock): tTimestamp;

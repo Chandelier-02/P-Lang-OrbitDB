@@ -455,6 +455,7 @@ namespace PImplementation
     internal partial class MemoryStorage : PMachine
     {
         private tMemoryStorage memoryStorage = null;
+        private PrtString name = ((PrtString)"");
         public class ConstructorEvent : PEvent{public ConstructorEvent(PrtString val) : base(val) { }}
         
         protected override Event GetConstructorEvent(IPrtValue value) { return new ConstructorEvent((PrtString)value); }
@@ -562,13 +563,14 @@ namespace PImplementation
         public void Anon(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
-            PrtString name = (PrtString)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtString name_1 = (PrtString)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             PrtString TMP_tmp0 = ((PrtString)"");
             tMemoryStorage TMP_tmp1 = null;
-            TMP_tmp0 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp0 = (PrtString)(((PrtString)((IPrtValue)name_1)?.Clone()));
             TMP_tmp1 = (tMemoryStorage)(GlobalFunctions.CreateMemoryStorage(TMP_tmp0, currentMachine));
             memoryStorage = TMP_tmp1;
+            name_1 = (PrtString)(((PrtString)((IPrtValue)name_1)?.Clone()));
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -641,22 +643,31 @@ namespace PImplementation
             PrtString TMP_tmp1_1 = ((PrtString)"");
             IPrtValue TMP_tmp2 = null;
             tMemoryStorage TMP_tmp3 = null;
-            PMachineValue TMP_tmp4 = null;
-            PMachineValue TMP_tmp5 = null;
-            PEvent TMP_tmp6 = null;
-            PrtInt TMP_tmp7 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp8 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
+            PrtString TMP_tmp4 = ((PrtString)"");
+            IPrtValue TMP_tmp5 = null;
+            PrtString TMP_tmp6 = ((PrtString)"");
+            PrtString TMP_tmp7 = ((PrtString)"");
+            PMachineValue TMP_tmp8 = null;
+            PMachineValue TMP_tmp9 = null;
+            PEvent TMP_tmp10 = null;
+            PrtInt TMP_tmp11 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp12 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
             TMP_tmp0_7 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
             TMP_tmp1_1 = (PrtString)(((PrtNamedTuple)req_6)["key"]);
             TMP_tmp2 = (IPrtValue)(((PrtNamedTuple)req_6)["value"]);
             TMP_tmp3 = (tMemoryStorage)(GlobalFunctions.PutValueInMemoryStorage(TMP_tmp0_7, TMP_tmp1_1, TMP_tmp2, currentMachine));
             memoryStorage = TMP_tmp3;
-            TMP_tmp4 = (PMachineValue)(((PrtNamedTuple)req_6)["source"]);
-            TMP_tmp5 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp4)?.Clone()));
-            TMP_tmp6 = (PEvent)(new ePutValueInStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
-            TMP_tmp7 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp8 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp7)));
-            currentMachine.TrySendEvent(TMP_tmp5, (Event)TMP_tmp6, TMP_tmp8);
+            TMP_tmp4 = (PrtString)(((PrtNamedTuple)req_6)["key"]);
+            TMP_tmp5 = (IPrtValue)(((PrtNamedTuple)req_6)["value"]);
+            TMP_tmp6 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp7 = (PrtString)(((PrtString) String.Format("Put key {0} with value {1} in {2}",TMP_tmp4,TMP_tmp5,TMP_tmp6)));
+            currentMachine.LogLine("" + TMP_tmp7);
+            TMP_tmp8 = (PMachineValue)(((PrtNamedTuple)req_6)["source"]);
+            TMP_tmp9 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp8)?.Clone()));
+            TMP_tmp10 = (PEvent)(new ePutValueInStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
+            TMP_tmp11 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp12 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp11)));
+            currentMachine.TrySendEvent(TMP_tmp9, (Event)TMP_tmp10, TMP_tmp12);
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -665,24 +676,57 @@ namespace PImplementation
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_7 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
+            PrtNamedTuple deleteResp = (new PrtNamedTuple(new string[]{"couldDelete","memoryStorage"},((PrtBool)false), null));
             tMemoryStorage TMP_tmp0_8 = null;
             PrtString TMP_tmp1_2 = ((PrtString)"");
-            tMemoryStorage TMP_tmp2_1 = null;
-            PMachineValue TMP_tmp3_1 = null;
-            PMachineValue TMP_tmp4_1 = null;
-            PEvent TMP_tmp5_1 = null;
-            PrtInt TMP_tmp6_1 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp7_1 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
+            PrtNamedTuple TMP_tmp2_1 = (new PrtNamedTuple(new string[]{"couldDelete","memoryStorage"},((PrtBool)false), null));
+            PrtBool TMP_tmp3_1 = ((PrtBool)false);
+            PrtString TMP_tmp4_1 = ((PrtString)"");
+            PrtString TMP_tmp5_1 = ((PrtString)"");
+            PrtString TMP_tmp6_1 = ((PrtString)"");
+            PMachineValue TMP_tmp7_1 = null;
+            PMachineValue TMP_tmp8_1 = null;
+            PEvent TMP_tmp9_1 = null;
+            PrtInt TMP_tmp10_1 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp11_1 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
+            PrtString TMP_tmp12_1 = ((PrtString)"");
+            PrtString TMP_tmp13 = ((PrtString)"");
+            PrtString TMP_tmp14 = ((PrtString)"");
+            PMachineValue TMP_tmp15 = null;
+            PMachineValue TMP_tmp16 = null;
+            PEvent TMP_tmp17 = null;
+            PrtInt TMP_tmp18 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp19 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
             TMP_tmp0_8 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
             TMP_tmp1_2 = (PrtString)(((PrtNamedTuple)req_7)["key"]);
-            TMP_tmp2_1 = (tMemoryStorage)(GlobalFunctions.DeleteValueFromMemoryStorage(TMP_tmp0_8, TMP_tmp1_2, currentMachine));
-            memoryStorage = TMP_tmp2_1;
-            TMP_tmp3_1 = (PMachineValue)(((PrtNamedTuple)req_7)["source"]);
-            TMP_tmp4_1 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp3_1)?.Clone()));
-            TMP_tmp5_1 = (PEvent)(new eDeleteValueFromStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
-            TMP_tmp6_1 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp7_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp6_1)));
-            currentMachine.TrySendEvent(TMP_tmp4_1, (Event)TMP_tmp5_1, TMP_tmp7_1);
+            TMP_tmp2_1 = (PrtNamedTuple)(GlobalFunctions.DeleteValueFromMemoryStorage(TMP_tmp0_8, TMP_tmp1_2, currentMachine));
+            deleteResp = TMP_tmp2_1;
+            TMP_tmp3_1 = (PrtBool)(((PrtNamedTuple)deleteResp)["couldDelete"]);
+            if (TMP_tmp3_1)
+            {
+                TMP_tmp4_1 = (PrtString)(((PrtNamedTuple)req_7)["key"]);
+                TMP_tmp5_1 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+                TMP_tmp6_1 = (PrtString)(((PrtString) String.Format("Deleted {0} from {1}",TMP_tmp4_1,TMP_tmp5_1)));
+                currentMachine.LogLine("" + TMP_tmp6_1);
+                TMP_tmp7_1 = (PMachineValue)(((PrtNamedTuple)req_7)["source"]);
+                TMP_tmp8_1 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp7_1)?.Clone()));
+                TMP_tmp9_1 = (PEvent)(new eDeleteValueFromStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
+                TMP_tmp10_1 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+                TMP_tmp11_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp10_1)));
+                currentMachine.TrySendEvent(TMP_tmp8_1, (Event)TMP_tmp9_1, TMP_tmp11_1);
+                currentMachine.TryGotoState<WaitForRequest>();
+                return;
+            }
+            TMP_tmp12_1 = (PrtString)(((PrtNamedTuple)req_7)["key"]);
+            TMP_tmp13 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp14 = (PrtString)(((PrtString) String.Format("{0} not in {1}",TMP_tmp12_1,TMP_tmp13)));
+            currentMachine.LogLine("" + TMP_tmp14);
+            TMP_tmp15 = (PMachineValue)(((PrtNamedTuple)req_7)["source"]);
+            TMP_tmp16 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp15)?.Clone()));
+            TMP_tmp17 = (PEvent)(new eDeleteValueFromStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
+            TMP_tmp18 = (PrtInt)((PrtEnum.Get("ERROR")));
+            TMP_tmp19 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp18)));
+            currentMachine.TrySendEvent(TMP_tmp16, (Event)TMP_tmp17, TMP_tmp19);
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -695,23 +739,59 @@ namespace PImplementation
             tMemoryStorage TMP_tmp0_9 = null;
             PrtString TMP_tmp1_3 = ((PrtString)"");
             IPrtValue TMP_tmp2_2 = null;
-            PMachineValue TMP_tmp3_2 = null;
-            PMachineValue TMP_tmp4_2 = null;
-            PEvent TMP_tmp5_2 = null;
-            PrtInt TMP_tmp6_2 = ((PrtInt)0);
-            IPrtValue TMP_tmp7_2 = null;
-            PrtNamedTuple TMP_tmp8_1 = (new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null));
+            PrtBool TMP_tmp3_2 = ((PrtBool)false);
+            PrtString TMP_tmp4_2 = ((PrtString)"");
+            PrtString TMP_tmp5_2 = ((PrtString)"");
+            PrtString TMP_tmp6_2 = ((PrtString)"");
+            PMachineValue TMP_tmp7_2 = null;
+            PMachineValue TMP_tmp8_2 = null;
+            PEvent TMP_tmp9_2 = null;
+            PrtInt TMP_tmp10_2 = ((PrtInt)0);
+            IPrtValue TMP_tmp11_2 = null;
+            PrtNamedTuple TMP_tmp12_2 = (new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null));
+            IPrtValue TMP_tmp13_1 = null;
+            PrtString TMP_tmp14_1 = ((PrtString)"");
+            PrtString TMP_tmp15_1 = ((PrtString)"");
+            PrtString TMP_tmp16_1 = ((PrtString)"");
+            PMachineValue TMP_tmp17_1 = null;
+            PMachineValue TMP_tmp18_1 = null;
+            PEvent TMP_tmp19_1 = null;
+            PrtInt TMP_tmp20 = ((PrtInt)0);
+            IPrtValue TMP_tmp21 = null;
+            PrtNamedTuple TMP_tmp22 = (new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null));
             TMP_tmp0_9 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
             TMP_tmp1_3 = (PrtString)(((PrtNamedTuple)req_8)["key"]);
             TMP_tmp2_2 = (IPrtValue)(GlobalFunctions.GetValueFromMemoryStorage(TMP_tmp0_9, TMP_tmp1_3, currentMachine));
             value = TMP_tmp2_2;
-            TMP_tmp3_2 = (PMachineValue)(((PrtNamedTuple)req_8)["source"]);
-            TMP_tmp4_2 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp3_2)?.Clone()));
-            TMP_tmp5_2 = (PEvent)(new eGetValueFromStorageResp((new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null))));
-            TMP_tmp6_2 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp7_2 = (IPrtValue)(((IPrtValue)((IPrtValue)value)?.Clone()));
-            TMP_tmp8_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","value"}, TMP_tmp6_2, TMP_tmp7_2)));
-            currentMachine.TrySendEvent(TMP_tmp4_2, (Event)TMP_tmp5_2, TMP_tmp8_1);
+            TMP_tmp3_2 = (PrtBool)((PrtValues.SafeEquals(value,((PrtBool)false))));
+            if (TMP_tmp3_2)
+            {
+                TMP_tmp4_2 = (PrtString)(((PrtNamedTuple)req_8)["key"]);
+                TMP_tmp5_2 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+                TMP_tmp6_2 = (PrtString)(((PrtString) String.Format("No value associated with key {0} in {1}",TMP_tmp4_2,TMP_tmp5_2)));
+                currentMachine.LogLine("" + TMP_tmp6_2);
+                TMP_tmp7_2 = (PMachineValue)(((PrtNamedTuple)req_8)["source"]);
+                TMP_tmp8_2 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp7_2)?.Clone()));
+                TMP_tmp9_2 = (PEvent)(new eGetValueFromStorageResp((new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null))));
+                TMP_tmp10_2 = (PrtInt)((PrtEnum.Get("ERROR")));
+                TMP_tmp11_2 = (IPrtValue)(((IPrtValue)((IPrtValue)value)?.Clone()));
+                TMP_tmp12_2 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","value"}, TMP_tmp10_2, TMP_tmp11_2)));
+                currentMachine.TrySendEvent(TMP_tmp8_2, (Event)TMP_tmp9_2, TMP_tmp12_2);
+                currentMachine.TryGotoState<WaitForRequest>();
+                return;
+            }
+            TMP_tmp13_1 = (IPrtValue)(((IPrtValue)((IPrtValue)value)?.Clone()));
+            TMP_tmp14_1 = (PrtString)(((PrtNamedTuple)req_8)["key"]);
+            TMP_tmp15_1 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp16_1 = (PrtString)(((PrtString) String.Format("Got value {0} for key {1} in {2}",TMP_tmp13_1,TMP_tmp14_1,TMP_tmp15_1)));
+            currentMachine.LogLine("" + TMP_tmp16_1);
+            TMP_tmp17_1 = (PMachineValue)(((PrtNamedTuple)req_8)["source"]);
+            TMP_tmp18_1 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp17_1)?.Clone()));
+            TMP_tmp19_1 = (PEvent)(new eGetValueFromStorageResp((new PrtNamedTuple(new string[]{"status","value"},((PrtInt)0), null))));
+            TMP_tmp20 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp21 = (IPrtValue)(((IPrtValue)((IPrtValue)value)?.Clone()));
+            TMP_tmp22 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","value"}, TMP_tmp20, TMP_tmp21)));
+            currentMachine.TrySendEvent(TMP_tmp18_1, (Event)TMP_tmp19_1, TMP_tmp22);
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -722,20 +802,25 @@ namespace PImplementation
             this.gotoPayload = null;
             tMemoryStorage TMP_tmp0_10 = null;
             tMemoryStorage TMP_tmp1_4 = null;
-            PMachineValue TMP_tmp2_3 = null;
-            PMachineValue TMP_tmp3_3 = null;
-            PEvent TMP_tmp4_3 = null;
-            PrtInt TMP_tmp5_3 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp6_3 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
+            PrtString TMP_tmp2_3 = ((PrtString)"");
+            PrtString TMP_tmp3_3 = ((PrtString)"");
+            PMachineValue TMP_tmp4_3 = null;
+            PMachineValue TMP_tmp5_3 = null;
+            PEvent TMP_tmp6_3 = null;
+            PrtInt TMP_tmp7_3 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp8_3 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
             TMP_tmp0_10 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
             TMP_tmp1_4 = (tMemoryStorage)(GlobalFunctions.ClearMemoryStorage(TMP_tmp0_10, currentMachine));
             memoryStorage = TMP_tmp1_4;
-            TMP_tmp2_3 = (PMachineValue)(((PrtNamedTuple)req_9)["source"]);
-            TMP_tmp3_3 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp2_3)?.Clone()));
-            TMP_tmp4_3 = (PEvent)(new eClearAllValuesFromStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
-            TMP_tmp5_3 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp6_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp5_3)));
-            currentMachine.TrySendEvent(TMP_tmp3_3, (Event)TMP_tmp4_3, TMP_tmp6_3);
+            TMP_tmp2_3 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp3_3 = (PrtString)(((PrtString) String.Format("Cleared all data from {0}",TMP_tmp2_3)));
+            currentMachine.LogLine("" + TMP_tmp3_3);
+            TMP_tmp4_3 = (PMachineValue)(((PrtNamedTuple)req_9)["source"]);
+            TMP_tmp5_3 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp4_3)?.Clone()));
+            TMP_tmp6_3 = (PEvent)(new eClearAllValuesFromStorageResp((new PrtNamedTuple(new string[]{"status"},((PrtInt)0)))));
+            TMP_tmp7_3 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp8_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp7_3)));
+            currentMachine.TrySendEvent(TMP_tmp5_3, (Event)TMP_tmp6_3, TMP_tmp8_3);
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -744,27 +829,34 @@ namespace PImplementation
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_10 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtSet retrivedValues = new PrtSet();
+            PrtSeq retrivedValues = new PrtSeq();
             tMemoryStorage TMP_tmp0_11 = null;
-            PrtSet TMP_tmp1_5 = new PrtSet();
-            PrtSet TMP_tmp2_4 = new PrtSet();
-            PMachineValue TMP_tmp3_4 = null;
-            PMachineValue TMP_tmp4_4 = null;
-            PEvent TMP_tmp5_4 = null;
-            PrtInt TMP_tmp6_4 = ((PrtInt)0);
-            PrtSet TMP_tmp7_3 = new PrtSet();
-            PrtNamedTuple TMP_tmp8_2 = (new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSet()));
+            PrtSeq TMP_tmp1_5 = new PrtSeq();
+            PrtSeq TMP_tmp2_4 = new PrtSeq();
+            PrtInt TMP_tmp3_4 = ((PrtInt)0);
+            PrtString TMP_tmp4_4 = ((PrtString)"");
+            PrtString TMP_tmp5_4 = ((PrtString)"");
+            PMachineValue TMP_tmp6_4 = null;
+            PMachineValue TMP_tmp7_4 = null;
+            PEvent TMP_tmp8_4 = null;
+            PrtInt TMP_tmp9_3 = ((PrtInt)0);
+            PrtSeq TMP_tmp10_3 = new PrtSeq();
+            PrtNamedTuple TMP_tmp11_3 = (new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSeq()));
             TMP_tmp0_11 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
-            TMP_tmp1_5 = (PrtSet)(GlobalFunctions.GetAllValuesFromMemoryStorage(TMP_tmp0_11, currentMachine));
-            TMP_tmp2_4 = (PrtSet)(((PrtSet)((PrtSet)((IPrtValue)TMP_tmp1_5)?.Clone())));
+            TMP_tmp1_5 = (PrtSeq)(GlobalFunctions.GetAllValuesFromMemoryStorage(TMP_tmp0_11, currentMachine));
+            TMP_tmp2_4 = (PrtSeq)(((PrtSeq)((PrtSeq)((IPrtValue)TMP_tmp1_5)?.Clone())));
             retrivedValues = TMP_tmp2_4;
-            TMP_tmp3_4 = (PMachineValue)(((PrtNamedTuple)req_10)["source"]);
-            TMP_tmp4_4 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp3_4)?.Clone()));
-            TMP_tmp5_4 = (PEvent)(new eGetAllValuesFromStorageResp((new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSet()))));
-            TMP_tmp6_4 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp7_3 = (PrtSet)(((PrtSet)((IPrtValue)retrivedValues)?.Clone()));
-            TMP_tmp8_2 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","retrivedValues"}, TMP_tmp6_4, TMP_tmp7_3)));
-            currentMachine.TrySendEvent(TMP_tmp4_4, (Event)TMP_tmp5_4, TMP_tmp8_2);
+            TMP_tmp3_4 = (PrtInt)(((PrtInt)(retrivedValues).Count));
+            TMP_tmp4_4 = (PrtString)(((PrtString)((IPrtValue)name)?.Clone()));
+            TMP_tmp5_4 = (PrtString)(((PrtString) String.Format("Retrieved {0} values from {1}",TMP_tmp3_4,TMP_tmp4_4)));
+            currentMachine.LogLine("" + TMP_tmp5_4);
+            TMP_tmp6_4 = (PMachineValue)(((PrtNamedTuple)req_10)["source"]);
+            TMP_tmp7_4 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp6_4)?.Clone()));
+            TMP_tmp8_4 = (PEvent)(new eGetAllValuesFromStorageResp((new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSeq()))));
+            TMP_tmp9_3 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp10_3 = (PrtSeq)(((PrtSeq)((IPrtValue)retrivedValues)?.Clone()));
+            TMP_tmp11_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","retrivedValues"}, TMP_tmp9_3, TMP_tmp10_3)));
+            currentMachine.TrySendEvent(TMP_tmp7_4, (Event)TMP_tmp8_4, TMP_tmp11_3);
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -781,7 +873,7 @@ namespace PImplementation
             PEvent TMP_tmp4_5 = null;
             PrtInt TMP_tmp5_5 = ((PrtInt)0);
             PrtMap TMP_tmp6_5 = new PrtMap();
-            PrtNamedTuple TMP_tmp7_4 = (new PrtNamedTuple(new string[]{"status","dictionary"},((PrtInt)0), new PrtMap()));
+            PrtNamedTuple TMP_tmp7_5 = (new PrtNamedTuple(new string[]{"status","dictionary"},((PrtInt)0), new PrtMap()));
             TMP_tmp0_12 = (tMemoryStorage)(((tMemoryStorage)((IPrtValue)memoryStorage)?.Clone()));
             TMP_tmp1_6 = (PrtMap)(GlobalFunctions.GetDictionaryFromMemoryStorage(TMP_tmp0_12, currentMachine));
             dictionary = TMP_tmp1_6;
@@ -790,8 +882,8 @@ namespace PImplementation
             TMP_tmp4_5 = (PEvent)(new eGetDictionaryFromMemoryStorageResp((new PrtNamedTuple(new string[]{"status","dictionary"},((PrtInt)0), new PrtMap()))));
             TMP_tmp5_5 = (PrtInt)((PrtEnum.Get("SUCCESS")));
             TMP_tmp6_5 = (PrtMap)(((PrtMap)((IPrtValue)dictionary)?.Clone()));
-            TMP_tmp7_4 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","dictionary"}, TMP_tmp5_5, TMP_tmp6_5)));
-            currentMachine.TrySendEvent(TMP_tmp3_5, (Event)TMP_tmp4_5, TMP_tmp7_4);
+            TMP_tmp7_5 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","dictionary"}, TMP_tmp5_5, TMP_tmp6_5)));
+            currentMachine.TrySendEvent(TMP_tmp3_5, (Event)TMP_tmp4_5, TMP_tmp7_5);
         }
         [Start]
         [OnEntry(nameof(InitializeParametersFunction))]
@@ -842,9 +934,9 @@ namespace PImplementation
     internal partial class Heads : PMachine
     {
         private PMachineValue storage = null;
-        public class ConstructorEvent : PEvent{public ConstructorEvent(PrtSet val) : base(val) { }}
+        public class ConstructorEvent : PEvent{public ConstructorEvent(PrtSeq val) : base(val) { }}
         
-        protected override Event GetConstructorEvent(IPrtValue value) { return new ConstructorEvent((PrtSet)value); }
+        protected override Event GetConstructorEvent(IPrtValue value) { return new ConstructorEvent((PrtSeq)value); }
         public Heads() {
             this.sends.Add(nameof(eAddEntryToHeadsReq));
             this.sends.Add(nameof(eAddEntryToHeadsResp));
@@ -950,17 +1042,17 @@ namespace PImplementation
         public async Task Anon_13(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
-            PrtSet heads = (PrtSet)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtSeq heads = (PrtSeq)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             PrtString TMP_tmp0_13 = ((PrtString)"");
             PMachineValue TMP_tmp1_7 = null;
             PMachineValue TMP_tmp2_6 = null;
-            PrtSet TMP_tmp3_6 = new PrtSet();
+            PrtSeq TMP_tmp3_6 = new PrtSeq();
             TMP_tmp0_13 = (PrtString)(((PrtString) String.Format("Heads")));
             TMP_tmp1_7 = (PMachineValue)(currentMachine.CreateInterface<I_MemoryStorage>( currentMachine, TMP_tmp0_13));
             storage = TMP_tmp1_7;
             TMP_tmp2_6 = (PMachineValue)(((PMachineValue)((IPrtValue)storage)?.Clone()));
-            TMP_tmp3_6 = (PrtSet)(((PrtSet)((IPrtValue)heads)?.Clone()));
+            TMP_tmp3_6 = (PrtSeq)(((PrtSeq)((IPrtValue)heads)?.Clone()));
             await PutHeads(TMP_tmp2_6, TMP_tmp3_6);
             currentMachine.TryGotoState<Active>();
             return;
@@ -971,14 +1063,14 @@ namespace PImplementation
             PrtNamedTuple req_12 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             PMachineValue TMP_tmp0_14 = null;
-            PrtSet TMP_tmp1_8 = new PrtSet();
+            PrtSeq TMP_tmp1_8 = new PrtSeq();
             PMachineValue TMP_tmp2_7 = null;
             PMachineValue TMP_tmp3_7 = null;
             PEvent TMP_tmp4_6 = null;
             PrtInt TMP_tmp5_6 = ((PrtInt)0);
             PrtNamedTuple TMP_tmp6_6 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
             TMP_tmp0_14 = (PMachineValue)(((PMachineValue)((IPrtValue)storage)?.Clone()));
-            TMP_tmp1_8 = (PrtSet)(((PrtNamedTuple)req_12)["entries"]);
+            TMP_tmp1_8 = (PrtSeq)(((PrtNamedTuple)req_12)["entries"]);
             await PutHeads(TMP_tmp0_14, TMP_tmp1_8);
             TMP_tmp2_7 = (PMachineValue)(((PrtNamedTuple)req_12)["source"]);
             TMP_tmp3_7 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp2_7)?.Clone()));
@@ -993,14 +1085,14 @@ namespace PImplementation
             PrtNamedTuple req_13 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             PMachineValue TMP_tmp0_15 = null;
-            PrtSet TMP_tmp1_9 = new PrtSet();
+            PrtSeq TMP_tmp1_9 = new PrtSeq();
             PMachineValue TMP_tmp2_8 = null;
             PMachineValue TMP_tmp3_8 = null;
             PEvent TMP_tmp4_7 = null;
             PrtInt TMP_tmp5_7 = ((PrtInt)0);
             PrtNamedTuple TMP_tmp6_7 = (new PrtNamedTuple(new string[]{"status"},((PrtInt)0)));
             TMP_tmp0_15 = (PMachineValue)(((PMachineValue)((IPrtValue)storage)?.Clone()));
-            TMP_tmp1_9 = (PrtSet)(((PrtNamedTuple)req_13)["entries"]);
+            TMP_tmp1_9 = (PrtSeq)(((PrtNamedTuple)req_13)["entries"]);
             await SetHeads(TMP_tmp0_15, TMP_tmp1_9);
             TMP_tmp2_8 = (PMachineValue)(((PrtNamedTuple)req_13)["source"]);
             TMP_tmp3_8 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp2_8)?.Clone()));
@@ -1014,27 +1106,27 @@ namespace PImplementation
             Heads currentMachine = this;
             PrtNamedTuple req_14 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtSet newHeads = new PrtSet();
+            PrtSeq newHeads = new PrtSeq();
             PMachineValue TMP_tmp0_16 = null;
             tEntry TMP_tmp1_10 = null;
-            PrtSet TMP_tmp2_9 = new PrtSet();
+            PrtSeq TMP_tmp2_9 = new PrtSeq();
             PMachineValue TMP_tmp3_9 = null;
             PMachineValue TMP_tmp4_8 = null;
             PEvent TMP_tmp5_8 = null;
             PrtInt TMP_tmp6_8 = ((PrtInt)0);
-            PrtSet TMP_tmp7_5 = new PrtSet();
-            PrtNamedTuple TMP_tmp8_3 = (new PrtNamedTuple(new string[]{"status","newHeads"},((PrtInt)0), new PrtSet()));
+            PrtSeq TMP_tmp7_6 = new PrtSeq();
+            PrtNamedTuple TMP_tmp8_5 = (new PrtNamedTuple(new string[]{"status","newHeads"},((PrtInt)0), new PrtSeq()));
             TMP_tmp0_16 = (PMachineValue)(((PMachineValue)((IPrtValue)storage)?.Clone()));
             TMP_tmp1_10 = (tEntry)(((PrtNamedTuple)req_14)["headEntry"]);
-            TMP_tmp2_9 = (PrtSet)(await AddHead(TMP_tmp0_16, TMP_tmp1_10));
+            TMP_tmp2_9 = (PrtSeq)(await AddHead(TMP_tmp0_16, TMP_tmp1_10));
             newHeads = TMP_tmp2_9;
             TMP_tmp3_9 = (PMachineValue)(((PrtNamedTuple)req_14)["source"]);
             TMP_tmp4_8 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp3_9)?.Clone()));
-            TMP_tmp5_8 = (PEvent)(new eAddEntryToHeadsResp((new PrtNamedTuple(new string[]{"status","newHeads"},((PrtInt)0), new PrtSet()))));
+            TMP_tmp5_8 = (PEvent)(new eAddEntryToHeadsResp((new PrtNamedTuple(new string[]{"status","newHeads"},((PrtInt)0), new PrtSeq()))));
             TMP_tmp6_8 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp7_5 = (PrtSet)(((PrtSet)((IPrtValue)newHeads)?.Clone()));
-            TMP_tmp8_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","newHeads"}, TMP_tmp6_8, TMP_tmp7_5)));
-            currentMachine.TrySendEvent(TMP_tmp4_8, (Event)TMP_tmp5_8, TMP_tmp8_3);
+            TMP_tmp7_6 = (PrtSeq)(((PrtSeq)((IPrtValue)newHeads)?.Clone()));
+            TMP_tmp8_5 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","newHeads"}, TMP_tmp6_8, TMP_tmp7_6)));
+            currentMachine.TrySendEvent(TMP_tmp4_8, (Event)TMP_tmp5_8, TMP_tmp8_5);
         }
         public async Task Anon_17(Event currentMachine_dequeuedEvent)
         {
@@ -1061,117 +1153,107 @@ namespace PImplementation
             Heads currentMachine = this;
             PrtNamedTuple req_16 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtSet allHeads = new PrtSet();
+            PrtSeq allHeads = new PrtSeq();
             PMachineValue TMP_tmp0_18 = null;
-            PrtSet TMP_tmp1_12 = new PrtSet();
+            PrtSeq TMP_tmp1_12 = new PrtSeq();
             PMachineValue TMP_tmp2_11 = null;
             PMachineValue TMP_tmp3_11 = null;
             PEvent TMP_tmp4_10 = null;
             PrtInt TMP_tmp5_10 = ((PrtInt)0);
-            PrtSet TMP_tmp6_9 = new PrtSet();
-            PrtNamedTuple TMP_tmp7_6 = (new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSet()));
+            PrtSeq TMP_tmp6_9 = new PrtSeq();
+            PrtNamedTuple TMP_tmp7_7 = (new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSeq()));
             TMP_tmp0_18 = (PMachineValue)(((PMachineValue)((IPrtValue)storage)?.Clone()));
-            TMP_tmp1_12 = (PrtSet)(await GetAllHeads(TMP_tmp0_18));
+            TMP_tmp1_12 = (PrtSeq)(await GetAllHeads(TMP_tmp0_18));
             allHeads = TMP_tmp1_12;
             TMP_tmp2_11 = (PMachineValue)(((PrtNamedTuple)req_16)["source"]);
             TMP_tmp3_11 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp2_11)?.Clone()));
-            TMP_tmp4_10 = (PEvent)(new eGetAllEntriesFromHeadsResp((new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSet()))));
+            TMP_tmp4_10 = (PEvent)(new eGetAllEntriesFromHeadsResp((new PrtNamedTuple(new string[]{"status","retrivedValues"},((PrtInt)0), new PrtSeq()))));
             TMP_tmp5_10 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp6_9 = (PrtSet)(((PrtSet)((IPrtValue)allHeads)?.Clone()));
-            TMP_tmp7_6 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","retrivedValues"}, TMP_tmp5_10, TMP_tmp6_9)));
-            currentMachine.TrySendEvent(TMP_tmp3_11, (Event)TMP_tmp4_10, TMP_tmp7_6);
+            TMP_tmp6_9 = (PrtSeq)(((PrtSeq)((IPrtValue)allHeads)?.Clone()));
+            TMP_tmp7_7 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","retrivedValues"}, TMP_tmp5_10, TMP_tmp6_9)));
+            currentMachine.TrySendEvent(TMP_tmp3_11, (Event)TMP_tmp4_10, TMP_tmp7_7);
         }
-        public async Task PutHeads(PMachineValue storage_1, PrtSet entries)
+        public async Task PutHeads(PMachineValue storage_1, PrtSeq entries)
         {
             Heads currentMachine = this;
-            PrtSet heads_1 = new PrtSet();
+            PrtSeq heads_1 = new PrtSeq();
             tEntry head = null;
             PrtInt numToPut = ((PrtInt)0);
-            PrtSet TMP_tmp0_19 = new PrtSet();
-            PrtSet TMP_tmp1_13 = new PrtSet();
-            PrtSet TMP_tmp2_12 = new PrtSet();
+            PrtSeq TMP_tmp0_19 = new PrtSeq();
+            PrtSeq TMP_tmp1_13 = new PrtSeq();
+            PrtSeq TMP_tmp2_12 = new PrtSeq();
             PrtInt TMP_i_head_tmp3 = ((PrtInt)0);
             PrtInt sizeof_head_tmp4 = ((PrtInt)0);
             PrtInt TMP_tmp5_11 = ((PrtInt)0);
             PrtInt TMP_tmp6_10 = ((PrtInt)0);
-            PrtBool TMP_tmp7_7 = ((PrtBool)false);
-            PrtBool TMP_tmp8_4 = ((PrtBool)false);
-            PrtInt TMP_tmp9 = ((PrtInt)0);
-            tEntry TMP_tmp10 = null;
-            tEntry TMP_tmp11 = null;
-            PMachineValue TMP_tmp12 = null;
-            PEvent TMP_tmp13 = null;
-            PMachineValue TMP_tmp14 = null;
-            tEntry TMP_tmp15 = null;
-            PrtString TMP_tmp16 = ((PrtString)"");
-            tEntry TMP_tmp17 = null;
-            PrtNamedTuple TMP_tmp18 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
-            PrtInt TMP_tmp19 = ((PrtInt)0);
-            PrtBool TMP_tmp20 = ((PrtBool)false);
-            PrtString TMP_tmp21 = ((PrtString)"");
-            PrtString TMP_tmp22 = ((PrtString)"");
-            PrtString TMP_tmp23 = ((PrtString)"");
-            TMP_tmp0_19 = (PrtSet)(((PrtSet)((IPrtValue)entries)?.Clone()));
-            TMP_tmp1_13 = (PrtSet)(GlobalFunctions.FindHeads(TMP_tmp0_19, currentMachine));
+            PrtBool TMP_tmp7_8 = ((PrtBool)false);
+            PrtBool TMP_tmp8_6 = ((PrtBool)false);
+            PrtInt TMP_tmp9_4 = ((PrtInt)0);
+            tEntry TMP_tmp10_4 = null;
+            tEntry TMP_tmp11_4 = null;
+            PMachineValue TMP_tmp12_3 = null;
+            PEvent TMP_tmp13_2 = null;
+            PMachineValue TMP_tmp14_2 = null;
+            tEntry TMP_tmp15_2 = null;
+            PrtString TMP_tmp16_2 = ((PrtString)"");
+            tEntry TMP_tmp17_2 = null;
+            PrtNamedTuple TMP_tmp18_2 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
+            tEntry TMP_tmp19_2 = null;
+            PrtString TMP_tmp20_1 = ((PrtString)"");
+            TMP_tmp0_19 = (PrtSeq)(((PrtSeq)((IPrtValue)entries)?.Clone()));
+            TMP_tmp1_13 = (PrtSeq)(GlobalFunctions.FindHeads(TMP_tmp0_19, currentMachine));
             heads_1 = TMP_tmp1_13;
-            TMP_tmp2_12 = (PrtSet)(((PrtSet)((IPrtValue)heads_1)?.Clone()));
+            TMP_tmp2_12 = (PrtSeq)(((PrtSeq)((IPrtValue)heads_1)?.Clone()));
             TMP_i_head_tmp3 = (PrtInt)(((PrtInt)(-1)));
             TMP_tmp5_11 = (PrtInt)(((PrtInt)(TMP_tmp2_12).Count));
             sizeof_head_tmp4 = TMP_tmp5_11;
             while (((PrtBool)true))
             {
                 TMP_tmp6_10 = (PrtInt)((sizeof_head_tmp4) - (((PrtInt)(1))));
-                TMP_tmp7_7 = (PrtBool)((TMP_i_head_tmp3) < (TMP_tmp6_10));
-                TMP_tmp8_4 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp7_7)?.Clone()));
-                if (TMP_tmp8_4)
+                TMP_tmp7_8 = (PrtBool)((TMP_i_head_tmp3) < (TMP_tmp6_10));
+                TMP_tmp8_6 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp7_8)?.Clone()));
+                if (TMP_tmp8_6)
                 {
                 }
                 else
                 {
                     break;
                 }
-                TMP_tmp9 = (PrtInt)((TMP_i_head_tmp3) + (((PrtInt)(1))));
-                TMP_i_head_tmp3 = TMP_tmp9;
-                TMP_tmp10 = (tEntry)(((PrtSet)TMP_tmp2_12)[TMP_i_head_tmp3]);
-                TMP_tmp11 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp10)?.Clone()));
-                head = TMP_tmp11;
-                TMP_tmp12 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_1)?.Clone()));
-                TMP_tmp13 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
-                TMP_tmp14 = (PMachineValue)(currentMachine.self);
-                TMP_tmp15 = (tEntry)(((tEntry)((IPrtValue)head)?.Clone()));
-                TMP_tmp16 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp15, currentMachine));
-                TMP_tmp17 = (tEntry)(((tEntry)((IPrtValue)head)?.Clone()));
-                TMP_tmp18 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp14, TMP_tmp16, TMP_tmp17)));
-                currentMachine.TrySendEvent(TMP_tmp12, (Event)TMP_tmp13, TMP_tmp18);
+                TMP_tmp9_4 = (PrtInt)((TMP_i_head_tmp3) + (((PrtInt)(1))));
+                TMP_i_head_tmp3 = TMP_tmp9_4;
+                TMP_tmp10_4 = (tEntry)(((PrtSeq)TMP_tmp2_12)[TMP_i_head_tmp3]);
+                TMP_tmp11_4 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp10_4)?.Clone()));
+                head = TMP_tmp11_4;
+                TMP_tmp12_3 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_1)?.Clone()));
+                TMP_tmp13_2 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
+                TMP_tmp14_2 = (PMachineValue)(currentMachine.self);
+                TMP_tmp15_2 = (tEntry)(((tEntry)((IPrtValue)head)?.Clone()));
+                TMP_tmp16_2 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp15_2, currentMachine));
+                TMP_tmp17_2 = (tEntry)(((tEntry)((IPrtValue)head)?.Clone()));
+                TMP_tmp18_2 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp14_2, TMP_tmp16_2, TMP_tmp17_2)));
+                currentMachine.TrySendEvent(TMP_tmp12_3, (Event)TMP_tmp13_2, TMP_tmp18_2);
                 var PGEN_recvEvent = await currentMachine.TryReceiveEvent(typeof(ePutEntriesInHeadsResp), typeof(PHalt));
                 switch (PGEN_recvEvent) {
                     case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                     case ePutEntriesInHeadsResp PGEN_evt: {
                         PrtNamedTuple resp = (PrtNamedTuple)(PGEN_evt.Payload);
-                        TMP_tmp19 = (PrtInt)(((PrtNamedTuple)resp)["status"]);
-                        TMP_tmp20 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp19),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                        TMP_tmp21 = (PrtString)(((PrtString) String.Format("PSrc/oplog/heads.p:85:21")));
-                        TMP_tmp22 = (PrtString)(((PrtString) String.Format("Failed to put head in storage.")));
-                        TMP_tmp23 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp21,TMP_tmp22)));
-                        currentMachine.TryAssert(TMP_tmp20,"Assertion Failed: " + TMP_tmp23);
+                        TMP_tmp19_2 = (tEntry)(((tEntry)((IPrtValue)head)?.Clone()));
+                        TMP_tmp20_1 = (PrtString)(((PrtString) String.Format("Head {0} put in heads storage",TMP_tmp19_2)));
+                        currentMachine.LogLine("" + TMP_tmp20_1);
                     } break;
                 }
             }
         }
-        public async Task SetHeads(PMachineValue storage_2, PrtSet entries_1)
+        public async Task SetHeads(PMachineValue storage_2, PrtSeq entries_1)
         {
             Heads currentMachine = this;
             PMachineValue TMP_tmp0_20 = null;
             PEvent TMP_tmp1_14 = null;
             PMachineValue TMP_tmp2_13 = null;
             PrtNamedTuple TMP_tmp3_12 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp4_11 = ((PrtInt)0);
-            PrtBool TMP_tmp5_12 = ((PrtBool)false);
-            PrtString TMP_tmp6_11 = ((PrtString)"");
-            PrtString TMP_tmp7_8 = ((PrtString)"");
-            PrtString TMP_tmp8_5 = ((PrtString)"");
-            PMachineValue TMP_tmp9_1 = null;
-            PrtSet TMP_tmp10_1 = new PrtSet();
+            PrtString TMP_tmp4_11 = ((PrtString)"");
+            PMachineValue TMP_tmp5_12 = null;
+            PrtSeq TMP_tmp6_11 = new PrtSeq();
             TMP_tmp0_20 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_2)?.Clone()));
             TMP_tmp1_14 = (PEvent)(new eClearAllValuesFromStorageReq((new PrtNamedTuple(new string[]{"source"},null))));
             TMP_tmp2_13 = (PMachineValue)(currentMachine.self);
@@ -1182,33 +1264,27 @@ namespace PImplementation
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eClearAllValuesFromStorageResp PGEN_evt_1: {
                     PrtNamedTuple resp_1 = (PrtNamedTuple)(PGEN_evt_1.Payload);
-                    TMP_tmp4_11 = (PrtInt)(((PrtNamedTuple)resp_1)["status"]);
-                    TMP_tmp5_12 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_11),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp6_11 = (PrtString)(((PrtString) String.Format("PSrc/oplog/heads.p:95:17")));
-                    TMP_tmp7_8 = (PrtString)(((PrtString) String.Format("Failed to clear heads storage.")));
-                    TMP_tmp8_5 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_11,TMP_tmp7_8)));
-                    currentMachine.TryAssert(TMP_tmp5_12,"Assertion Failed: " + TMP_tmp8_5);
+                    TMP_tmp4_11 = (PrtString)(((PrtString) String.Format("Cleared all heads from heads storage")));
+                    currentMachine.LogLine("" + TMP_tmp4_11);
                 } break;
             }
-            TMP_tmp9_1 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_2)?.Clone()));
-            TMP_tmp10_1 = (PrtSet)(((PrtSet)((IPrtValue)entries_1)?.Clone()));
-            await PutHeads(TMP_tmp9_1, TMP_tmp10_1);
+            TMP_tmp5_12 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_2)?.Clone()));
+            TMP_tmp6_11 = (PrtSeq)(((PrtSeq)((IPrtValue)entries_1)?.Clone()));
+            await PutHeads(TMP_tmp5_12, TMP_tmp6_11);
         }
-        public async Task<PrtSet> GetAllHeads(PMachineValue storage_3)
+        public async Task<PrtSeq> GetAllHeads(PMachineValue storage_3)
         {
             Heads currentMachine = this;
-            PrtSet returnValues = new PrtSet();
+            PrtSeq returnValues = new PrtSeq();
             PMachineValue TMP_tmp0_21 = null;
             PEvent TMP_tmp1_15 = null;
             PMachineValue TMP_tmp2_14 = null;
             PrtNamedTuple TMP_tmp3_13 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp4_12 = ((PrtInt)0);
-            PrtBool TMP_tmp5_13 = ((PrtBool)false);
+            PrtSeq TMP_tmp4_12 = new PrtSeq();
+            PrtInt TMP_tmp5_13 = ((PrtInt)0);
             PrtString TMP_tmp6_12 = ((PrtString)"");
-            PrtString TMP_tmp7_9 = ((PrtString)"");
-            PrtString TMP_tmp8_6 = ((PrtString)"");
-            PrtSet TMP_tmp9_2 = new PrtSet();
-            PrtSet TMP_tmp10_2 = new PrtSet();
+            PrtSeq TMP_tmp7_9 = new PrtSeq();
+            PrtSeq TMP_tmp8_7 = new PrtSeq();
             TMP_tmp0_21 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_3)?.Clone()));
             TMP_tmp1_15 = (PEvent)(new eGetAllValuesFromStorageReq((new PrtNamedTuple(new string[]{"source"},null))));
             TMP_tmp2_14 = (PMachineValue)(currentMachine.self);
@@ -1219,52 +1295,60 @@ namespace PImplementation
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eGetAllValuesFromStorageResp PGEN_evt_2: {
                     PrtNamedTuple resp_2 = (PrtNamedTuple)(PGEN_evt_2.Payload);
-                    TMP_tmp4_12 = (PrtInt)(((PrtNamedTuple)resp_2)["status"]);
-                    TMP_tmp5_13 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_12),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp6_12 = (PrtString)(((PrtString) String.Format("PSrc/oplog/heads.p:106:17")));
-                    TMP_tmp7_9 = (PrtString)(((PrtString) String.Format("Failed to retrieve all heads from storage.")));
-                    TMP_tmp8_6 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_12,TMP_tmp7_9)));
-                    currentMachine.TryAssert(TMP_tmp5_13,"Assertion Failed: " + TMP_tmp8_6);
-                    TMP_tmp9_2 = (PrtSet)(((PrtNamedTuple)resp_2)["retrivedValues"]);
-                    TMP_tmp10_2 = (PrtSet)(((PrtSet)((PrtSet)((IPrtValue)TMP_tmp9_2)?.Clone())));
-                    returnValues = TMP_tmp10_2;
+                    TMP_tmp4_12 = (PrtSeq)(((PrtNamedTuple)resp_2)["retrivedValues"]);
+                    TMP_tmp5_13 = (PrtInt)(((PrtInt)(TMP_tmp4_12).Count));
+                    TMP_tmp6_12 = (PrtString)(((PrtString) String.Format("Got {0} heads from heads storage",TMP_tmp5_13)));
+                    currentMachine.LogLine("" + TMP_tmp6_12);
+                    TMP_tmp7_9 = (PrtSeq)(((PrtNamedTuple)resp_2)["retrivedValues"]);
+                    TMP_tmp8_7 = (PrtSeq)(((PrtSeq)((PrtSeq)((IPrtValue)TMP_tmp7_9)?.Clone())));
+                    returnValues = TMP_tmp8_7;
                 } break;
             }
-            return ((PrtSet)((IPrtValue)returnValues)?.Clone());
+            return ((PrtSeq)((IPrtValue)returnValues)?.Clone());
         }
-        public async Task<PrtSet> AddHead(PMachineValue storage_4, tEntry head_1)
+        public async Task<PrtSeq> AddHead(PMachineValue storage_4, tEntry head_1)
         {
             Heads currentMachine = this;
-            PrtSet retrievedHeads = new PrtSet();
-            PrtSet newHeads_1 = new PrtSet();
-            PrtSet combinedHeadsToFind = new PrtSet();
+            PrtSeq retrievedHeads = new PrtSeq();
+            PrtSeq newHeads_1 = new PrtSeq();
+            PrtSeq combinedHeadsToFind = new PrtSeq();
             PMachineValue TMP_tmp0_22 = null;
-            PrtSet TMP_tmp1_16 = new PrtSet();
+            PrtSeq TMP_tmp1_16 = new PrtSeq();
             PrtBool TMP_tmp2_15 = ((PrtBool)false);
             tEntry TMP_tmp3_14 = null;
-            PrtSet TMP_tmp4_13 = new PrtSet();
-            PrtSet TMP_tmp5_14 = new PrtSet();
-            PMachineValue TMP_tmp6_13 = null;
-            PrtSet TMP_tmp7_10 = new PrtSet();
+            PrtString TMP_tmp4_13 = ((PrtString)"");
+            tEntry TMP_tmp5_14 = null;
+            PrtSeq TMP_tmp6_13 = new PrtSeq();
+            PrtSeq TMP_tmp7_10 = new PrtSeq();
+            PMachineValue TMP_tmp8_8 = null;
+            PrtSeq TMP_tmp9_5 = new PrtSeq();
+            tEntry TMP_tmp10_5 = null;
+            PrtString TMP_tmp11_5 = ((PrtString)"");
             TMP_tmp0_22 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_4)?.Clone()));
-            TMP_tmp1_16 = (PrtSet)(await GetAllHeads(TMP_tmp0_22));
+            TMP_tmp1_16 = (PrtSeq)(await GetAllHeads(TMP_tmp0_22));
             retrievedHeads = TMP_tmp1_16;
-            combinedHeadsToFind = (PrtSet)(((PrtSet)((IPrtValue)retrievedHeads)?.Clone()));
-            TMP_tmp2_15 = (PrtBool)(((PrtBool)(((PrtSet)retrievedHeads).Contains(head_1))));
+            combinedHeadsToFind = (PrtSeq)(((PrtSeq)((IPrtValue)retrievedHeads)?.Clone()));
+            TMP_tmp2_15 = (PrtBool)(((PrtBool)(((PrtSeq)retrievedHeads).Contains(head_1))));
             if (TMP_tmp2_15)
             {
-                return ((PrtSet)((IPrtValue)retrievedHeads)?.Clone());
+                TMP_tmp3_14 = (tEntry)(((tEntry)((IPrtValue)head_1)?.Clone()));
+                TMP_tmp4_13 = (PrtString)(((PrtString) String.Format("Head {0} already in head storage",TMP_tmp3_14)));
+                currentMachine.LogLine("" + TMP_tmp4_13);
+                return ((PrtSeq)((IPrtValue)retrievedHeads)?.Clone());
             }
-            combinedHeadsToFind = (PrtSet)(((PrtSet)((IPrtValue)retrievedHeads)?.Clone()));
-            TMP_tmp3_14 = (tEntry)(((tEntry)((IPrtValue)head_1)?.Clone()));
-            ((PrtSet)combinedHeadsToFind).Add(TMP_tmp3_14);
-            TMP_tmp4_13 = (PrtSet)(((PrtSet)((IPrtValue)combinedHeadsToFind)?.Clone()));
-            TMP_tmp5_14 = (PrtSet)(GlobalFunctions.FindHeads(TMP_tmp4_13, currentMachine));
-            newHeads_1 = TMP_tmp5_14;
-            TMP_tmp6_13 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_4)?.Clone()));
-            TMP_tmp7_10 = (PrtSet)(((PrtSet)((IPrtValue)newHeads_1)?.Clone()));
-            await SetHeads(TMP_tmp6_13, TMP_tmp7_10);
-            return ((PrtSet)((IPrtValue)newHeads_1)?.Clone());
+            combinedHeadsToFind = (PrtSeq)(((PrtSeq)((IPrtValue)retrievedHeads)?.Clone()));
+            TMP_tmp5_14 = (tEntry)(((tEntry)((IPrtValue)head_1)?.Clone()));
+            ((PrtSeq)combinedHeadsToFind).Insert(((PrtInt)(0)), TMP_tmp5_14);
+            TMP_tmp6_13 = (PrtSeq)(((PrtSeq)((IPrtValue)combinedHeadsToFind)?.Clone()));
+            TMP_tmp7_10 = (PrtSeq)(GlobalFunctions.FindHeads(TMP_tmp6_13, currentMachine));
+            newHeads_1 = TMP_tmp7_10;
+            TMP_tmp8_8 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_4)?.Clone()));
+            TMP_tmp9_5 = (PrtSeq)(((PrtSeq)((IPrtValue)newHeads_1)?.Clone()));
+            await SetHeads(TMP_tmp8_8, TMP_tmp9_5);
+            TMP_tmp10_5 = (tEntry)(((tEntry)((IPrtValue)head_1)?.Clone()));
+            TMP_tmp11_5 = (PrtString)(((PrtString) String.Format("Successfully added head {0} to heads storage",TMP_tmp10_5)));
+            currentMachine.LogLine("" + TMP_tmp11_5);
+            return ((PrtSeq)((IPrtValue)newHeads_1)?.Clone());
         }
         public async Task ClearHeads(PMachineValue storage_5)
         {
@@ -1273,11 +1357,7 @@ namespace PImplementation
             PEvent TMP_tmp1_17 = null;
             PMachineValue TMP_tmp2_16 = null;
             PrtNamedTuple TMP_tmp3_15 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp4_14 = ((PrtInt)0);
-            PrtBool TMP_tmp5_15 = ((PrtBool)false);
-            PrtString TMP_tmp6_14 = ((PrtString)"");
-            PrtString TMP_tmp7_11 = ((PrtString)"");
-            PrtString TMP_tmp8_7 = ((PrtString)"");
+            PrtString TMP_tmp4_14 = ((PrtString)"");
             TMP_tmp0_23 = (PMachineValue)(((PMachineValue)((IPrtValue)storage_5)?.Clone()));
             TMP_tmp1_17 = (PEvent)(new eClearAllValuesFromStorageReq((new PrtNamedTuple(new string[]{"source"},null))));
             TMP_tmp2_16 = (PMachineValue)(currentMachine.self);
@@ -1288,12 +1368,8 @@ namespace PImplementation
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eClearAllValuesFromStorageResp PGEN_evt_3: {
                     PrtNamedTuple resp_3 = (PrtNamedTuple)(PGEN_evt_3.Payload);
-                    TMP_tmp4_14 = (PrtInt)(((PrtNamedTuple)resp_3)["status"]);
-                    TMP_tmp5_15 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_14),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp6_14 = (PrtString)(((PrtString) String.Format("PSrc/oplog/heads.p:133:17")));
-                    TMP_tmp7_11 = (PrtString)(((PrtString) String.Format("Failed to clear heads storage.")));
-                    TMP_tmp8_7 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_14,TMP_tmp7_11)));
-                    currentMachine.TryAssert(TMP_tmp5_15,"Assertion Failed: " + TMP_tmp8_7);
+                    TMP_tmp4_14 = (PrtString)(((PrtString) String.Format("Cleared all heads from heads storage")));
+                    currentMachine.LogLine("" + TMP_tmp4_14);
                 } break;
             }
         }
@@ -1443,13 +1519,13 @@ namespace PImplementation
             PrtString TMP_tmp2_17 = ((PrtString)"");
             PrtString TMP_tmp3_16 = ((PrtString)"");
             PrtString TMP_tmp4_15 = ((PrtString)"");
-            PMachineValue TMP_tmp5_16 = null;
-            PrtString TMP_tmp6_15 = ((PrtString)"");
-            PMachineValue TMP_tmp7_12 = null;
-            PrtString TMP_tmp8_8 = ((PrtString)"");
-            PMachineValue TMP_tmp9_3 = null;
-            PrtSet TMP_tmp10_3 = new PrtSet();
-            PMachineValue TMP_tmp11_1 = null;
+            PMachineValue TMP_tmp5_15 = null;
+            PrtString TMP_tmp6_14 = ((PrtString)"");
+            PMachineValue TMP_tmp7_11 = null;
+            PrtString TMP_tmp8_9 = ((PrtString)"");
+            PMachineValue TMP_tmp9_6 = null;
+            PrtSeq TMP_tmp10_6 = new PrtSeq();
+            PMachineValue TMP_tmp11_6 = null;
             TMP_tmp0_24 = (PrtString)(((PrtNamedTuple)init)["identityIn"]);
             TMP_tmp1_18 = (PrtString)(((PrtString)((IPrtValue)TMP_tmp0_24)?.Clone()));
             identity = TMP_tmp1_18;
@@ -1457,17 +1533,17 @@ namespace PImplementation
             TMP_tmp3_16 = (PrtString)(((PrtString)((IPrtValue)TMP_tmp2_17)?.Clone()));
             logId = TMP_tmp3_16;
             TMP_tmp4_15 = (PrtString)(((PrtString)((IPrtValue)identity)?.Clone()));
-            TMP_tmp5_16 = (PMachineValue)(currentMachine.CreateInterface<I_HybridLogicalClock>( currentMachine, TMP_tmp4_15));
-            clock = TMP_tmp5_16;
-            TMP_tmp6_15 = (PrtString)(((PrtString) String.Format("Entry Storage")));
-            TMP_tmp7_12 = (PMachineValue)(currentMachine.CreateInterface<I_MemoryStorage>( currentMachine, TMP_tmp6_15));
-            entries_2 = TMP_tmp7_12;
-            TMP_tmp8_8 = (PrtString)(((PrtString) String.Format("Index Storage")));
-            TMP_tmp9_3 = (PMachineValue)(currentMachine.CreateInterface<I_MemoryStorage>( currentMachine, TMP_tmp8_8));
-            index = TMP_tmp9_3;
-            TMP_tmp10_3 = (PrtSet)(((PrtNamedTuple)init)["logHeads"]);
-            TMP_tmp11_1 = (PMachineValue)(currentMachine.CreateInterface<I_Heads>( currentMachine, TMP_tmp10_3));
-            heads_2 = TMP_tmp11_1;
+            TMP_tmp5_15 = (PMachineValue)(currentMachine.CreateInterface<I_HybridLogicalClock>( currentMachine, TMP_tmp4_15));
+            clock = TMP_tmp5_15;
+            TMP_tmp6_14 = (PrtString)(((PrtString) String.Format("Entry Storage")));
+            TMP_tmp7_11 = (PMachineValue)(currentMachine.CreateInterface<I_MemoryStorage>( currentMachine, TMP_tmp6_14));
+            entries_2 = TMP_tmp7_11;
+            TMP_tmp8_9 = (PrtString)(((PrtString) String.Format("Index Storage")));
+            TMP_tmp9_6 = (PMachineValue)(currentMachine.CreateInterface<I_MemoryStorage>( currentMachine, TMP_tmp8_9));
+            index = TMP_tmp9_6;
+            TMP_tmp10_6 = (PrtSeq)(((PrtNamedTuple)init)["logHeads"]);
+            TMP_tmp11_6 = (PMachineValue)(currentMachine.CreateInterface<I_Heads>( currentMachine, TMP_tmp10_6));
+            heads_2 = TMP_tmp11_6;
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
@@ -1482,36 +1558,184 @@ namespace PImplementation
             PMachineValue TMP_tmp2_18 = null;
             PEvent TMP_tmp3_17 = null;
             PrtInt TMP_tmp4_16 = ((PrtInt)0);
-            tTimestamp TMP_tmp5_17 = null;
-            PrtNamedTuple TMP_tmp6_16 = (new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null));
+            tTimestamp TMP_tmp5_16 = null;
+            PrtNamedTuple TMP_tmp6_15 = (new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null));
             TMP_tmp0_25 = (tTimestamp)(await GetClockLastState());
             lastTimestamp = TMP_tmp0_25;
             TMP_tmp1_19 = (PMachineValue)(((PrtNamedTuple)req_17)["source"]);
             TMP_tmp2_18 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp1_19)?.Clone()));
             TMP_tmp3_17 = (PEvent)(new eGetClockLastStateResp((new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null))));
             TMP_tmp4_16 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp5_17 = (tTimestamp)(((tTimestamp)((IPrtValue)lastTimestamp)?.Clone()));
-            TMP_tmp6_16 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp4_16, TMP_tmp5_17)));
-            currentMachine.TrySendEvent(TMP_tmp2_18, (Event)TMP_tmp3_17, TMP_tmp6_16);
+            TMP_tmp5_16 = (tTimestamp)(((tTimestamp)((IPrtValue)lastTimestamp)?.Clone()));
+            TMP_tmp6_15 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp4_16, TMP_tmp5_16)));
+            currentMachine.TrySendEvent(TMP_tmp2_18, (Event)TMP_tmp3_17, TMP_tmp6_15);
         }
         public async Task Anon_21(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_18 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            await GetHeadsFromLog();
+            PrtSeq heads_3 = new PrtSeq();
+            PrtSeq TMP_tmp0_26 = new PrtSeq();
+            PMachineValue TMP_tmp1_20 = null;
+            PMachineValue TMP_tmp2_19 = null;
+            PEvent TMP_tmp3_18 = null;
+            PrtInt TMP_tmp4_17 = ((PrtInt)0);
+            PrtSeq TMP_tmp5_17 = new PrtSeq();
+            PrtNamedTuple TMP_tmp6_16 = (new PrtNamedTuple(new string[]{"status","heads"},((PrtInt)0), new PrtSeq()));
+            TMP_tmp0_26 = (PrtSeq)(await GetHeadsFromLog());
+            heads_3 = TMP_tmp0_26;
+            TMP_tmp1_20 = (PMachineValue)(((PrtNamedTuple)req_18)["source"]);
+            TMP_tmp2_19 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp1_20)?.Clone()));
+            TMP_tmp3_18 = (PEvent)(new eGetHeadsFromLogResp((new PrtNamedTuple(new string[]{"status","heads"},((PrtInt)0), new PrtSeq()))));
+            TMP_tmp4_17 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp5_17 = (PrtSeq)(((PrtSeq)((IPrtValue)heads_3)?.Clone()));
+            TMP_tmp6_16 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","heads"}, TMP_tmp4_17, TMP_tmp5_17)));
+            currentMachine.TrySendEvent(TMP_tmp2_19, (Event)TMP_tmp3_18, TMP_tmp6_16);
         }
-        public void Anon_22(Event currentMachine_dequeuedEvent)
+        public async Task Anon_22(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_19 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
+            PrtSeq entries_3 = new PrtSeq();
+            PrtSeq traversedEntries = new PrtSeq();
+            PrtSeq rootEntries = new PrtSeq();
+            PrtMap dictionary_1 = new PrtMap();
+            tTraversalStopper stopper = null;
+            tEntry traversedEntry = null;
+            tTraversalStopper TMP_tmp0_27 = null;
+            PrtSeq TMP_tmp1_21 = new PrtSeq();
+            PrtSeq TMP_tmp2_20 = new PrtSeq();
+            PrtMap TMP_tmp3_19 = new PrtMap();
+            tTraversalStopper TMP_tmp4_18 = null;
+            PrtBool TMP_tmp5_18 = ((PrtBool)false);
+            PrtSeq TMP_tmp6_17 = new PrtSeq();
+            PrtSeq TMP_tmp7_12 = new PrtSeq();
+            PrtInt TMP_i_traversedEntry_tmp8 = ((PrtInt)0);
+            PrtInt sizeof_traversedEntry_tmp9 = ((PrtInt)0);
+            PrtInt TMP_tmp10_7 = ((PrtInt)0);
+            PrtInt TMP_tmp11_7 = ((PrtInt)0);
+            PrtBool TMP_tmp12_4 = ((PrtBool)false);
+            PrtBool TMP_tmp13_3 = ((PrtBool)false);
+            PrtInt TMP_tmp14_3 = ((PrtInt)0);
+            tEntry TMP_tmp15_3 = null;
+            tEntry TMP_tmp16_3 = null;
+            tEntry TMP_tmp17_3 = null;
+            PMachineValue TMP_tmp18_3 = null;
+            PMachineValue TMP_tmp19_3 = null;
+            PEvent TMP_tmp20_2 = null;
+            PrtInt TMP_tmp21_1 = ((PrtInt)0);
+            PrtSeq TMP_tmp22_1 = new PrtSeq();
+            PrtNamedTuple TMP_tmp23 = (new PrtNamedTuple(new string[]{"status","entries"},((PrtInt)0), new PrtSeq()));
+            TMP_tmp0_27 = (tTraversalStopper)(GlobalFunctions.CreateDefaultTraversalStopper(currentMachine));
+            stopper = TMP_tmp0_27;
+            TMP_tmp1_21 = (PrtSeq)(await GetHeadsFromLog());
+            rootEntries = TMP_tmp1_21;
+            TMP_tmp2_20 = (PrtSeq)(((PrtSeq)((IPrtValue)rootEntries)?.Clone()));
+            TMP_tmp3_19 = (PrtMap)(((PrtMap)((IPrtValue)dictionary_1)?.Clone()));
+            TMP_tmp4_18 = (tTraversalStopper)(((tTraversalStopper)((IPrtValue)stopper)?.Clone()));
+            TMP_tmp5_18 = (PrtBool)(((PrtBool)true));
+            TMP_tmp6_17 = (PrtSeq)(GlobalFunctions.Traverse(TMP_tmp2_20, TMP_tmp3_19, TMP_tmp4_18, TMP_tmp5_18, currentMachine));
+            traversedEntries = TMP_tmp6_17;
+            TMP_tmp7_12 = (PrtSeq)(((PrtSeq)((IPrtValue)traversedEntries)?.Clone()));
+            TMP_i_traversedEntry_tmp8 = (PrtInt)(((PrtInt)(-1)));
+            TMP_tmp10_7 = (PrtInt)(((PrtInt)(TMP_tmp7_12).Count));
+            sizeof_traversedEntry_tmp9 = TMP_tmp10_7;
+            while (((PrtBool)true))
+            {
+                TMP_tmp11_7 = (PrtInt)((sizeof_traversedEntry_tmp9) - (((PrtInt)(1))));
+                TMP_tmp12_4 = (PrtBool)((TMP_i_traversedEntry_tmp8) < (TMP_tmp11_7));
+                TMP_tmp13_3 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp12_4)?.Clone()));
+                if (TMP_tmp13_3)
+                {
+                }
+                else
+                {
+                    break;
+                }
+                TMP_tmp14_3 = (PrtInt)((TMP_i_traversedEntry_tmp8) + (((PrtInt)(1))));
+                TMP_i_traversedEntry_tmp8 = TMP_tmp14_3;
+                TMP_tmp15_3 = (tEntry)(((PrtSeq)TMP_tmp7_12)[TMP_i_traversedEntry_tmp8]);
+                TMP_tmp16_3 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp15_3)?.Clone()));
+                traversedEntry = TMP_tmp16_3;
+                TMP_tmp17_3 = (tEntry)(((tEntry)((IPrtValue)traversedEntry)?.Clone()));
+                ((PrtSeq)entries_3).Insert(((PrtInt)(0)), TMP_tmp17_3);
+            }
+            TMP_tmp18_3 = (PMachineValue)(((PrtNamedTuple)req_19)["source"]);
+            TMP_tmp19_3 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp18_3)?.Clone()));
+            TMP_tmp20_2 = (PEvent)(new eGetAllEntriesFromLogResp((new PrtNamedTuple(new string[]{"status","entries"},((PrtInt)0), new PrtSeq()))));
+            TMP_tmp21_1 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp22_1 = (PrtSeq)(((PrtSeq)((IPrtValue)entries_3)?.Clone()));
+            TMP_tmp23 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","entries"}, TMP_tmp21_1, TMP_tmp22_1)));
+            currentMachine.TrySendEvent(TMP_tmp19_3, (Event)TMP_tmp20_2, TMP_tmp23);
         }
-        public void Anon_23(Event currentMachine_dequeuedEvent)
+        public async Task Anon_23(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_20 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
+            tEntry foundEntry = null;
+            PMachineValue TMP_tmp0_28 = null;
+            PEvent TMP_tmp1_22 = null;
+            PMachineValue TMP_tmp2_21 = null;
+            PrtString TMP_tmp3_20 = ((PrtString)"");
+            PrtNamedTuple TMP_tmp4_19 = (new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")));
+            PrtInt TMP_tmp5_19 = ((PrtInt)0);
+            PrtBool TMP_tmp6_18 = ((PrtBool)false);
+            IPrtValue TMP_tmp7_13 = null;
+            tEntry TMP_tmp8_10 = null;
+            PMachineValue TMP_tmp9_7 = null;
+            PMachineValue TMP_tmp10_8 = null;
+            PEvent TMP_tmp11_8 = null;
+            PrtInt TMP_tmp12_5 = ((PrtInt)0);
+            tEntry TMP_tmp13_4 = null;
+            PrtNamedTuple TMP_tmp14_4 = (new PrtNamedTuple(new string[]{"status","foundEntry"},((PrtInt)0), null));
+            PMachineValue TMP_tmp15_4 = null;
+            PMachineValue TMP_tmp16_4 = null;
+            PEvent TMP_tmp17_4 = null;
+            PrtInt TMP_tmp18_4 = ((PrtInt)0);
+            tEntry TMP_tmp19_4 = null;
+            PrtNamedTuple TMP_tmp20_3 = (new PrtNamedTuple(new string[]{"status","foundEntry"},((PrtInt)0), null));
+            TMP_tmp0_28 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
+            TMP_tmp1_22 = (PEvent)(new eGetValueFromStorageReq((new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")))));
+            TMP_tmp2_21 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_20 = (PrtString)(((PrtNamedTuple)req_20)["hash"]);
+            TMP_tmp4_19 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key"}, TMP_tmp2_21, TMP_tmp3_20)));
+            currentMachine.TrySendEvent(TMP_tmp0_28, (Event)TMP_tmp1_22, TMP_tmp4_19);
+            var PGEN_recvEvent_4 = await currentMachine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
+            switch (PGEN_recvEvent_4) {
+                case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
+                case eGetValueFromStorageResp PGEN_evt_4: {
+                    PrtNamedTuple resp_4 = (PrtNamedTuple)(PGEN_evt_4.Payload);
+                    TMP_tmp5_19 = (PrtInt)(((PrtNamedTuple)resp_4)["status"]);
+                    TMP_tmp6_18 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_19),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    if (TMP_tmp6_18)
+                    {
+                        TMP_tmp7_13 = (IPrtValue)(((PrtNamedTuple)resp_4)["value"]);
+                        TMP_tmp8_10 = (tEntry)(((tEntry)((IPrtValue)((IPrtValue)TMP_tmp7_13)?.Clone())));
+                        foundEntry = TMP_tmp8_10;
+                        TMP_tmp9_7 = (PMachineValue)(((PrtNamedTuple)req_20)["source"]);
+                        TMP_tmp10_8 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp9_7)?.Clone()));
+                        TMP_tmp11_8 = (PEvent)(new eGetEntryFromLogResp((new PrtNamedTuple(new string[]{"status","foundEntry"},((PrtInt)0), null))));
+                        TMP_tmp12_5 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+                        TMP_tmp13_4 = (tEntry)(((tEntry)((IPrtValue)foundEntry)?.Clone()));
+                        TMP_tmp14_4 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","foundEntry"}, TMP_tmp12_5, TMP_tmp13_4)));
+                        currentMachine.TrySendEvent(TMP_tmp10_8, (Event)TMP_tmp11_8, TMP_tmp14_4);
+                        currentMachine.TryGotoState<WaitForRequest>();
+                        return;
+                    }
+                    TMP_tmp15_4 = (PMachineValue)(((PrtNamedTuple)req_20)["source"]);
+                    TMP_tmp16_4 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp15_4)?.Clone()));
+                    TMP_tmp17_4 = (PEvent)(new eGetEntryFromLogResp((new PrtNamedTuple(new string[]{"status","foundEntry"},((PrtInt)0), null))));
+                    TMP_tmp18_4 = (PrtInt)((PrtEnum.Get("ERROR")));
+                    TMP_tmp19_4 = (tEntry)(((tEntry)((IPrtValue)foundEntry)?.Clone()));
+                    TMP_tmp20_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","foundEntry"}, TMP_tmp18_4, TMP_tmp19_4)));
+                    currentMachine.TrySendEvent(TMP_tmp16_4, (Event)TMP_tmp17_4, TMP_tmp20_3);
+                    currentMachine.TryGotoState<WaitForRequest>();
+                    return;
+                } break;
+            }
         }
         public void Anon_24(Event currentMachine_dequeuedEvent)
         {
@@ -1547,77 +1771,79 @@ namespace PImplementation
         {
             Log currentMachine = this;
             tTimestamp lastTimestamp_1 = null;
-            PMachineValue TMP_tmp0_26 = null;
-            PEvent TMP_tmp1_20 = null;
-            PMachineValue TMP_tmp2_19 = null;
-            PrtNamedTuple TMP_tmp3_18 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp4_17 = ((PrtInt)0);
-            PrtBool TMP_tmp5_18 = ((PrtBool)false);
-            PrtString TMP_tmp6_17 = ((PrtString)"");
-            PrtString TMP_tmp7_13 = ((PrtString)"");
-            PrtString TMP_tmp8_9 = ((PrtString)"");
-            tTimestamp TMP_tmp9_4 = null;
-            tTimestamp TMP_tmp10_4 = null;
-            TMP_tmp0_26 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
-            TMP_tmp1_20 = (PEvent)(new eGetLastTimestampReq((new PrtNamedTuple(new string[]{"source"},null))));
-            TMP_tmp2_19 = (PMachineValue)(currentMachine.self);
-            TMP_tmp3_18 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp2_19)));
-            currentMachine.TrySendEvent(TMP_tmp0_26, (Event)TMP_tmp1_20, TMP_tmp3_18);
-            var PGEN_recvEvent_4 = await currentMachine.TryReceiveEvent(typeof(eGetLastTimestampResp), typeof(PHalt));
-            switch (PGEN_recvEvent_4) {
+            PMachineValue TMP_tmp0_29 = null;
+            PEvent TMP_tmp1_23 = null;
+            PMachineValue TMP_tmp2_22 = null;
+            PrtNamedTuple TMP_tmp3_21 = (new PrtNamedTuple(new string[]{"source"},null));
+            PrtInt TMP_tmp4_20 = ((PrtInt)0);
+            PrtBool TMP_tmp5_20 = ((PrtBool)false);
+            PrtString TMP_tmp6_19 = ((PrtString)"");
+            PrtString TMP_tmp7_14 = ((PrtString)"");
+            PrtString TMP_tmp8_11 = ((PrtString)"");
+            tTimestamp TMP_tmp9_8 = null;
+            tTimestamp TMP_tmp10_9 = null;
+            TMP_tmp0_29 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
+            TMP_tmp1_23 = (PEvent)(new eGetLastTimestampReq((new PrtNamedTuple(new string[]{"source"},null))));
+            TMP_tmp2_22 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_21 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp2_22)));
+            currentMachine.TrySendEvent(TMP_tmp0_29, (Event)TMP_tmp1_23, TMP_tmp3_21);
+            var PGEN_recvEvent_5 = await currentMachine.TryReceiveEvent(typeof(eGetLastTimestampResp), typeof(PHalt));
+            switch (PGEN_recvEvent_5) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
-                case eGetLastTimestampResp PGEN_evt_4: {
-                    PrtNamedTuple resp_4 = (PrtNamedTuple)(PGEN_evt_4.Payload);
-                    TMP_tmp4_17 = (PrtInt)(((PrtNamedTuple)resp_4)["status"]);
-                    TMP_tmp5_18 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_17),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp6_17 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:147:17")));
-                    TMP_tmp7_13 = (PrtString)(((PrtString) String.Format("Failed to get last timestamp from clock.")));
-                    TMP_tmp8_9 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_17,TMP_tmp7_13)));
-                    currentMachine.TryAssert(TMP_tmp5_18,"Assertion Failed: " + TMP_tmp8_9);
-                    TMP_tmp9_4 = (tTimestamp)(((PrtNamedTuple)resp_4)["lastTimestamp"]);
-                    TMP_tmp10_4 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp9_4)?.Clone()));
-                    lastTimestamp_1 = TMP_tmp10_4;
+                case eGetLastTimestampResp PGEN_evt_5: {
+                    PrtNamedTuple resp_5 = (PrtNamedTuple)(PGEN_evt_5.Payload);
+                    TMP_tmp4_20 = (PrtInt)(((PrtNamedTuple)resp_5)["status"]);
+                    TMP_tmp5_20 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_20),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp6_19 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:173:17")));
+                    TMP_tmp7_14 = (PrtString)(((PrtString) String.Format("Failed to get last timestamp from clock.")));
+                    TMP_tmp8_11 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_19,TMP_tmp7_14)));
+                    currentMachine.TryAssert(TMP_tmp5_20,"Assertion Failed: " + TMP_tmp8_11);
+                    TMP_tmp9_8 = (tTimestamp)(((PrtNamedTuple)resp_5)["lastTimestamp"]);
+                    TMP_tmp10_9 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp9_8)?.Clone()));
+                    lastTimestamp_1 = TMP_tmp10_9;
                 } break;
             }
             return ((tTimestamp)((IPrtValue)lastTimestamp_1)?.Clone());
         }
-        public async Task<PrtSet> GetHeadsFromLog()
+        public async Task<PrtSeq> GetHeadsFromLog()
         {
             Log currentMachine = this;
-            PrtSet headsToReturn = new PrtSet();
-            PMachineValue TMP_tmp0_27 = null;
-            PEvent TMP_tmp1_21 = null;
-            PMachineValue TMP_tmp2_20 = null;
-            PrtNamedTuple TMP_tmp3_19 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp4_18 = ((PrtInt)0);
-            PrtBool TMP_tmp5_19 = ((PrtBool)false);
-            PrtString TMP_tmp6_18 = ((PrtString)"");
-            PrtString TMP_tmp7_14 = ((PrtString)"");
-            PrtString TMP_tmp8_10 = ((PrtString)"");
-            PrtSet TMP_tmp9_5 = new PrtSet();
-            PrtSet TMP_tmp10_5 = new PrtSet();
-            TMP_tmp0_27 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
-            TMP_tmp1_21 = (PEvent)(new eGetAllEntriesFromHeadsReq((new PrtNamedTuple(new string[]{"source"},null))));
-            TMP_tmp2_20 = (PMachineValue)(currentMachine.self);
-            TMP_tmp3_19 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp2_20)));
-            currentMachine.TrySendEvent(TMP_tmp0_27, (Event)TMP_tmp1_21, TMP_tmp3_19);
-            var PGEN_recvEvent_5 = await currentMachine.TryReceiveEvent(typeof(eGetAllEntriesFromHeadsResp), typeof(PHalt));
-            switch (PGEN_recvEvent_5) {
+            PrtSeq headsToReturn = new PrtSeq();
+            PMachineValue TMP_tmp0_30 = null;
+            PEvent TMP_tmp1_24 = null;
+            PMachineValue TMP_tmp2_23 = null;
+            PrtNamedTuple TMP_tmp3_22 = (new PrtNamedTuple(new string[]{"source"},null));
+            PrtInt TMP_tmp4_21 = ((PrtInt)0);
+            PrtBool TMP_tmp5_21 = ((PrtBool)false);
+            PrtString TMP_tmp6_20 = ((PrtString)"");
+            PrtString TMP_tmp7_15 = ((PrtString)"");
+            PrtString TMP_tmp8_12 = ((PrtString)"");
+            PrtSeq TMP_tmp9_9 = new PrtSeq();
+            PrtBool TMP_tmp10_10 = ((PrtBool)false);
+            PrtSeq TMP_tmp11_9 = new PrtSeq();
+            TMP_tmp0_30 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
+            TMP_tmp1_24 = (PEvent)(new eGetAllEntriesFromHeadsReq((new PrtNamedTuple(new string[]{"source"},null))));
+            TMP_tmp2_23 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_22 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp2_23)));
+            currentMachine.TrySendEvent(TMP_tmp0_30, (Event)TMP_tmp1_24, TMP_tmp3_22);
+            var PGEN_recvEvent_6 = await currentMachine.TryReceiveEvent(typeof(eGetAllEntriesFromHeadsResp), typeof(PHalt));
+            switch (PGEN_recvEvent_6) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
-                case eGetAllEntriesFromHeadsResp PGEN_evt_5: {
-                    PrtNamedTuple resp_5 = (PrtNamedTuple)(PGEN_evt_5.Payload);
-                    TMP_tmp4_18 = (PrtInt)(((PrtNamedTuple)resp_5)["status"]);
-                    TMP_tmp5_19 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_18),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp6_18 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:159:17")));
-                    TMP_tmp7_14 = (PrtString)(((PrtString) String.Format("Failed to get heads from log.")));
-                    TMP_tmp8_10 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_18,TMP_tmp7_14)));
-                    currentMachine.TryAssert(TMP_tmp5_19,"Assertion Failed: " + TMP_tmp8_10);
-                    TMP_tmp9_5 = (PrtSet)(((PrtNamedTuple)resp_5)["retrivedValues"]);
-                    TMP_tmp10_5 = (PrtSet)(((PrtSet)((IPrtValue)TMP_tmp9_5)?.Clone()));
-                    headsToReturn = TMP_tmp10_5;
+                case eGetAllEntriesFromHeadsResp PGEN_evt_6: {
+                    PrtNamedTuple resp_6 = (PrtNamedTuple)(PGEN_evt_6.Payload);
+                    TMP_tmp4_21 = (PrtInt)(((PrtNamedTuple)resp_6)["status"]);
+                    TMP_tmp5_21 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp4_21),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp6_20 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:185:17")));
+                    TMP_tmp7_15 = (PrtString)(((PrtString) String.Format("Failed to get heads from log.")));
+                    TMP_tmp8_12 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp6_20,TMP_tmp7_15)));
+                    currentMachine.TryAssert(TMP_tmp5_21,"Assertion Failed: " + TMP_tmp8_12);
+                    TMP_tmp9_9 = (PrtSeq)(((PrtNamedTuple)resp_6)["retrivedValues"]);
+                    TMP_tmp10_10 = (PrtBool)(((PrtBool)true));
+                    TMP_tmp11_9 = (PrtSeq)(GlobalFunctions.Sorted(TMP_tmp9_9, TMP_tmp10_10, currentMachine));
+                    headsToReturn = TMP_tmp11_9;
                 } break;
             }
-            return ((PrtSet)((IPrtValue)headsToReturn)?.Clone());
+            return ((PrtSeq)((IPrtValue)headsToReturn)?.Clone());
         }
         public void GetAllEntriesFromLog()
         {
@@ -1627,40 +1853,40 @@ namespace PImplementation
         {
             Log currentMachine = this;
             tEntry entryToReturn = null;
-            PMachineValue TMP_tmp0_28 = null;
-            PEvent TMP_tmp1_22 = null;
-            PMachineValue TMP_tmp2_21 = null;
-            PrtString TMP_tmp3_20 = ((PrtString)"");
-            PrtNamedTuple TMP_tmp4_19 = (new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")));
-            PrtInt TMP_tmp5_20 = ((PrtInt)0);
-            PrtBool TMP_tmp6_19 = ((PrtBool)false);
-            PrtString TMP_tmp7_15 = ((PrtString)"");
-            PrtString TMP_tmp8_11 = ((PrtString)"");
-            PrtString TMP_tmp9_6 = ((PrtString)"");
-            PrtString TMP_tmp10_6 = ((PrtString)"");
-            IPrtValue TMP_tmp11_2 = null;
-            tEntry TMP_tmp12_1 = null;
-            TMP_tmp0_28 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
-            TMP_tmp1_22 = (PEvent)(new eGetValueFromStorageReq((new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")))));
-            TMP_tmp2_21 = (PMachineValue)(currentMachine.self);
-            TMP_tmp3_20 = (PrtString)(((PrtString)((IPrtValue)hash)?.Clone()));
-            TMP_tmp4_19 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key"}, TMP_tmp2_21, TMP_tmp3_20)));
-            currentMachine.TrySendEvent(TMP_tmp0_28, (Event)TMP_tmp1_22, TMP_tmp4_19);
-            var PGEN_recvEvent_6 = await currentMachine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
-            switch (PGEN_recvEvent_6) {
+            PMachineValue TMP_tmp0_31 = null;
+            PEvent TMP_tmp1_25 = null;
+            PMachineValue TMP_tmp2_24 = null;
+            PrtString TMP_tmp3_23 = ((PrtString)"");
+            PrtNamedTuple TMP_tmp4_22 = (new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")));
+            PrtInt TMP_tmp5_22 = ((PrtInt)0);
+            PrtBool TMP_tmp6_21 = ((PrtBool)false);
+            PrtString TMP_tmp7_16 = ((PrtString)"");
+            PrtString TMP_tmp8_13 = ((PrtString)"");
+            PrtString TMP_tmp9_10 = ((PrtString)"");
+            PrtString TMP_tmp10_11 = ((PrtString)"");
+            IPrtValue TMP_tmp11_10 = null;
+            tEntry TMP_tmp12_6 = null;
+            TMP_tmp0_31 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
+            TMP_tmp1_25 = (PEvent)(new eGetValueFromStorageReq((new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")))));
+            TMP_tmp2_24 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_23 = (PrtString)(((PrtString)((IPrtValue)hash)?.Clone()));
+            TMP_tmp4_22 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key"}, TMP_tmp2_24, TMP_tmp3_23)));
+            currentMachine.TrySendEvent(TMP_tmp0_31, (Event)TMP_tmp1_25, TMP_tmp4_22);
+            var PGEN_recvEvent_7 = await currentMachine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
+            switch (PGEN_recvEvent_7) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
-                case eGetValueFromStorageResp PGEN_evt_6: {
-                    PrtNamedTuple resp_6 = (PrtNamedTuple)(PGEN_evt_6.Payload);
-                    TMP_tmp5_20 = (PrtInt)(((PrtNamedTuple)resp_6)["status"]);
-                    TMP_tmp6_19 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_20),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp7_15 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:173:17")));
-                    TMP_tmp8_11 = (PrtString)(((PrtString)((IPrtValue)hash)?.Clone()));
-                    TMP_tmp9_6 = (PrtString)(((PrtString) String.Format("Failed to retrive entry with hash {0}",TMP_tmp8_11)));
-                    TMP_tmp10_6 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp7_15,TMP_tmp9_6)));
-                    currentMachine.TryAssert(TMP_tmp6_19,"Assertion Failed: " + TMP_tmp10_6);
-                    TMP_tmp11_2 = (IPrtValue)(((PrtNamedTuple)resp_6)["value"]);
-                    TMP_tmp12_1 = (tEntry)(((tEntry)((IPrtValue)((IPrtValue)TMP_tmp11_2)?.Clone())));
-                    entryToReturn = TMP_tmp12_1;
+                case eGetValueFromStorageResp PGEN_evt_7: {
+                    PrtNamedTuple resp_7 = (PrtNamedTuple)(PGEN_evt_7.Payload);
+                    TMP_tmp5_22 = (PrtInt)(((PrtNamedTuple)resp_7)["status"]);
+                    TMP_tmp6_21 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_22),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp7_16 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:199:17")));
+                    TMP_tmp8_13 = (PrtString)(((PrtString)((IPrtValue)hash)?.Clone()));
+                    TMP_tmp9_10 = (PrtString)(((PrtString) String.Format("Failed to retrive entry with hash {0}",TMP_tmp8_13)));
+                    TMP_tmp10_11 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp7_16,TMP_tmp9_10)));
+                    currentMachine.TryAssert(TMP_tmp6_21,"Assertion Failed: " + TMP_tmp10_11);
+                    TMP_tmp11_10 = (IPrtValue)(((PrtNamedTuple)resp_7)["value"]);
+                    TMP_tmp12_6 = (tEntry)(((tEntry)((IPrtValue)((IPrtValue)TMP_tmp11_10)?.Clone())));
+                    entryToReturn = TMP_tmp12_6;
                 } break;
             }
             return ((tEntry)((IPrtValue)entryToReturn)?.Clone());
@@ -1669,40 +1895,40 @@ namespace PImplementation
         {
             Log currentMachine = this;
             PrtBool logHasEntry = ((PrtBool)false);
-            PMachineValue TMP_tmp0_29 = null;
-            PEvent TMP_tmp1_23 = null;
-            PMachineValue TMP_tmp2_22 = null;
-            PrtString TMP_tmp3_21 = ((PrtString)"");
-            PrtNamedTuple TMP_tmp4_20 = (new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")));
-            PrtInt TMP_tmp5_21 = ((PrtInt)0);
-            PrtBool TMP_tmp6_20 = ((PrtBool)false);
-            PrtString TMP_tmp7_16 = ((PrtString)"");
-            PrtString TMP_tmp8_12 = ((PrtString)"");
-            PrtString TMP_tmp9_7 = ((PrtString)"");
-            PrtString TMP_tmp10_7 = ((PrtString)"");
-            IPrtValue TMP_tmp11_3 = null;
-            PrtBool TMP_tmp12_2 = ((PrtBool)false);
-            TMP_tmp0_29 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
-            TMP_tmp1_23 = (PEvent)(new eGetValueFromStorageReq((new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")))));
-            TMP_tmp2_22 = (PMachineValue)(currentMachine.self);
-            TMP_tmp3_21 = (PrtString)(((PrtString)((IPrtValue)hash_1)?.Clone()));
-            TMP_tmp4_20 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key"}, TMP_tmp2_22, TMP_tmp3_21)));
-            currentMachine.TrySendEvent(TMP_tmp0_29, (Event)TMP_tmp1_23, TMP_tmp4_20);
-            var PGEN_recvEvent_7 = await currentMachine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
-            switch (PGEN_recvEvent_7) {
+            PMachineValue TMP_tmp0_32 = null;
+            PEvent TMP_tmp1_26 = null;
+            PMachineValue TMP_tmp2_25 = null;
+            PrtString TMP_tmp3_24 = ((PrtString)"");
+            PrtNamedTuple TMP_tmp4_23 = (new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")));
+            PrtInt TMP_tmp5_23 = ((PrtInt)0);
+            PrtBool TMP_tmp6_22 = ((PrtBool)false);
+            PrtString TMP_tmp7_17 = ((PrtString)"");
+            PrtString TMP_tmp8_14 = ((PrtString)"");
+            PrtString TMP_tmp9_11 = ((PrtString)"");
+            PrtString TMP_tmp10_12 = ((PrtString)"");
+            IPrtValue TMP_tmp11_11 = null;
+            PrtBool TMP_tmp12_7 = ((PrtBool)false);
+            TMP_tmp0_32 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
+            TMP_tmp1_26 = (PEvent)(new eGetValueFromStorageReq((new PrtNamedTuple(new string[]{"source","key"},null, ((PrtString)"")))));
+            TMP_tmp2_25 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_24 = (PrtString)(((PrtString)((IPrtValue)hash_1)?.Clone()));
+            TMP_tmp4_23 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key"}, TMP_tmp2_25, TMP_tmp3_24)));
+            currentMachine.TrySendEvent(TMP_tmp0_32, (Event)TMP_tmp1_26, TMP_tmp4_23);
+            var PGEN_recvEvent_8 = await currentMachine.TryReceiveEvent(typeof(eGetValueFromStorageResp), typeof(PHalt));
+            switch (PGEN_recvEvent_8) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
-                case eGetValueFromStorageResp PGEN_evt_7: {
-                    PrtNamedTuple resp_7 = (PrtNamedTuple)(PGEN_evt_7.Payload);
-                    TMP_tmp5_21 = (PrtInt)(((PrtNamedTuple)resp_7)["status"]);
-                    TMP_tmp6_20 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_21),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp7_16 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:186:17")));
-                    TMP_tmp8_12 = (PrtString)(((PrtString)((IPrtValue)hash_1)?.Clone()));
-                    TMP_tmp9_7 = (PrtString)(((PrtString) String.Format("Failed to retrive entry with hash {0}",TMP_tmp8_12)));
-                    TMP_tmp10_7 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp7_16,TMP_tmp9_7)));
-                    currentMachine.TryAssert(TMP_tmp6_20,"Assertion Failed: " + TMP_tmp10_7);
-                    TMP_tmp11_3 = (IPrtValue)(((PrtNamedTuple)resp_7)["value"]);
-                    TMP_tmp12_2 = (PrtBool)(((PrtBool)((IPrtValue)((IPrtValue)TMP_tmp11_3)?.Clone())));
-                    logHasEntry = TMP_tmp12_2;
+                case eGetValueFromStorageResp PGEN_evt_8: {
+                    PrtNamedTuple resp_8 = (PrtNamedTuple)(PGEN_evt_8.Payload);
+                    TMP_tmp5_23 = (PrtInt)(((PrtNamedTuple)resp_8)["status"]);
+                    TMP_tmp6_22 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_23),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp7_17 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:212:17")));
+                    TMP_tmp8_14 = (PrtString)(((PrtString)((IPrtValue)hash_1)?.Clone()));
+                    TMP_tmp9_11 = (PrtString)(((PrtString) String.Format("Failed to retrive entry with hash {0}",TMP_tmp8_14)));
+                    TMP_tmp10_12 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp7_17,TMP_tmp9_11)));
+                    currentMachine.TryAssert(TMP_tmp6_22,"Assertion Failed: " + TMP_tmp10_12);
+                    TMP_tmp11_11 = (IPrtValue)(((PrtNamedTuple)resp_8)["value"]);
+                    TMP_tmp12_7 = (PrtBool)(((PrtBool)((IPrtValue)((IPrtValue)TMP_tmp11_11)?.Clone())));
+                    logHasEntry = TMP_tmp12_7;
                 } break;
             }
             return ((PrtBool)((IPrtValue)logHasEntry)?.Clone());
@@ -1710,244 +1936,217 @@ namespace PImplementation
         public async Task<tEntry> AppendEntry(PrtString entryData, PrtInt numReferences)
         {
             Log currentMachine = this;
-            PrtSet logHeads = new PrtSet();
+            PrtSeq logHeads = new PrtSeq();
             tEntry itrEntry = null;
             PrtSet nexts = new PrtSet();
             PrtSet refs = new PrtSet();
             tEntry createdEntry = null;
             PrtInt totalNumReferences = ((PrtInt)0);
             tTimestamp now = null;
-            PrtSet entrySet = new PrtSet();
-            PrtMap dictionary_1 = new PrtMap();
-            PrtSet TMP_tmp0_30 = new PrtSet();
-            PMachineValue TMP_tmp1_24 = null;
-            PEvent TMP_tmp2_23 = null;
-            PMachineValue TMP_tmp3_22 = null;
-            PrtNamedTuple TMP_tmp4_21 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp5_22 = ((PrtInt)0);
-            PrtBool TMP_tmp6_21 = ((PrtBool)false);
-            PrtString TMP_tmp7_17 = ((PrtString)"");
-            PrtString TMP_tmp8_13 = ((PrtString)"");
-            PrtString TMP_tmp9_8 = ((PrtString)"");
-            PrtMap TMP_tmp10_8 = new PrtMap();
-            PrtMap TMP_tmp11_4 = new PrtMap();
-            PrtSet TMP_tmp12_3 = new PrtSet();
-            PrtInt TMP_i_itrEntry_tmp13 = ((PrtInt)0);
-            PrtInt sizeof_itrEntry_tmp14 = ((PrtInt)0);
-            PrtInt TMP_tmp15_1 = ((PrtInt)0);
-            PrtInt TMP_tmp16_1 = ((PrtInt)0);
-            PrtBool TMP_tmp17_1 = ((PrtBool)false);
-            PrtBool TMP_tmp18_1 = ((PrtBool)false);
-            PrtInt TMP_tmp19_1 = ((PrtInt)0);
-            tEntry TMP_tmp20_1 = null;
-            tEntry TMP_tmp21_1 = null;
-            tEntry TMP_tmp22_1 = null;
-            PrtString TMP_tmp23_1 = ((PrtString)"");
-            PrtInt TMP_tmp24 = ((PrtInt)0);
+            PrtSeq entrySet = new PrtSeq();
+            PrtMap dictionary_2 = new PrtMap();
+            PrtSeq TMP_tmp0_33 = new PrtSeq();
+            PrtSeq TMP_tmp1_27 = new PrtSeq();
+            PrtMap TMP_tmp2_26 = new PrtMap();
+            PrtSeq TMP_tmp3_25 = new PrtSeq();
+            PrtInt TMP_i_itrEntry_tmp4 = ((PrtInt)0);
+            PrtInt sizeof_itrEntry_tmp5 = ((PrtInt)0);
+            PrtInt TMP_tmp6_23 = ((PrtInt)0);
+            PrtInt TMP_tmp7_18 = ((PrtInt)0);
+            PrtBool TMP_tmp8_15 = ((PrtBool)false);
+            PrtBool TMP_tmp9_12 = ((PrtBool)false);
+            PrtInt TMP_tmp10_13 = ((PrtInt)0);
+            tEntry TMP_tmp11_12 = null;
+            tEntry TMP_tmp12_8 = null;
+            tEntry TMP_tmp13_5 = null;
+            PrtString TMP_tmp14_5 = ((PrtString)"");
+            PrtInt TMP_tmp15_5 = ((PrtInt)0);
+            PrtInt TMP_tmp16_5 = ((PrtInt)0);
+            PrtSeq TMP_tmp17_5 = new PrtSeq();
+            PrtMap TMP_tmp18_5 = new PrtMap();
+            PrtInt TMP_tmp19_5 = ((PrtInt)0);
+            PrtSet TMP_tmp20_4 = new PrtSet();
+            PMachineValue TMP_tmp21_2 = null;
+            PEvent TMP_tmp22_2 = null;
+            PMachineValue TMP_tmp23_1 = null;
+            PrtNamedTuple TMP_tmp24 = (new PrtNamedTuple(new string[]{"source"},null));
             PrtInt TMP_tmp25 = ((PrtInt)0);
-            PrtSet TMP_tmp26 = new PrtSet();
-            PrtMap TMP_tmp27 = new PrtMap();
-            PrtInt TMP_tmp28 = ((PrtInt)0);
-            PrtSet TMP_tmp29 = new PrtSet();
-            PMachineValue TMP_tmp30 = null;
-            PEvent TMP_tmp31 = null;
-            PMachineValue TMP_tmp32 = null;
-            PrtNamedTuple TMP_tmp33 = (new PrtNamedTuple(new string[]{"source"},null));
-            PrtInt TMP_tmp34 = ((PrtInt)0);
-            PrtBool TMP_tmp35 = ((PrtBool)false);
-            PrtString TMP_tmp36 = ((PrtString)"");
-            PrtString TMP_tmp37 = ((PrtString)"");
-            PrtString TMP_tmp38 = ((PrtString)"");
-            tTimestamp TMP_tmp39 = null;
-            tTimestamp TMP_tmp40 = null;
-            PrtString TMP_tmp41 = ((PrtString)"");
-            PrtString TMP_tmp42 = ((PrtString)"");
-            PrtString TMP_tmp43 = ((PrtString)"");
-            tTimestamp TMP_tmp44 = null;
-            PrtSet TMP_tmp45 = new PrtSet();
-            PrtSet TMP_tmp46 = new PrtSet();
-            tEntry TMP_tmp47 = null;
-            tEntry TMP_tmp48 = null;
-            PMachineValue TMP_tmp49 = null;
-            PEvent TMP_tmp50 = null;
-            PMachineValue TMP_tmp51 = null;
-            PrtSet TMP_tmp52 = new PrtSet();
-            PrtNamedTuple TMP_tmp53 = (new PrtNamedTuple(new string[]{"source","entries"},null, new PrtSet()));
-            PrtInt TMP_tmp54 = ((PrtInt)0);
-            PrtBool TMP_tmp55 = ((PrtBool)false);
-            PrtString TMP_tmp56 = ((PrtString)"");
-            PrtString TMP_tmp57 = ((PrtString)"");
-            PrtString TMP_tmp58 = ((PrtString)"");
-            PMachineValue TMP_tmp59 = null;
-            PEvent TMP_tmp60 = null;
-            PMachineValue TMP_tmp61 = null;
-            tEntry TMP_tmp62 = null;
-            PrtString TMP_tmp63 = ((PrtString)"");
-            tEntry TMP_tmp64 = null;
-            PrtNamedTuple TMP_tmp65 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
-            PrtInt TMP_tmp66 = ((PrtInt)0);
+            PrtBool TMP_tmp26 = ((PrtBool)false);
+            PrtString TMP_tmp27 = ((PrtString)"");
+            PrtString TMP_tmp28 = ((PrtString)"");
+            PrtString TMP_tmp29 = ((PrtString)"");
+            tTimestamp TMP_tmp30 = null;
+            tTimestamp TMP_tmp31 = null;
+            PrtString TMP_tmp32 = ((PrtString)"");
+            PrtString TMP_tmp33 = ((PrtString)"");
+            PrtString TMP_tmp34 = ((PrtString)"");
+            tTimestamp TMP_tmp35 = null;
+            PrtSet TMP_tmp36 = new PrtSet();
+            PrtSet TMP_tmp37 = new PrtSet();
+            tEntry TMP_tmp38 = null;
+            tEntry TMP_tmp39 = null;
+            PMachineValue TMP_tmp40 = null;
+            PEvent TMP_tmp41 = null;
+            PMachineValue TMP_tmp42 = null;
+            PrtSeq TMP_tmp43 = new PrtSeq();
+            PrtNamedTuple TMP_tmp44 = (new PrtNamedTuple(new string[]{"source","entries"},null, new PrtSeq()));
+            PrtInt TMP_tmp45 = ((PrtInt)0);
+            PrtBool TMP_tmp46 = ((PrtBool)false);
+            PrtString TMP_tmp47 = ((PrtString)"");
+            PrtString TMP_tmp48 = ((PrtString)"");
+            PrtString TMP_tmp49 = ((PrtString)"");
+            PMachineValue TMP_tmp50 = null;
+            PEvent TMP_tmp51 = null;
+            PMachineValue TMP_tmp52 = null;
+            tEntry TMP_tmp53 = null;
+            PrtString TMP_tmp54 = ((PrtString)"");
+            tEntry TMP_tmp55 = null;
+            PrtNamedTuple TMP_tmp56 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
+            PrtInt TMP_tmp57 = ((PrtInt)0);
+            PrtBool TMP_tmp58 = ((PrtBool)false);
+            PrtString TMP_tmp59 = ((PrtString)"");
+            PrtString TMP_tmp60 = ((PrtString)"");
+            PrtString TMP_tmp61 = ((PrtString)"");
+            PMachineValue TMP_tmp62 = null;
+            PEvent TMP_tmp63 = null;
+            PMachineValue TMP_tmp64 = null;
+            tEntry TMP_tmp65 = null;
+            PrtString TMP_tmp66 = ((PrtString)"");
             PrtBool TMP_tmp67 = ((PrtBool)false);
-            PrtString TMP_tmp68 = ((PrtString)"");
-            PrtString TMP_tmp69 = ((PrtString)"");
-            PrtString TMP_tmp70 = ((PrtString)"");
-            PMachineValue TMP_tmp71 = null;
-            PEvent TMP_tmp72 = null;
-            PMachineValue TMP_tmp73 = null;
-            tEntry TMP_tmp74 = null;
-            PrtString TMP_tmp75 = ((PrtString)"");
-            PrtBool TMP_tmp76 = ((PrtBool)false);
-            PrtNamedTuple TMP_tmp77 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), ((PrtBool)false)));
-            PrtInt TMP_tmp78 = ((PrtInt)0);
-            PrtBool TMP_tmp79 = ((PrtBool)false);
-            PrtString TMP_tmp80 = ((PrtString)"");
-            PrtString TMP_tmp81 = ((PrtString)"");
-            PrtString TMP_tmp82 = ((PrtString)"");
-            TMP_tmp0_30 = (PrtSet)(await GetHeadsFromLog());
-            logHeads = TMP_tmp0_30;
-            TMP_tmp1_24 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
-            TMP_tmp2_23 = (PEvent)(new eGetAllValuesFromStorageReq((new PrtNamedTuple(new string[]{"source"},null))));
-            TMP_tmp3_22 = (PMachineValue)(currentMachine.self);
-            TMP_tmp4_21 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp3_22)));
-            currentMachine.TrySendEvent(TMP_tmp1_24, (Event)TMP_tmp2_23, TMP_tmp4_21);
-            var PGEN_recvEvent_8 = await currentMachine.TryReceiveEvent(typeof(eGetDictionaryFromMemoryStorageResp), typeof(PHalt));
-            switch (PGEN_recvEvent_8) {
-                case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
-                case eGetDictionaryFromMemoryStorageResp PGEN_evt_8: {
-                    PrtNamedTuple resp_8 = (PrtNamedTuple)(PGEN_evt_8.Payload);
-                    TMP_tmp5_22 = (PrtInt)(((PrtNamedTuple)resp_8)["status"]);
-                    TMP_tmp6_21 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp5_22),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp7_17 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:209:17")));
-                    TMP_tmp8_13 = (PrtString)(((PrtString) String.Format("Failed to get all values from entries storage")));
-                    TMP_tmp9_8 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp7_17,TMP_tmp8_13)));
-                    currentMachine.TryAssert(TMP_tmp6_21,"Assertion Failed: " + TMP_tmp9_8);
-                    TMP_tmp10_8 = (PrtMap)(((PrtNamedTuple)resp_8)["dictionary"]);
-                    TMP_tmp11_4 = (PrtMap)(((PrtMap)((PrtMap)((IPrtValue)TMP_tmp10_8)?.Clone())));
-                    dictionary_1 = TMP_tmp11_4;
-                } break;
-            }
-            TMP_tmp12_3 = (PrtSet)(((PrtSet)((IPrtValue)logHeads)?.Clone()));
-            TMP_i_itrEntry_tmp13 = (PrtInt)(((PrtInt)(-1)));
-            TMP_tmp15_1 = (PrtInt)(((PrtInt)(TMP_tmp12_3).Count));
-            sizeof_itrEntry_tmp14 = TMP_tmp15_1;
+            PrtNamedTuple TMP_tmp68 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), ((PrtBool)false)));
+            PrtInt TMP_tmp69 = ((PrtInt)0);
+            PrtBool TMP_tmp70 = ((PrtBool)false);
+            PrtString TMP_tmp71 = ((PrtString)"");
+            PrtString TMP_tmp72 = ((PrtString)"");
+            PrtString TMP_tmp73 = ((PrtString)"");
+            TMP_tmp0_33 = (PrtSeq)(await GetHeadsFromLog());
+            TMP_tmp1_27 = (PrtSeq)(((PrtSeq)((PrtSeq)((IPrtValue)TMP_tmp0_33)?.Clone())));
+            logHeads = TMP_tmp1_27;
+            TMP_tmp2_26 = (PrtMap)(await GetDictionaryFromMemoryStorage_1());
+            dictionary_2 = TMP_tmp2_26;
+            TMP_tmp3_25 = (PrtSeq)(((PrtSeq)((IPrtValue)logHeads)?.Clone()));
+            TMP_i_itrEntry_tmp4 = (PrtInt)(((PrtInt)(-1)));
+            TMP_tmp6_23 = (PrtInt)(((PrtInt)(TMP_tmp3_25).Count));
+            sizeof_itrEntry_tmp5 = TMP_tmp6_23;
             while (((PrtBool)true))
             {
-                TMP_tmp16_1 = (PrtInt)((sizeof_itrEntry_tmp14) - (((PrtInt)(1))));
-                TMP_tmp17_1 = (PrtBool)((TMP_i_itrEntry_tmp13) < (TMP_tmp16_1));
-                TMP_tmp18_1 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp17_1)?.Clone()));
-                if (TMP_tmp18_1)
+                TMP_tmp7_18 = (PrtInt)((sizeof_itrEntry_tmp5) - (((PrtInt)(1))));
+                TMP_tmp8_15 = (PrtBool)((TMP_i_itrEntry_tmp4) < (TMP_tmp7_18));
+                TMP_tmp9_12 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp8_15)?.Clone()));
+                if (TMP_tmp9_12)
                 {
                 }
                 else
                 {
                     break;
                 }
-                TMP_tmp19_1 = (PrtInt)((TMP_i_itrEntry_tmp13) + (((PrtInt)(1))));
-                TMP_i_itrEntry_tmp13 = TMP_tmp19_1;
-                TMP_tmp20_1 = (tEntry)(((PrtSet)TMP_tmp12_3)[TMP_i_itrEntry_tmp13]);
-                TMP_tmp21_1 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp20_1)?.Clone()));
-                itrEntry = TMP_tmp21_1;
-                TMP_tmp22_1 = (tEntry)(((tEntry)((IPrtValue)itrEntry)?.Clone()));
-                TMP_tmp23_1 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp22_1, currentMachine));
-                ((PrtSet)nexts).Add(TMP_tmp23_1);
+                TMP_tmp10_13 = (PrtInt)((TMP_i_itrEntry_tmp4) + (((PrtInt)(1))));
+                TMP_i_itrEntry_tmp4 = TMP_tmp10_13;
+                TMP_tmp11_12 = (tEntry)(((PrtSeq)TMP_tmp3_25)[TMP_i_itrEntry_tmp4]);
+                TMP_tmp12_8 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp11_12)?.Clone()));
+                itrEntry = TMP_tmp12_8;
+                TMP_tmp13_5 = (tEntry)(((tEntry)((IPrtValue)itrEntry)?.Clone()));
+                TMP_tmp14_5 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp13_5, currentMachine));
+                ((PrtSet)nexts).Add(TMP_tmp14_5);
             }
-            TMP_tmp24 = (PrtInt)(((PrtInt)(logHeads).Count));
-            TMP_tmp25 = (PrtInt)((numReferences) + (TMP_tmp24));
-            totalNumReferences = TMP_tmp25;
-            TMP_tmp26 = (PrtSet)(((PrtSet)((IPrtValue)logHeads)?.Clone()));
-            TMP_tmp27 = (PrtMap)(((PrtMap)((IPrtValue)dictionary_1)?.Clone()));
-            TMP_tmp28 = (PrtInt)(((PrtInt)((IPrtValue)totalNumReferences)?.Clone()));
-            TMP_tmp29 = (PrtSet)(GlobalFunctions.GetReferences(TMP_tmp26, TMP_tmp27, TMP_tmp28, currentMachine));
-            refs = TMP_tmp29;
-            TMP_tmp30 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
-            TMP_tmp31 = (PEvent)(new eGetNowReq((new PrtNamedTuple(new string[]{"source"},null))));
-            TMP_tmp32 = (PMachineValue)(currentMachine.self);
-            TMP_tmp33 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp32)));
-            currentMachine.TrySendEvent(TMP_tmp30, (Event)TMP_tmp31, TMP_tmp33);
+            TMP_tmp15_5 = (PrtInt)(((PrtInt)(logHeads).Count));
+            TMP_tmp16_5 = (PrtInt)((numReferences) + (TMP_tmp15_5));
+            totalNumReferences = TMP_tmp16_5;
+            TMP_tmp17_5 = (PrtSeq)(((PrtSeq)((IPrtValue)logHeads)?.Clone()));
+            TMP_tmp18_5 = (PrtMap)(((PrtMap)((IPrtValue)dictionary_2)?.Clone()));
+            TMP_tmp19_5 = (PrtInt)(((PrtInt)((IPrtValue)totalNumReferences)?.Clone()));
+            TMP_tmp20_4 = (PrtSet)(GlobalFunctions.GetReferences(TMP_tmp17_5, TMP_tmp18_5, TMP_tmp19_5, currentMachine));
+            refs = TMP_tmp20_4;
+            TMP_tmp21_2 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
+            TMP_tmp22_2 = (PEvent)(new eGetNowReq((new PrtNamedTuple(new string[]{"source"},null))));
+            TMP_tmp23_1 = (PMachineValue)(currentMachine.self);
+            TMP_tmp24 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp23_1)));
+            currentMachine.TrySendEvent(TMP_tmp21_2, (Event)TMP_tmp22_2, TMP_tmp24);
             var PGEN_recvEvent_9 = await currentMachine.TryReceiveEvent(typeof(eGetNowResp), typeof(PHalt));
             switch (PGEN_recvEvent_9) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eGetNowResp PGEN_evt_9: {
                     PrtNamedTuple resp_9 = (PrtNamedTuple)(PGEN_evt_9.Payload);
-                    TMP_tmp34 = (PrtInt)(((PrtNamedTuple)resp_9)["status"]);
-                    TMP_tmp35 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp34),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp36 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:223:17")));
-                    TMP_tmp37 = (PrtString)(((PrtString) String.Format("Failed to get now from clock.")));
-                    TMP_tmp38 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp36,TMP_tmp37)));
-                    currentMachine.TryAssert(TMP_tmp35,"Assertion Failed: " + TMP_tmp38);
-                    TMP_tmp39 = (tTimestamp)(((PrtNamedTuple)resp_9)["now"]);
-                    TMP_tmp40 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp39)?.Clone()));
-                    now = TMP_tmp40;
+                    TMP_tmp25 = (PrtInt)(((PrtNamedTuple)resp_9)["status"]);
+                    TMP_tmp26 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp25),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp27 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:244:17")));
+                    TMP_tmp28 = (PrtString)(((PrtString) String.Format("Failed to get now from clock.")));
+                    TMP_tmp29 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp27,TMP_tmp28)));
+                    currentMachine.TryAssert(TMP_tmp26,"Assertion Failed: " + TMP_tmp29);
+                    TMP_tmp30 = (tTimestamp)(((PrtNamedTuple)resp_9)["now"]);
+                    TMP_tmp31 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp30)?.Clone()));
+                    now = TMP_tmp31;
                 } break;
             }
-            TMP_tmp41 = (PrtString)(((PrtString)((IPrtValue)identity)?.Clone()));
-            TMP_tmp42 = (PrtString)(((PrtString)((IPrtValue)logId)?.Clone()));
-            TMP_tmp43 = (PrtString)(((PrtString)((IPrtValue)entryData)?.Clone()));
-            TMP_tmp44 = (tTimestamp)(((tTimestamp)((IPrtValue)now)?.Clone()));
-            TMP_tmp45 = (PrtSet)(((PrtSet)((IPrtValue)nexts)?.Clone()));
-            TMP_tmp46 = (PrtSet)(((PrtSet)((IPrtValue)refs)?.Clone()));
-            TMP_tmp47 = (tEntry)(GlobalFunctions.CreateEntry(TMP_tmp41, TMP_tmp42, TMP_tmp43, TMP_tmp44, TMP_tmp45, TMP_tmp46, currentMachine));
-            createdEntry = TMP_tmp47;
-            TMP_tmp48 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
-            ((PrtSet)entrySet).Add(TMP_tmp48);
-            TMP_tmp49 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
-            TMP_tmp50 = (PEvent)(new eSetEntriesInHeadsReq((new PrtNamedTuple(new string[]{"source","entries"},null, new PrtSet()))));
-            TMP_tmp51 = (PMachineValue)(currentMachine.self);
-            TMP_tmp52 = (PrtSet)(((PrtSet)((IPrtValue)entrySet)?.Clone()));
-            TMP_tmp53 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","entries"}, TMP_tmp51, TMP_tmp52)));
-            currentMachine.TrySendEvent(TMP_tmp49, (Event)TMP_tmp50, TMP_tmp53);
+            TMP_tmp32 = (PrtString)(((PrtString)((IPrtValue)identity)?.Clone()));
+            TMP_tmp33 = (PrtString)(((PrtString)((IPrtValue)logId)?.Clone()));
+            TMP_tmp34 = (PrtString)(((PrtString)((IPrtValue)entryData)?.Clone()));
+            TMP_tmp35 = (tTimestamp)(((tTimestamp)((IPrtValue)now)?.Clone()));
+            TMP_tmp36 = (PrtSet)(((PrtSet)((IPrtValue)nexts)?.Clone()));
+            TMP_tmp37 = (PrtSet)(((PrtSet)((IPrtValue)refs)?.Clone()));
+            TMP_tmp38 = (tEntry)(GlobalFunctions.CreateEntry(TMP_tmp32, TMP_tmp33, TMP_tmp34, TMP_tmp35, TMP_tmp36, TMP_tmp37, currentMachine));
+            createdEntry = TMP_tmp38;
+            TMP_tmp39 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
+            ((PrtSeq)entrySet).Insert(((PrtInt)(0)), TMP_tmp39);
+            TMP_tmp40 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
+            TMP_tmp41 = (PEvent)(new eSetEntriesInHeadsReq((new PrtNamedTuple(new string[]{"source","entries"},null, new PrtSeq()))));
+            TMP_tmp42 = (PMachineValue)(currentMachine.self);
+            TMP_tmp43 = (PrtSeq)(((PrtSeq)((IPrtValue)entrySet)?.Clone()));
+            TMP_tmp44 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","entries"}, TMP_tmp42, TMP_tmp43)));
+            currentMachine.TrySendEvent(TMP_tmp40, (Event)TMP_tmp41, TMP_tmp44);
             var PGEN_recvEvent_10 = await currentMachine.TryReceiveEvent(typeof(eSetEntriesInHeadsResp), typeof(PHalt));
             switch (PGEN_recvEvent_10) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eSetEntriesInHeadsResp PGEN_evt_10: {
                     PrtNamedTuple resp_10 = (PrtNamedTuple)(PGEN_evt_10.Payload);
-                    TMP_tmp54 = (PrtInt)(((PrtNamedTuple)resp_10)["status"]);
-                    TMP_tmp55 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp54),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp56 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:233:17")));
-                    TMP_tmp57 = (PrtString)(((PrtString) String.Format("Could not set entries in Heads")));
-                    TMP_tmp58 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp56,TMP_tmp57)));
-                    currentMachine.TryAssert(TMP_tmp55,"Assertion Failed: " + TMP_tmp58);
+                    TMP_tmp45 = (PrtInt)(((PrtNamedTuple)resp_10)["status"]);
+                    TMP_tmp46 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp45),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp47 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:254:17")));
+                    TMP_tmp48 = (PrtString)(((PrtString) String.Format("Could not set entries in Heads")));
+                    TMP_tmp49 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp47,TMP_tmp48)));
+                    currentMachine.TryAssert(TMP_tmp46,"Assertion Failed: " + TMP_tmp49);
                 } break;
             }
-            TMP_tmp59 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
-            TMP_tmp60 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
-            TMP_tmp61 = (PMachineValue)(currentMachine.self);
-            TMP_tmp62 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
-            TMP_tmp63 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp62, currentMachine));
-            TMP_tmp64 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
-            TMP_tmp65 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp61, TMP_tmp63, TMP_tmp64)));
-            currentMachine.TrySendEvent(TMP_tmp59, (Event)TMP_tmp60, TMP_tmp65);
+            TMP_tmp50 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
+            TMP_tmp51 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
+            TMP_tmp52 = (PMachineValue)(currentMachine.self);
+            TMP_tmp53 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
+            TMP_tmp54 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp53, currentMachine));
+            TMP_tmp55 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
+            TMP_tmp56 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp52, TMP_tmp54, TMP_tmp55)));
+            currentMachine.TrySendEvent(TMP_tmp50, (Event)TMP_tmp51, TMP_tmp56);
             var PGEN_recvEvent_11 = await currentMachine.TryReceiveEvent(typeof(ePutValueInStorageResp), typeof(PHalt));
             switch (PGEN_recvEvent_11) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case ePutValueInStorageResp PGEN_evt_11: {
                     PrtNamedTuple resp_11 = (PrtNamedTuple)(PGEN_evt_11.Payload);
-                    TMP_tmp66 = (PrtInt)(((PrtNamedTuple)resp_11)["status"]);
-                    TMP_tmp67 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp66),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp68 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:239:17")));
-                    TMP_tmp69 = (PrtString)(((PrtString) String.Format("Could not put entry in Entries Storage")));
-                    TMP_tmp70 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp68,TMP_tmp69)));
-                    currentMachine.TryAssert(TMP_tmp67,"Assertion Failed: " + TMP_tmp70);
+                    TMP_tmp57 = (PrtInt)(((PrtNamedTuple)resp_11)["status"]);
+                    TMP_tmp58 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp57),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp59 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:260:17")));
+                    TMP_tmp60 = (PrtString)(((PrtString) String.Format("Could not put entry in Entries Storage")));
+                    TMP_tmp61 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp59,TMP_tmp60)));
+                    currentMachine.TryAssert(TMP_tmp58,"Assertion Failed: " + TMP_tmp61);
                 } break;
             }
-            TMP_tmp71 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
-            TMP_tmp72 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
-            TMP_tmp73 = (PMachineValue)(currentMachine.self);
-            TMP_tmp74 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
-            TMP_tmp75 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp74, currentMachine));
-            TMP_tmp76 = (PrtBool)(((PrtBool)true));
-            TMP_tmp77 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp73, TMP_tmp75, TMP_tmp76)));
-            currentMachine.TrySendEvent(TMP_tmp71, (Event)TMP_tmp72, TMP_tmp77);
+            TMP_tmp62 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
+            TMP_tmp63 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
+            TMP_tmp64 = (PMachineValue)(currentMachine.self);
+            TMP_tmp65 = (tEntry)(((tEntry)((IPrtValue)createdEntry)?.Clone()));
+            TMP_tmp66 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp65, currentMachine));
+            TMP_tmp67 = (PrtBool)(((PrtBool)true));
+            TMP_tmp68 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp64, TMP_tmp66, TMP_tmp67)));
+            currentMachine.TrySendEvent(TMP_tmp62, (Event)TMP_tmp63, TMP_tmp68);
             var PGEN_recvEvent_12 = await currentMachine.TryReceiveEvent(typeof(ePutValueInStorageResp), typeof(PHalt));
             switch (PGEN_recvEvent_12) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case ePutValueInStorageResp PGEN_evt_12: {
                     PrtNamedTuple resp_12 = (PrtNamedTuple)(PGEN_evt_12.Payload);
-                    TMP_tmp78 = (PrtInt)(((PrtNamedTuple)resp_12)["status"]);
-                    TMP_tmp79 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp78),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp80 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:245:17")));
-                    TMP_tmp81 = (PrtString)(((PrtString) String.Format("Could not put entry in Index Storage")));
-                    TMP_tmp82 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp80,TMP_tmp81)));
-                    currentMachine.TryAssert(TMP_tmp79,"Assertion Failed: " + TMP_tmp82);
+                    TMP_tmp69 = (PrtInt)(((PrtNamedTuple)resp_12)["status"]);
+                    TMP_tmp70 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp69),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp71 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:266:17")));
+                    TMP_tmp72 = (PrtString)(((PrtString) String.Format("Could not put entry in Index Storage")));
+                    TMP_tmp73 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp71,TMP_tmp72)));
+                    currentMachine.TryAssert(TMP_tmp70,"Assertion Failed: " + TMP_tmp73);
                 } break;
             }
             return ((tEntry)((IPrtValue)createdEntry)?.Clone());
@@ -1955,168 +2154,199 @@ namespace PImplementation
         public void JoinLog(PMachineValue log)
         {
             Log currentMachine = this;
-            PrtSet otherLogHeads = new PrtSet();
+            PrtSeq otherLogHeads = new PrtSeq();
             tEntry otherLogEntry = null;
         }
         public async Task<PrtBool> JoinEntry(tEntry entryToJoin)
         {
             Log currentMachine = this;
             PrtBool returnBool = ((PrtBool)false);
-            tEntry TMP_tmp0_31 = null;
-            PrtString TMP_tmp1_25 = ((PrtString)"");
-            PrtBool TMP_tmp2_24 = ((PrtBool)false);
-            PrtBool TMP_tmp3_23 = ((PrtBool)false);
-            PMachineValue TMP_tmp4_22 = null;
-            PEvent TMP_tmp5_23 = null;
-            PMachineValue TMP_tmp6_22 = null;
-            tEntry TMP_tmp7_18 = null;
-            tTimestamp TMP_tmp8_14 = null;
-            PrtNamedTuple TMP_tmp9_9 = (new PrtNamedTuple(new string[]{"source","remoteTs"},null, null));
-            PrtInt TMP_tmp10_9 = ((PrtInt)0);
-            PrtBool TMP_tmp11_5 = ((PrtBool)false);
-            PrtString TMP_tmp12_4 = ((PrtString)"");
-            PrtString TMP_tmp13_1 = ((PrtString)"");
-            PrtString TMP_tmp14_1 = ((PrtString)"");
-            PMachineValue TMP_tmp15_2 = null;
-            PEvent TMP_tmp16_2 = null;
-            PMachineValue TMP_tmp17_2 = null;
-            tEntry TMP_tmp18_2 = null;
-            PrtNamedTuple TMP_tmp19_2 = (new PrtNamedTuple(new string[]{"source","headEntry"},null, null));
-            PrtInt TMP_tmp20_2 = ((PrtInt)0);
-            PrtBool TMP_tmp21_2 = ((PrtBool)false);
-            PrtString TMP_tmp22_2 = ((PrtString)"");
+            tEntry TMP_tmp0_34 = null;
+            PrtString TMP_tmp1_28 = ((PrtString)"");
+            PrtBool TMP_tmp2_27 = ((PrtBool)false);
+            PrtBool TMP_tmp3_26 = ((PrtBool)false);
+            PMachineValue TMP_tmp4_24 = null;
+            PEvent TMP_tmp5_24 = null;
+            PMachineValue TMP_tmp6_24 = null;
+            tEntry TMP_tmp7_19 = null;
+            tTimestamp TMP_tmp8_16 = null;
+            PrtNamedTuple TMP_tmp9_13 = (new PrtNamedTuple(new string[]{"source","remoteTs"},null, null));
+            PrtInt TMP_tmp10_14 = ((PrtInt)0);
+            PrtBool TMP_tmp11_13 = ((PrtBool)false);
+            PrtString TMP_tmp12_9 = ((PrtString)"");
+            PrtString TMP_tmp13_6 = ((PrtString)"");
+            PrtString TMP_tmp14_6 = ((PrtString)"");
+            PMachineValue TMP_tmp15_6 = null;
+            PEvent TMP_tmp16_6 = null;
+            PMachineValue TMP_tmp17_6 = null;
+            tEntry TMP_tmp18_6 = null;
+            PrtNamedTuple TMP_tmp19_6 = (new PrtNamedTuple(new string[]{"source","headEntry"},null, null));
+            PrtInt TMP_tmp20_5 = ((PrtInt)0);
+            PrtBool TMP_tmp21_3 = ((PrtBool)false);
+            PrtString TMP_tmp22_3 = ((PrtString)"");
             PrtString TMP_tmp23_2 = ((PrtString)"");
             PrtString TMP_tmp24_1 = ((PrtString)"");
-            PrtSet TMP_tmp25_1 = new PrtSet();
-            PrtSet TMP_tmp26_1 = new PrtSet();
-            PrtBool TMP_tmp27_1 = ((PrtBool)false);
-            PrtBool TMP_tmp28_1 = ((PrtBool)false);
-            PMachineValue TMP_tmp29_1 = null;
-            PEvent TMP_tmp30_1 = null;
+            PrtSeq TMP_tmp25_1 = new PrtSeq();
+            PrtBool TMP_tmp26_1 = ((PrtBool)false);
+            PrtSeq TMP_tmp27_1 = new PrtSeq();
+            PrtSeq TMP_tmp28_1 = new PrtSeq();
+            PrtBool TMP_tmp29_1 = ((PrtBool)false);
+            PrtBool TMP_tmp30_1 = ((PrtBool)false);
             PMachineValue TMP_tmp31_1 = null;
-            tEntry TMP_tmp32_1 = null;
-            PrtString TMP_tmp33_1 = ((PrtString)"");
+            PEvent TMP_tmp32_1 = null;
+            PMachineValue TMP_tmp33_1 = null;
             tEntry TMP_tmp34_1 = null;
-            PrtNamedTuple TMP_tmp35_1 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
-            PrtInt TMP_tmp36_1 = ((PrtInt)0);
-            PrtBool TMP_tmp37_1 = ((PrtBool)false);
-            PrtString TMP_tmp38_1 = ((PrtString)"");
-            PrtString TMP_tmp39_1 = ((PrtString)"");
+            PrtString TMP_tmp35_1 = ((PrtString)"");
+            tEntry TMP_tmp36_1 = null;
+            PrtNamedTuple TMP_tmp37_1 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null));
+            PrtInt TMP_tmp38_1 = ((PrtInt)0);
+            PrtBool TMP_tmp39_1 = ((PrtBool)false);
             PrtString TMP_tmp40_1 = ((PrtString)"");
-            PMachineValue TMP_tmp41_1 = null;
-            PEvent TMP_tmp42_1 = null;
+            PrtString TMP_tmp41_1 = ((PrtString)"");
+            PrtString TMP_tmp42_1 = ((PrtString)"");
             PMachineValue TMP_tmp43_1 = null;
-            tEntry TMP_tmp44_1 = null;
-            PrtString TMP_tmp45_1 = ((PrtString)"");
-            PrtBool TMP_tmp46_1 = ((PrtBool)false);
-            PrtNamedTuple TMP_tmp47_1 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), ((PrtBool)false)));
-            PrtInt TMP_tmp48_1 = ((PrtInt)0);
-            PrtBool TMP_tmp49_1 = ((PrtBool)false);
-            PrtString TMP_tmp50_1 = ((PrtString)"");
-            PrtString TMP_tmp51_1 = ((PrtString)"");
+            PEvent TMP_tmp44_1 = null;
+            PMachineValue TMP_tmp45_1 = null;
+            tEntry TMP_tmp46_1 = null;
+            PrtString TMP_tmp47_1 = ((PrtString)"");
+            PrtBool TMP_tmp48_1 = ((PrtBool)false);
+            PrtNamedTuple TMP_tmp49_1 = (new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), ((PrtBool)false)));
+            PrtInt TMP_tmp50_1 = ((PrtInt)0);
+            PrtBool TMP_tmp51_1 = ((PrtBool)false);
             PrtString TMP_tmp52_1 = ((PrtString)"");
-            TMP_tmp0_31 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp1_25 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp0_31, currentMachine));
-            TMP_tmp2_24 = (PrtBool)(await LogHasEntry(TMP_tmp1_25));
-            TMP_tmp3_23 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp2_24,((PrtBool)true))));
-            if (TMP_tmp3_23)
+            PrtString TMP_tmp53_1 = ((PrtString)"");
+            PrtString TMP_tmp54_1 = ((PrtString)"");
+            TMP_tmp0_34 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
+            TMP_tmp1_28 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp0_34, currentMachine));
+            TMP_tmp2_27 = (PrtBool)(await LogHasEntry(TMP_tmp1_28));
+            TMP_tmp3_26 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp2_27,((PrtBool)true))));
+            if (TMP_tmp3_26)
             {
                 return ((PrtBool)false);
             }
-            TMP_tmp4_22 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
-            TMP_tmp5_23 = (PEvent)(new eUpdateHlcReq((new PrtNamedTuple(new string[]{"source","remoteTs"},null, null))));
-            TMP_tmp6_22 = (PMachineValue)(currentMachine.self);
-            TMP_tmp7_18 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp8_14 = (tTimestamp)(GlobalFunctions.GetClock(TMP_tmp7_18, currentMachine));
-            TMP_tmp9_9 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","remoteTs"}, TMP_tmp6_22, TMP_tmp8_14)));
-            currentMachine.TrySendEvent(TMP_tmp4_22, (Event)TMP_tmp5_23, TMP_tmp9_9);
+            TMP_tmp4_24 = (PMachineValue)(((PMachineValue)((IPrtValue)clock)?.Clone()));
+            TMP_tmp5_24 = (PEvent)(new eUpdateHlcReq((new PrtNamedTuple(new string[]{"source","remoteTs"},null, null))));
+            TMP_tmp6_24 = (PMachineValue)(currentMachine.self);
+            TMP_tmp7_19 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
+            TMP_tmp8_16 = (tTimestamp)(GlobalFunctions.GetClock(TMP_tmp7_19, currentMachine));
+            TMP_tmp9_13 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","remoteTs"}, TMP_tmp6_24, TMP_tmp8_16)));
+            currentMachine.TrySendEvent(TMP_tmp4_24, (Event)TMP_tmp5_24, TMP_tmp9_13);
             var PGEN_recvEvent_13 = await currentMachine.TryReceiveEvent(typeof(eUpdateHlcResp), typeof(PHalt));
             switch (PGEN_recvEvent_13) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eUpdateHlcResp PGEN_evt_13: {
                     PrtNamedTuple resp_13 = (PrtNamedTuple)(PGEN_evt_13.Payload);
-                    TMP_tmp10_9 = (PrtInt)(((PrtNamedTuple)resp_13)["status"]);
-                    TMP_tmp11_5 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp10_9),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp12_4 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:266:17")));
-                    TMP_tmp13_1 = (PrtString)(((PrtString) String.Format("Failed to update clock with other entry's clock")));
-                    TMP_tmp14_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp12_4,TMP_tmp13_1)));
-                    currentMachine.TryAssert(TMP_tmp11_5,"Assertion Failed: " + TMP_tmp14_1);
+                    TMP_tmp10_14 = (PrtInt)(((PrtNamedTuple)resp_13)["status"]);
+                    TMP_tmp11_13 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp10_14),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp12_9 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:287:17")));
+                    TMP_tmp13_6 = (PrtString)(((PrtString) String.Format("Failed to update clock with other entry's clock")));
+                    TMP_tmp14_6 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp12_9,TMP_tmp13_6)));
+                    currentMachine.TryAssert(TMP_tmp11_13,"Assertion Failed: " + TMP_tmp14_6);
                 } break;
             }
-            TMP_tmp15_2 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
-            TMP_tmp16_2 = (PEvent)(new eAddEntryToHeadsReq((new PrtNamedTuple(new string[]{"source","headEntry"},null, null))));
-            TMP_tmp17_2 = (PMachineValue)(currentMachine.self);
-            TMP_tmp18_2 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp19_2 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","headEntry"}, TMP_tmp17_2, TMP_tmp18_2)));
-            currentMachine.TrySendEvent(TMP_tmp15_2, (Event)TMP_tmp16_2, TMP_tmp19_2);
+            TMP_tmp15_6 = (PMachineValue)(((PMachineValue)((IPrtValue)heads_2)?.Clone()));
+            TMP_tmp16_6 = (PEvent)(new eAddEntryToHeadsReq((new PrtNamedTuple(new string[]{"source","headEntry"},null, null))));
+            TMP_tmp17_6 = (PMachineValue)(currentMachine.self);
+            TMP_tmp18_6 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
+            TMP_tmp19_6 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","headEntry"}, TMP_tmp17_6, TMP_tmp18_6)));
+            currentMachine.TrySendEvent(TMP_tmp15_6, (Event)TMP_tmp16_6, TMP_tmp19_6);
             var PGEN_recvEvent_14 = await currentMachine.TryReceiveEvent(typeof(eAddEntryToHeadsResp), typeof(PHalt));
             switch (PGEN_recvEvent_14) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case eAddEntryToHeadsResp PGEN_evt_14: {
                     PrtNamedTuple resp_14 = (PrtNamedTuple)(PGEN_evt_14.Payload);
-                    TMP_tmp20_2 = (PrtInt)(((PrtNamedTuple)resp_14)["status"]);
-                    TMP_tmp21_2 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp20_2),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp22_2 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:272:17")));
+                    TMP_tmp20_5 = (PrtInt)(((PrtNamedTuple)resp_14)["status"]);
+                    TMP_tmp21_3 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp20_5),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp22_3 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:293:17")));
                     TMP_tmp23_2 = (PrtString)(((PrtString) String.Format("Failed to add entry to Heads")));
-                    TMP_tmp24_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp22_2,TMP_tmp23_2)));
-                    currentMachine.TryAssert(TMP_tmp21_2,"Assertion Failed: " + TMP_tmp24_1);
-                    TMP_tmp25_1 = (PrtSet)(((PrtNamedTuple)resp_14)["newHeads"]);
-                    TMP_tmp26_1 = (PrtSet)(await GetHeadsFromLog());
-                    TMP_tmp27_1 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp25_1,TMP_tmp26_1)));
-                    if (TMP_tmp27_1)
+                    TMP_tmp24_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp22_3,TMP_tmp23_2)));
+                    currentMachine.TryAssert(TMP_tmp21_3,"Assertion Failed: " + TMP_tmp24_1);
+                    TMP_tmp25_1 = (PrtSeq)(((PrtNamedTuple)resp_14)["newHeads"]);
+                    TMP_tmp26_1 = (PrtBool)(((PrtBool)true));
+                    TMP_tmp27_1 = (PrtSeq)(GlobalFunctions.Sorted(TMP_tmp25_1, TMP_tmp26_1, currentMachine));
+                    TMP_tmp28_1 = (PrtSeq)(await GetHeadsFromLog());
+                    TMP_tmp29_1 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp27_1,TMP_tmp28_1)));
+                    if (TMP_tmp29_1)
                     {
                         returnBool = (PrtBool)(((PrtBool)false));
                     }
                 } break;
             }
-            TMP_tmp28_1 = (PrtBool)((PrtValues.SafeEquals(returnBool,((PrtBool)false))));
-            if (TMP_tmp28_1)
+            TMP_tmp30_1 = (PrtBool)((PrtValues.SafeEquals(returnBool,((PrtBool)false))));
+            if (TMP_tmp30_1)
             {
                 return ((PrtBool)false);
             }
-            TMP_tmp29_1 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
-            TMP_tmp30_1 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
-            TMP_tmp31_1 = (PMachineValue)(currentMachine.self);
-            TMP_tmp32_1 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp33_1 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp32_1, currentMachine));
+            TMP_tmp31_1 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
+            TMP_tmp32_1 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
+            TMP_tmp33_1 = (PMachineValue)(currentMachine.self);
             TMP_tmp34_1 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp35_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp31_1, TMP_tmp33_1, TMP_tmp34_1)));
-            currentMachine.TrySendEvent(TMP_tmp29_1, (Event)TMP_tmp30_1, TMP_tmp35_1);
+            TMP_tmp35_1 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp34_1, currentMachine));
+            TMP_tmp36_1 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
+            TMP_tmp37_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp33_1, TMP_tmp35_1, TMP_tmp36_1)));
+            currentMachine.TrySendEvent(TMP_tmp31_1, (Event)TMP_tmp32_1, TMP_tmp37_1);
             var PGEN_recvEvent_15 = await currentMachine.TryReceiveEvent(typeof(ePutValueInStorageResp), typeof(PHalt));
             switch (PGEN_recvEvent_15) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case ePutValueInStorageResp PGEN_evt_15: {
                     PrtNamedTuple resp_15 = (PrtNamedTuple)(PGEN_evt_15.Payload);
-                    TMP_tmp36_1 = (PrtInt)(((PrtNamedTuple)resp_15)["status"]);
-                    TMP_tmp37_1 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp36_1),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp38_1 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:285:17")));
-                    TMP_tmp39_1 = (PrtString)(((PrtString) String.Format("Could not put entry in Entries Storage")));
-                    TMP_tmp40_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp38_1,TMP_tmp39_1)));
-                    currentMachine.TryAssert(TMP_tmp37_1,"Assertion Failed: " + TMP_tmp40_1);
+                    TMP_tmp38_1 = (PrtInt)(((PrtNamedTuple)resp_15)["status"]);
+                    TMP_tmp39_1 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp38_1),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp40_1 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:306:17")));
+                    TMP_tmp41_1 = (PrtString)(((PrtString) String.Format("Could not put entry in Entries Storage")));
+                    TMP_tmp42_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp40_1,TMP_tmp41_1)));
+                    currentMachine.TryAssert(TMP_tmp39_1,"Assertion Failed: " + TMP_tmp42_1);
                 } break;
             }
-            TMP_tmp41_1 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
-            TMP_tmp42_1 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
-            TMP_tmp43_1 = (PMachineValue)(currentMachine.self);
-            TMP_tmp44_1 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
-            TMP_tmp45_1 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp44_1, currentMachine));
-            TMP_tmp46_1 = (PrtBool)(((PrtBool)true));
-            TMP_tmp47_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp43_1, TMP_tmp45_1, TMP_tmp46_1)));
-            currentMachine.TrySendEvent(TMP_tmp41_1, (Event)TMP_tmp42_1, TMP_tmp47_1);
+            TMP_tmp43_1 = (PMachineValue)(((PMachineValue)((IPrtValue)index)?.Clone()));
+            TMP_tmp44_1 = (PEvent)(new ePutValueInStorageReq((new PrtNamedTuple(new string[]{"source","key","value"},null, ((PrtString)""), null))));
+            TMP_tmp45_1 = (PMachineValue)(currentMachine.self);
+            TMP_tmp46_1 = (tEntry)(((tEntry)((IPrtValue)entryToJoin)?.Clone()));
+            TMP_tmp47_1 = (PrtString)(GlobalFunctions.GetHash(TMP_tmp46_1, currentMachine));
+            TMP_tmp48_1 = (PrtBool)(((PrtBool)true));
+            TMP_tmp49_1 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","key","value"}, TMP_tmp45_1, TMP_tmp47_1, TMP_tmp48_1)));
+            currentMachine.TrySendEvent(TMP_tmp43_1, (Event)TMP_tmp44_1, TMP_tmp49_1);
             var PGEN_recvEvent_16 = await currentMachine.TryReceiveEvent(typeof(ePutValueInStorageResp), typeof(PHalt));
             switch (PGEN_recvEvent_16) {
                 case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
                 case ePutValueInStorageResp PGEN_evt_16: {
                     PrtNamedTuple resp_16 = (PrtNamedTuple)(PGEN_evt_16.Payload);
-                    TMP_tmp48_1 = (PrtInt)(((PrtNamedTuple)resp_16)["status"]);
-                    TMP_tmp49_1 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp48_1),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
-                    TMP_tmp50_1 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:291:17")));
-                    TMP_tmp51_1 = (PrtString)(((PrtString) String.Format("Could not put entry in Index Storage")));
-                    TMP_tmp52_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp50_1,TMP_tmp51_1)));
-                    currentMachine.TryAssert(TMP_tmp49_1,"Assertion Failed: " + TMP_tmp52_1);
+                    TMP_tmp50_1 = (PrtInt)(((PrtNamedTuple)resp_16)["status"]);
+                    TMP_tmp51_1 = (PrtBool)((PrtValues.SafeEquals(PrtValues.Box((long) TMP_tmp50_1),PrtValues.Box((long) (PrtEnum.Get("SUCCESS"))))));
+                    TMP_tmp52_1 = (PrtString)(((PrtString) String.Format("PSrc/oplog/log.p:312:17")));
+                    TMP_tmp53_1 = (PrtString)(((PrtString) String.Format("Could not put entry in Index Storage")));
+                    TMP_tmp54_1 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp52_1,TMP_tmp53_1)));
+                    currentMachine.TryAssert(TMP_tmp51_1,"Assertion Failed: " + TMP_tmp54_1);
                 } break;
             }
             return ((PrtBool)true);
+        }
+        public async Task<PrtMap> GetDictionaryFromMemoryStorage_1()
+        {
+            Log currentMachine = this;
+            PrtMap dictionary_3 = new PrtMap();
+            PMachineValue TMP_tmp0_35 = null;
+            PEvent TMP_tmp1_29 = null;
+            PMachineValue TMP_tmp2_28 = null;
+            PrtNamedTuple TMP_tmp3_27 = (new PrtNamedTuple(new string[]{"source"},null));
+            PrtMap TMP_tmp4_25 = new PrtMap();
+            PrtMap TMP_tmp5_25 = new PrtMap();
+            TMP_tmp0_35 = (PMachineValue)(((PMachineValue)((IPrtValue)entries_2)?.Clone()));
+            TMP_tmp1_29 = (PEvent)(new eGetDictionaryFromMemoryStorageReq((new PrtNamedTuple(new string[]{"source"},null))));
+            TMP_tmp2_28 = (PMachineValue)(currentMachine.self);
+            TMP_tmp3_27 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp2_28)));
+            currentMachine.TrySendEvent(TMP_tmp0_35, (Event)TMP_tmp1_29, TMP_tmp3_27);
+            var PGEN_recvEvent_17 = await currentMachine.TryReceiveEvent(typeof(eGetDictionaryFromMemoryStorageResp), typeof(PHalt));
+            switch (PGEN_recvEvent_17) {
+                case PHalt _hv: { currentMachine.TryRaiseEvent(_hv); break;} 
+                case eGetDictionaryFromMemoryStorageResp PGEN_evt_17: {
+                    PrtNamedTuple resp_17 = (PrtNamedTuple)(PGEN_evt_17.Payload);
+                    TMP_tmp4_25 = (PrtMap)(((PrtNamedTuple)resp_17)["dictionary"]);
+                    TMP_tmp5_25 = (PrtMap)(((PrtMap)((PrtMap)((IPrtValue)TMP_tmp4_25)?.Clone())));
+                    dictionary_3 = TMP_tmp5_25;
+                } break;
+            }
+            return ((PrtMap)((IPrtValue)dictionary_3)?.Clone());
         }
         [Start]
         [OnEntry(nameof(InitializeParametersFunction))]
@@ -2259,56 +2489,88 @@ namespace PImplementation
             tPhysicalTime physicalTime = null;
             PrtInt physicalTimeNow = ((PrtInt)0);
             tTimestamp timestamp = null;
-            PrtInt TMP_tmp0_32 = ((PrtInt)0);
-            tPhysicalTime TMP_tmp1_26 = null;
-            tPhysicalTime TMP_tmp2_25 = null;
-            PrtInt TMP_tmp3_24 = ((PrtInt)0);
-            PrtInt TMP_tmp4_23 = ((PrtInt)0);
-            PrtInt TMP_tmp5_24 = ((PrtInt)0);
-            PrtString TMP_tmp6_23 = ((PrtString)"");
-            tTimestamp TMP_tmp7_19 = null;
-            PrtString TMP_tmp8_15 = ((PrtString)"");
-            tPhysicalTime TMP_tmp9_10 = null;
-            tTimestamp TMP_tmp10_10 = null;
-            tHybridLogicalClock TMP_tmp11_6 = null;
+            PrtInt TMP_tmp0_36 = ((PrtInt)0);
+            PrtString TMP_tmp1_30 = ((PrtString)"");
+            tPhysicalTime TMP_tmp2_29 = null;
+            PrtString TMP_tmp3_28 = ((PrtString)"");
+            PrtString TMP_tmp4_26 = ((PrtString)"");
+            tPhysicalTime TMP_tmp5_26 = null;
+            PrtInt TMP_tmp6_25 = ((PrtInt)0);
+            PrtString TMP_tmp7_20 = ((PrtString)"");
+            PrtInt TMP_tmp8_17 = ((PrtInt)0);
+            PrtString TMP_tmp9_14 = ((PrtString)"");
+            PrtInt TMP_tmp10_15 = ((PrtInt)0);
+            PrtInt TMP_tmp11_14 = ((PrtInt)0);
+            PrtString TMP_tmp12_10 = ((PrtString)"");
+            tTimestamp TMP_tmp13_7 = null;
+            tTimestamp TMP_tmp14_7 = null;
+            PrtString TMP_tmp15_7 = ((PrtString)"");
+            PrtString TMP_tmp16_7 = ((PrtString)"");
+            PrtString TMP_tmp17_7 = ((PrtString)"");
+            tPhysicalTime TMP_tmp18_7 = null;
+            tTimestamp TMP_tmp19_7 = null;
+            tHybridLogicalClock TMP_tmp20_6 = null;
+            tHybridLogicalClock TMP_tmp21_4 = null;
+            PrtString TMP_tmp22_4 = ((PrtString)"");
             id_1 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
-            TMP_tmp0_32 = (PrtInt)(((PrtInt)(0)));
-            TMP_tmp1_26 = (tPhysicalTime)(GlobalFunctions.CreatePhysicalTime(TMP_tmp0_32, currentMachine));
-            physicalTime = TMP_tmp1_26;
-            TMP_tmp2_25 = (tPhysicalTime)(((tPhysicalTime)((IPrtValue)physicalTime)?.Clone()));
-            TMP_tmp3_24 = (PrtInt)(GlobalFunctions.GetPhysicalTimeNow(TMP_tmp2_25, currentMachine));
-            physicalTimeNow = TMP_tmp3_24;
-            TMP_tmp4_23 = (PrtInt)(((PrtInt)((IPrtValue)physicalTimeNow)?.Clone()));
-            TMP_tmp5_24 = (PrtInt)(((PrtInt)(0)));
-            TMP_tmp6_23 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
-            TMP_tmp7_19 = (tTimestamp)(GlobalFunctions.CreateNewTimestamp(TMP_tmp4_23, TMP_tmp5_24, TMP_tmp6_23, currentMachine));
-            timestamp = TMP_tmp7_19;
-            TMP_tmp8_15 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
-            TMP_tmp9_10 = (tPhysicalTime)(((tPhysicalTime)((IPrtValue)physicalTime)?.Clone()));
-            TMP_tmp10_10 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp)?.Clone()));
-            TMP_tmp11_6 = (tHybridLogicalClock)(GlobalFunctions.CreateHybridLogicalClock(TMP_tmp8_15, TMP_tmp9_10, TMP_tmp10_10, currentMachine));
-            hlc = TMP_tmp11_6;
+            TMP_tmp0_36 = (PrtInt)(((PrtInt)(0)));
+            TMP_tmp1_30 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp2_29 = (tPhysicalTime)(GlobalFunctions.CreatePhysicalTime(TMP_tmp0_36, TMP_tmp1_30, currentMachine));
+            physicalTime = TMP_tmp2_29;
+            TMP_tmp3_28 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp4_26 = (PrtString)(((PrtString) String.Format("Created new Physical Time for Hybrid Logical Clock with id {0}",TMP_tmp3_28)));
+            currentMachine.LogLine("" + TMP_tmp4_26);
+            TMP_tmp5_26 = (tPhysicalTime)(((tPhysicalTime)((IPrtValue)physicalTime)?.Clone()));
+            TMP_tmp6_25 = (PrtInt)(GlobalFunctions.GetPhysicalTimeNow(TMP_tmp5_26, currentMachine));
+            physicalTimeNow = TMP_tmp6_25;
+            TMP_tmp7_20 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp8_17 = (PrtInt)(((PrtInt)((IPrtValue)physicalTimeNow)?.Clone()));
+            TMP_tmp9_14 = (PrtString)(((PrtString) String.Format("Now for Hybrid Logical Clock with id {0} is {1}",TMP_tmp7_20,TMP_tmp8_17)));
+            currentMachine.LogLine("" + TMP_tmp9_14);
+            TMP_tmp10_15 = (PrtInt)(((PrtInt)((IPrtValue)physicalTimeNow)?.Clone()));
+            TMP_tmp11_14 = (PrtInt)(((PrtInt)(0)));
+            TMP_tmp12_10 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp13_7 = (tTimestamp)(GlobalFunctions.CreateTimestamp(TMP_tmp10_15, TMP_tmp11_14, TMP_tmp12_10, currentMachine));
+            timestamp = TMP_tmp13_7;
+            TMP_tmp14_7 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp)?.Clone()));
+            TMP_tmp15_7 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp16_7 = (PrtString)(((PrtString) String.Format("Created timestamp {0} for Hybrid Logical Clock with id {1}",TMP_tmp14_7,TMP_tmp15_7)));
+            currentMachine.LogLine("" + TMP_tmp16_7);
+            TMP_tmp17_7 = (PrtString)(((PrtString)((IPrtValue)id_1)?.Clone()));
+            TMP_tmp18_7 = (tPhysicalTime)(((tPhysicalTime)((IPrtValue)physicalTime)?.Clone()));
+            TMP_tmp19_7 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp)?.Clone()));
+            TMP_tmp20_6 = (tHybridLogicalClock)(GlobalFunctions.CreateHybridLogicalClock(TMP_tmp17_7, TMP_tmp18_7, TMP_tmp19_7, currentMachine));
+            hlc = TMP_tmp20_6;
+            TMP_tmp21_4 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
+            TMP_tmp22_4 = (PrtString)(((PrtString) String.Format("Created new Hybrid Logical Clock {0}",TMP_tmp21_4)));
+            currentMachine.LogLine("" + TMP_tmp22_4);
         }
         public void Anon_30(Event currentMachine_dequeuedEvent)
         {
             HybridLogicalClock currentMachine = this;
             PrtNamedTuple req_26 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PMachineValue TMP_tmp0_33 = null;
-            PMachineValue TMP_tmp1_27 = null;
-            PEvent TMP_tmp2_26 = null;
-            PrtInt TMP_tmp3_25 = ((PrtInt)0);
-            tHybridLogicalClock TMP_tmp4_24 = null;
-            tTimestamp TMP_tmp5_25 = null;
-            PrtNamedTuple TMP_tmp6_24 = (new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null));
-            TMP_tmp0_33 = (PMachineValue)(((PrtNamedTuple)req_26)["source"]);
-            TMP_tmp1_27 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp0_33)?.Clone()));
-            TMP_tmp2_26 = (PEvent)(new eGetLastTimestampResp((new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null))));
-            TMP_tmp3_25 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp4_24 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
-            TMP_tmp5_25 = (tTimestamp)(GlobalFunctions.GetLastTimestamp(TMP_tmp4_24, currentMachine));
-            TMP_tmp6_24 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp3_25, TMP_tmp5_25)));
-            currentMachine.TrySendEvent(TMP_tmp1_27, (Event)TMP_tmp2_26, TMP_tmp6_24);
+            tTimestamp lastTimestamp_2 = null;
+            tTimestamp TMP_tmp0_37 = null;
+            PrtString TMP_tmp1_31 = ((PrtString)"");
+            PrtString TMP_tmp2_30 = ((PrtString)"");
+            PMachineValue TMP_tmp3_29 = null;
+            PMachineValue TMP_tmp4_27 = null;
+            PEvent TMP_tmp5_27 = null;
+            PrtInt TMP_tmp6_26 = ((PrtInt)0);
+            tTimestamp TMP_tmp7_21 = null;
+            PrtNamedTuple TMP_tmp8_18 = (new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null));
+            TMP_tmp0_37 = (tTimestamp)(((tTimestamp)((IPrtValue)lastTimestamp_2)?.Clone()));
+            TMP_tmp1_31 = (PrtString)(((PrtString)((IPrtValue)id)?.Clone()));
+            TMP_tmp2_30 = (PrtString)(((PrtString) String.Format("Got last timestamp {0} from Hybrid Logical Clock with id {1}",TMP_tmp0_37,TMP_tmp1_31)));
+            currentMachine.LogLine("" + TMP_tmp2_30);
+            TMP_tmp3_29 = (PMachineValue)(((PrtNamedTuple)req_26)["source"]);
+            TMP_tmp4_27 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp3_29)?.Clone()));
+            TMP_tmp5_27 = (PEvent)(new eGetLastTimestampResp((new PrtNamedTuple(new string[]{"status","lastTimestamp"},((PrtInt)0), null))));
+            TMP_tmp6_26 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp7_21 = (tTimestamp)(((tTimestamp)((IPrtValue)lastTimestamp_2)?.Clone()));
+            TMP_tmp8_18 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp6_26, TMP_tmp7_21)));
+            currentMachine.TrySendEvent(TMP_tmp4_27, (Event)TMP_tmp5_27, TMP_tmp8_18);
         }
         public void Anon_31(Event currentMachine_dequeuedEvent)
         {
@@ -2319,48 +2581,62 @@ namespace PImplementation
             PrtNamedTuple nowResponse = (new PrtNamedTuple(new string[]{"newHlc","timestamp"},null, null));
             tTimestamp extractedTimestamp = null;
             PrtInt comparisonToPrevious = ((PrtInt)0);
-            tHybridLogicalClock TMP_tmp0_34 = null;
-            tTimestamp TMP_tmp1_28 = null;
-            tHybridLogicalClock TMP_tmp2_27 = null;
-            PrtNamedTuple TMP_tmp3_26 = (new PrtNamedTuple(new string[]{"newHlc","timestamp"},null, null));
-            tHybridLogicalClock TMP_tmp4_25 = null;
-            tHybridLogicalClock TMP_tmp5_26 = null;
-            tTimestamp TMP_tmp6_25 = null;
-            tTimestamp TMP_tmp7_20 = null;
-            tTimestamp TMP_tmp8_16 = null;
-            tTimestamp TMP_tmp9_11 = null;
-            PrtInt TMP_tmp10_11 = ((PrtInt)0);
-            PMachineValue TMP_tmp11_7 = null;
-            PMachineValue TMP_tmp12_5 = null;
-            PEvent TMP_tmp13_2 = null;
-            PrtInt TMP_tmp14_2 = ((PrtInt)0);
-            tTimestamp TMP_tmp15_3 = null;
-            PrtInt TMP_tmp16_3 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp17_3 = (new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)));
-            TMP_tmp0_34 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
-            TMP_tmp1_28 = (tTimestamp)(GlobalFunctions.GetLastTimestamp(TMP_tmp0_34, currentMachine));
-            previousTimestamp = TMP_tmp1_28;
-            TMP_tmp2_27 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
-            TMP_tmp3_26 = (PrtNamedTuple)(GlobalFunctions.GetHlcNow(TMP_tmp2_27, currentMachine));
-            nowResponse = TMP_tmp3_26;
-            TMP_tmp4_25 = (tHybridLogicalClock)(((PrtNamedTuple)nowResponse)["newHlc"]);
-            TMP_tmp5_26 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)TMP_tmp4_25)?.Clone()));
-            hlc = TMP_tmp5_26;
-            TMP_tmp6_25 = (tTimestamp)(((PrtNamedTuple)nowResponse)["timestamp"]);
-            TMP_tmp7_20 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp6_25)?.Clone()));
-            extractedTimestamp = TMP_tmp7_20;
-            TMP_tmp8_16 = (tTimestamp)(((tTimestamp)((IPrtValue)extractedTimestamp)?.Clone()));
-            TMP_tmp9_11 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp)?.Clone()));
-            TMP_tmp10_11 = (PrtInt)(GlobalFunctions.CompareTimestamps(TMP_tmp8_16, TMP_tmp9_11, currentMachine));
-            comparisonToPrevious = TMP_tmp10_11;
-            TMP_tmp11_7 = (PMachineValue)(((PrtNamedTuple)req_27)["source"]);
-            TMP_tmp12_5 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp11_7)?.Clone()));
-            TMP_tmp13_2 = (PEvent)(new eGetNowResp((new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)))));
-            TMP_tmp14_2 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp15_3 = (tTimestamp)(((tTimestamp)((IPrtValue)extractedTimestamp)?.Clone()));
-            TMP_tmp16_3 = (PrtInt)(((PrtInt)((IPrtValue)comparisonToPrevious)?.Clone()));
-            TMP_tmp17_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"}, TMP_tmp14_2, TMP_tmp15_3, TMP_tmp16_3)));
-            currentMachine.TrySendEvent(TMP_tmp12_5, (Event)TMP_tmp13_2, TMP_tmp17_3);
+            tHybridLogicalClock TMP_tmp0_38 = null;
+            tTimestamp TMP_tmp1_32 = null;
+            tTimestamp TMP_tmp2_31 = null;
+            PrtString TMP_tmp3_30 = ((PrtString)"");
+            PrtString TMP_tmp4_28 = ((PrtString)"");
+            tHybridLogicalClock TMP_tmp5_28 = null;
+            PrtNamedTuple TMP_tmp6_27 = (new PrtNamedTuple(new string[]{"newHlc","timestamp"},null, null));
+            PrtString TMP_tmp7_22 = ((PrtString)"");
+            PrtNamedTuple TMP_tmp8_19 = (new PrtNamedTuple(new string[]{"newHlc","timestamp"},null, null));
+            PrtString TMP_tmp9_15 = ((PrtString)"");
+            tHybridLogicalClock TMP_tmp10_16 = null;
+            tHybridLogicalClock TMP_tmp11_15 = null;
+            tTimestamp TMP_tmp12_11 = null;
+            tTimestamp TMP_tmp13_8 = null;
+            tTimestamp TMP_tmp14_8 = null;
+            tTimestamp TMP_tmp15_8 = null;
+            PrtInt TMP_tmp16_8 = ((PrtInt)0);
+            PMachineValue TMP_tmp17_8 = null;
+            PMachineValue TMP_tmp18_8 = null;
+            PEvent TMP_tmp19_8 = null;
+            PrtInt TMP_tmp20_7 = ((PrtInt)0);
+            tTimestamp TMP_tmp21_5 = null;
+            PrtInt TMP_tmp22_5 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp23_3 = (new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)));
+            TMP_tmp0_38 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
+            TMP_tmp1_32 = (tTimestamp)(GlobalFunctions.GetLastTimestamp(TMP_tmp0_38, currentMachine));
+            previousTimestamp = TMP_tmp1_32;
+            TMP_tmp2_31 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp)?.Clone()));
+            TMP_tmp3_30 = (PrtString)(((PrtString)((IPrtValue)id)?.Clone()));
+            TMP_tmp4_28 = (PrtString)(((PrtString) String.Format("Got last timestamp {0} from Hybrid Logical Clock with id {1}",TMP_tmp2_31,TMP_tmp3_30)));
+            currentMachine.LogLine("" + TMP_tmp4_28);
+            TMP_tmp5_28 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
+            TMP_tmp6_27 = (PrtNamedTuple)(GlobalFunctions.GetHlcNow(TMP_tmp5_28, currentMachine));
+            nowResponse = TMP_tmp6_27;
+            TMP_tmp7_22 = (PrtString)(((PrtString)((IPrtValue)id)?.Clone()));
+            TMP_tmp8_19 = (PrtNamedTuple)(((PrtNamedTuple)((IPrtValue)nowResponse)?.Clone()));
+            TMP_tmp9_15 = (PrtString)(((PrtString) String.Format("Now for Hybrid Logical Clock with id {0} is {1}",TMP_tmp7_22,TMP_tmp8_19)));
+            currentMachine.LogLine("" + TMP_tmp9_15);
+            TMP_tmp10_16 = (tHybridLogicalClock)(((PrtNamedTuple)nowResponse)["newHlc"]);
+            TMP_tmp11_15 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)TMP_tmp10_16)?.Clone()));
+            hlc = TMP_tmp11_15;
+            TMP_tmp12_11 = (tTimestamp)(((PrtNamedTuple)nowResponse)["timestamp"]);
+            TMP_tmp13_8 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp12_11)?.Clone()));
+            extractedTimestamp = TMP_tmp13_8;
+            TMP_tmp14_8 = (tTimestamp)(((tTimestamp)((IPrtValue)extractedTimestamp)?.Clone()));
+            TMP_tmp15_8 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp)?.Clone()));
+            TMP_tmp16_8 = (PrtInt)(GlobalFunctions.CompareTimestamps(TMP_tmp14_8, TMP_tmp15_8, currentMachine));
+            comparisonToPrevious = TMP_tmp16_8;
+            TMP_tmp17_8 = (PMachineValue)(((PrtNamedTuple)req_27)["source"]);
+            TMP_tmp18_8 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp17_8)?.Clone()));
+            TMP_tmp19_8 = (PEvent)(new eGetNowResp((new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)))));
+            TMP_tmp20_7 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp21_5 = (tTimestamp)(((tTimestamp)((IPrtValue)extractedTimestamp)?.Clone()));
+            TMP_tmp22_5 = (PrtInt)(((PrtInt)((IPrtValue)comparisonToPrevious)?.Clone()));
+            TMP_tmp23_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"}, TMP_tmp20_7, TMP_tmp21_5, TMP_tmp22_5)));
+            currentMachine.TrySendEvent(TMP_tmp18_8, (Event)TMP_tmp19_8, TMP_tmp23_3);
         }
         public void Anon_32(Event currentMachine_dequeuedEvent)
         {
@@ -2371,50 +2647,64 @@ namespace PImplementation
             PrtInt comparisonToPrevious_1 = ((PrtInt)0);
             PrtNamedTuple updateResponse = (new PrtNamedTuple(new string[]{"newHlc","updatedTimestamp"},null, null));
             tTimestamp timestamp_1 = null;
-            tHybridLogicalClock TMP_tmp0_35 = null;
-            tTimestamp TMP_tmp1_29 = null;
-            tHybridLogicalClock TMP_tmp2_28 = null;
-            tTimestamp TMP_tmp3_27 = null;
-            PrtNamedTuple TMP_tmp4_26 = (new PrtNamedTuple(new string[]{"newHlc","updatedTimestamp"},null, null));
-            tHybridLogicalClock TMP_tmp5_27 = null;
-            tHybridLogicalClock TMP_tmp6_26 = null;
-            tTimestamp TMP_tmp7_21 = null;
-            tTimestamp TMP_tmp8_17 = null;
-            tTimestamp TMP_tmp9_12 = null;
-            tTimestamp TMP_tmp10_12 = null;
-            PrtInt TMP_tmp11_8 = ((PrtInt)0);
-            PMachineValue TMP_tmp12_6 = null;
-            PMachineValue TMP_tmp13_3 = null;
-            PEvent TMP_tmp14_3 = null;
-            PrtInt TMP_tmp15_4 = ((PrtInt)0);
-            tTimestamp TMP_tmp16_4 = null;
-            PrtInt TMP_tmp17_4 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp18_3 = (new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)));
-            TMP_tmp0_35 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
-            TMP_tmp1_29 = (tTimestamp)(GlobalFunctions.GetLastTimestamp(TMP_tmp0_35, currentMachine));
-            previousTimestamp_1 = TMP_tmp1_29;
-            TMP_tmp2_28 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
-            TMP_tmp3_27 = (tTimestamp)(((PrtNamedTuple)req_28)["remoteTs"]);
-            TMP_tmp4_26 = (PrtNamedTuple)(GlobalFunctions.UpdateHlc(TMP_tmp2_28, TMP_tmp3_27, currentMachine));
-            updateResponse = TMP_tmp4_26;
-            TMP_tmp5_27 = (tHybridLogicalClock)(((PrtNamedTuple)updateResponse)["newHlc"]);
-            TMP_tmp6_26 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)TMP_tmp5_27)?.Clone()));
-            hlc = TMP_tmp6_26;
-            TMP_tmp7_21 = (tTimestamp)(((PrtNamedTuple)updateResponse)["updatedTimestamp"]);
-            TMP_tmp8_17 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp7_21)?.Clone()));
-            timestamp_1 = TMP_tmp8_17;
-            TMP_tmp9_12 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp_1)?.Clone()));
-            TMP_tmp10_12 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp_1)?.Clone()));
-            TMP_tmp11_8 = (PrtInt)(GlobalFunctions.CompareTimestamps(TMP_tmp9_12, TMP_tmp10_12, currentMachine));
-            comparisonToPrevious_1 = TMP_tmp11_8;
-            TMP_tmp12_6 = (PMachineValue)(((PrtNamedTuple)req_28)["source"]);
-            TMP_tmp13_3 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp12_6)?.Clone()));
-            TMP_tmp14_3 = (PEvent)(new eUpdateHlcResp((new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)))));
-            TMP_tmp15_4 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp16_4 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp_1)?.Clone()));
-            TMP_tmp17_4 = (PrtInt)(((PrtInt)((IPrtValue)comparisonToPrevious_1)?.Clone()));
-            TMP_tmp18_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"}, TMP_tmp15_4, TMP_tmp16_4, TMP_tmp17_4)));
-            currentMachine.TrySendEvent(TMP_tmp13_3, (Event)TMP_tmp14_3, TMP_tmp18_3);
+            tHybridLogicalClock TMP_tmp0_39 = null;
+            tTimestamp TMP_tmp1_33 = null;
+            tTimestamp TMP_tmp2_32 = null;
+            PrtString TMP_tmp3_31 = ((PrtString)"");
+            PrtString TMP_tmp4_29 = ((PrtString)"");
+            tHybridLogicalClock TMP_tmp5_29 = null;
+            tTimestamp TMP_tmp6_28 = null;
+            PrtNamedTuple TMP_tmp7_23 = (new PrtNamedTuple(new string[]{"newHlc","updatedTimestamp"},null, null));
+            PrtString TMP_tmp8_20 = ((PrtString)"");
+            tTimestamp TMP_tmp9_16 = null;
+            PrtString TMP_tmp10_17 = ((PrtString)"");
+            tHybridLogicalClock TMP_tmp11_16 = null;
+            tHybridLogicalClock TMP_tmp12_12 = null;
+            tTimestamp TMP_tmp13_9 = null;
+            tTimestamp TMP_tmp14_9 = null;
+            tTimestamp TMP_tmp15_9 = null;
+            tTimestamp TMP_tmp16_9 = null;
+            PrtInt TMP_tmp17_9 = ((PrtInt)0);
+            PMachineValue TMP_tmp18_9 = null;
+            PMachineValue TMP_tmp19_9 = null;
+            PEvent TMP_tmp20_8 = null;
+            PrtInt TMP_tmp21_6 = ((PrtInt)0);
+            tTimestamp TMP_tmp22_6 = null;
+            PrtInt TMP_tmp23_4 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp24_2 = (new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)));
+            TMP_tmp0_39 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
+            TMP_tmp1_33 = (tTimestamp)(GlobalFunctions.GetLastTimestamp(TMP_tmp0_39, currentMachine));
+            previousTimestamp_1 = TMP_tmp1_33;
+            TMP_tmp2_32 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp_1)?.Clone()));
+            TMP_tmp3_31 = (PrtString)(((PrtString)((IPrtValue)id)?.Clone()));
+            TMP_tmp4_29 = (PrtString)(((PrtString) String.Format("Got last timestamp {0} from Hybrid Logical Clock with id {1}",TMP_tmp2_32,TMP_tmp3_31)));
+            currentMachine.LogLine("" + TMP_tmp4_29);
+            TMP_tmp5_29 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)hlc)?.Clone()));
+            TMP_tmp6_28 = (tTimestamp)(((PrtNamedTuple)req_28)["remoteTs"]);
+            TMP_tmp7_23 = (PrtNamedTuple)(GlobalFunctions.UpdateHlc(TMP_tmp5_29, TMP_tmp6_28, currentMachine));
+            updateResponse = TMP_tmp7_23;
+            TMP_tmp8_20 = (PrtString)(((PrtString)((IPrtValue)id)?.Clone()));
+            TMP_tmp9_16 = (tTimestamp)(((PrtNamedTuple)updateResponse)["updatedTimestamp"]);
+            TMP_tmp10_17 = (PrtString)(((PrtString) String.Format("Updated HLC with id {0} to have last timestamp: {1}",TMP_tmp8_20,TMP_tmp9_16)));
+            currentMachine.LogLine("" + TMP_tmp10_17);
+            TMP_tmp11_16 = (tHybridLogicalClock)(((PrtNamedTuple)updateResponse)["newHlc"]);
+            TMP_tmp12_12 = (tHybridLogicalClock)(((tHybridLogicalClock)((IPrtValue)TMP_tmp11_16)?.Clone()));
+            hlc = TMP_tmp12_12;
+            TMP_tmp13_9 = (tTimestamp)(((PrtNamedTuple)updateResponse)["updatedTimestamp"]);
+            TMP_tmp14_9 = (tTimestamp)(((tTimestamp)((IPrtValue)TMP_tmp13_9)?.Clone()));
+            timestamp_1 = TMP_tmp14_9;
+            TMP_tmp15_9 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp_1)?.Clone()));
+            TMP_tmp16_9 = (tTimestamp)(((tTimestamp)((IPrtValue)previousTimestamp_1)?.Clone()));
+            TMP_tmp17_9 = (PrtInt)(GlobalFunctions.CompareTimestamps(TMP_tmp15_9, TMP_tmp16_9, currentMachine));
+            comparisonToPrevious_1 = TMP_tmp17_9;
+            TMP_tmp18_9 = (PMachineValue)(((PrtNamedTuple)req_28)["source"]);
+            TMP_tmp19_9 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp18_9)?.Clone()));
+            TMP_tmp20_8 = (PEvent)(new eUpdateHlcResp((new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"},((PrtInt)0), null, ((PrtInt)0)))));
+            TMP_tmp21_6 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp22_6 = (tTimestamp)(((tTimestamp)((IPrtValue)timestamp_1)?.Clone()));
+            TMP_tmp23_4 = (PrtInt)(((PrtInt)((IPrtValue)comparisonToPrevious_1)?.Clone()));
+            TMP_tmp24_2 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","updatedTimestamp","comparisonToPrevious"}, TMP_tmp21_6, TMP_tmp22_6, TMP_tmp23_4)));
+            currentMachine.TrySendEvent(TMP_tmp19_9, (Event)TMP_tmp20_8, TMP_tmp24_2);
         }
         [Start]
         [OnEntry(nameof(InitializeParametersFunction))]
@@ -2544,34 +2834,39 @@ namespace PImplementation
             PrtNamedTuple req_29 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             tEntry createdEntry_1 = null;
-            PrtString TMP_tmp0_36 = ((PrtString)"");
-            PrtString TMP_tmp1_30 = ((PrtString)"");
-            PrtString TMP_tmp2_29 = ((PrtString)"");
-            tTimestamp TMP_tmp3_28 = null;
-            PrtSet TMP_tmp4_27 = new PrtSet();
-            PrtSet TMP_tmp5_28 = new PrtSet();
-            tEntry TMP_tmp6_27 = null;
-            PMachineValue TMP_tmp7_22 = null;
-            PMachineValue TMP_tmp8_18 = null;
-            PEvent TMP_tmp9_13 = null;
-            PrtInt TMP_tmp10_13 = ((PrtInt)0);
-            tEntry TMP_tmp11_9 = null;
-            PrtNamedTuple TMP_tmp12_7 = (new PrtNamedTuple(new string[]{"status","createdEntry"},((PrtInt)0), null));
-            TMP_tmp0_36 = (PrtString)(((PrtNamedTuple)req_29)["identity"]);
-            TMP_tmp1_30 = (PrtString)(((PrtNamedTuple)req_29)["id"]);
-            TMP_tmp2_29 = (PrtString)(((PrtNamedTuple)req_29)["entryData"]);
-            TMP_tmp3_28 = (tTimestamp)(((PrtNamedTuple)req_29)["clock"]);
-            TMP_tmp4_27 = (PrtSet)(((PrtNamedTuple)req_29)["next"]);
-            TMP_tmp5_28 = (PrtSet)(((PrtNamedTuple)req_29)["refs"]);
-            TMP_tmp6_27 = (tEntry)(GlobalFunctions.CreateEntry(TMP_tmp0_36, TMP_tmp1_30, TMP_tmp2_29, TMP_tmp3_28, TMP_tmp4_27, TMP_tmp5_28, currentMachine));
-            createdEntry_1 = TMP_tmp6_27;
-            TMP_tmp7_22 = (PMachineValue)(((PrtNamedTuple)req_29)["source"]);
-            TMP_tmp8_18 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp7_22)?.Clone()));
-            TMP_tmp9_13 = (PEvent)(new eCreateEntryResp((new PrtNamedTuple(new string[]{"status","createdEntry"},((PrtInt)0), null))));
-            TMP_tmp10_13 = (PrtInt)((PrtEnum.Get("SUCCESS")));
-            TMP_tmp11_9 = (tEntry)(((tEntry)((IPrtValue)createdEntry_1)?.Clone()));
-            TMP_tmp12_7 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","createdEntry"}, TMP_tmp10_13, TMP_tmp11_9)));
-            currentMachine.TrySendEvent(TMP_tmp8_18, (Event)TMP_tmp9_13, TMP_tmp12_7);
+            PrtString TMP_tmp0_40 = ((PrtString)"");
+            PrtString TMP_tmp1_34 = ((PrtString)"");
+            PrtString TMP_tmp2_33 = ((PrtString)"");
+            tTimestamp TMP_tmp3_32 = null;
+            PrtSet TMP_tmp4_30 = new PrtSet();
+            PrtSet TMP_tmp5_30 = new PrtSet();
+            tEntry TMP_tmp6_29 = null;
+            tEntry TMP_tmp7_24 = null;
+            PrtString TMP_tmp8_21 = ((PrtString)"");
+            PMachineValue TMP_tmp9_17 = null;
+            PMachineValue TMP_tmp10_18 = null;
+            PEvent TMP_tmp11_17 = null;
+            PrtInt TMP_tmp12_13 = ((PrtInt)0);
+            tEntry TMP_tmp13_10 = null;
+            PrtNamedTuple TMP_tmp14_10 = (new PrtNamedTuple(new string[]{"status","createdEntry"},((PrtInt)0), null));
+            TMP_tmp0_40 = (PrtString)(((PrtNamedTuple)req_29)["identity"]);
+            TMP_tmp1_34 = (PrtString)(((PrtNamedTuple)req_29)["id"]);
+            TMP_tmp2_33 = (PrtString)(((PrtNamedTuple)req_29)["entryData"]);
+            TMP_tmp3_32 = (tTimestamp)(((PrtNamedTuple)req_29)["clock"]);
+            TMP_tmp4_30 = (PrtSet)(((PrtNamedTuple)req_29)["next"]);
+            TMP_tmp5_30 = (PrtSet)(((PrtNamedTuple)req_29)["refs"]);
+            TMP_tmp6_29 = (tEntry)(GlobalFunctions.CreateEntry(TMP_tmp0_40, TMP_tmp1_34, TMP_tmp2_33, TMP_tmp3_32, TMP_tmp4_30, TMP_tmp5_30, currentMachine));
+            createdEntry_1 = TMP_tmp6_29;
+            TMP_tmp7_24 = (tEntry)(((tEntry)((IPrtValue)createdEntry_1)?.Clone()));
+            TMP_tmp8_21 = (PrtString)(((PrtString) String.Format("Created new entry {0}",TMP_tmp7_24)));
+            currentMachine.LogLine("" + TMP_tmp8_21);
+            TMP_tmp9_17 = (PMachineValue)(((PrtNamedTuple)req_29)["source"]);
+            TMP_tmp10_18 = (PMachineValue)(((PMachineValue)((IPrtValue)TMP_tmp9_17)?.Clone()));
+            TMP_tmp11_17 = (PEvent)(new eCreateEntryResp((new PrtNamedTuple(new string[]{"status","createdEntry"},((PrtInt)0), null))));
+            TMP_tmp12_13 = (PrtInt)((PrtEnum.Get("SUCCESS")));
+            TMP_tmp13_10 = (tEntry)(((tEntry)((IPrtValue)createdEntry_1)?.Clone()));
+            TMP_tmp14_10 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","createdEntry"}, TMP_tmp12_13, TMP_tmp13_10)));
+            currentMachine.TrySendEvent(TMP_tmp10_18, (Event)TMP_tmp11_17, TMP_tmp14_10);
         }
         [Start]
         [OnEntry(nameof(InitializeParametersFunction))]
@@ -2596,36 +2891,36 @@ namespace PImplementation
         public void Anon_34(Event currentMachine_dequeuedEvent)
         {
             TimestampsAreMonotonicallyIncreasing currentMachine = this;
-            PrtNamedTuple resp_17 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtNamedTuple resp_18 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtInt TMP_tmp0_37 = ((PrtInt)0);
-            PrtBool TMP_tmp1_31 = ((PrtBool)false);
-            PrtString TMP_tmp2_30 = ((PrtString)"");
-            PrtString TMP_tmp3_29 = ((PrtString)"");
-            PrtString TMP_tmp4_28 = ((PrtString)"");
-            TMP_tmp0_37 = (PrtInt)(((PrtNamedTuple)resp_17)["comparisonToPrevious"]);
-            TMP_tmp1_31 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp0_37,((PrtInt)(1)))));
-            TMP_tmp2_30 = (PrtString)(((PrtString) String.Format("PSpec/HybridLogicalClockSpec.p:4:13")));
-            TMP_tmp3_29 = (PrtString)(((PrtString) String.Format("Timestamps are not monotonically increasing.")));
-            TMP_tmp4_28 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp2_30,TMP_tmp3_29)));
-            currentMachine.TryAssert(TMP_tmp1_31,"Assertion Failed: " + TMP_tmp4_28);
+            PrtInt TMP_tmp0_41 = ((PrtInt)0);
+            PrtBool TMP_tmp1_35 = ((PrtBool)false);
+            PrtString TMP_tmp2_34 = ((PrtString)"");
+            PrtString TMP_tmp3_33 = ((PrtString)"");
+            PrtString TMP_tmp4_31 = ((PrtString)"");
+            TMP_tmp0_41 = (PrtInt)(((PrtNamedTuple)resp_18)["comparisonToPrevious"]);
+            TMP_tmp1_35 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp0_41,((PrtInt)(1)))));
+            TMP_tmp2_34 = (PrtString)(((PrtString) String.Format("PSpec/HybridLogicalClockSpec.p:4:13")));
+            TMP_tmp3_33 = (PrtString)(((PrtString) String.Format("Timestamps are not monotonically increasing.")));
+            TMP_tmp4_31 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp2_34,TMP_tmp3_33)));
+            currentMachine.TryAssert(TMP_tmp1_35,"Assertion Failed: " + TMP_tmp4_31);
         }
         public void Anon_35(Event currentMachine_dequeuedEvent)
         {
             TimestampsAreMonotonicallyIncreasing currentMachine = this;
-            PrtNamedTuple resp_18 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtNamedTuple resp_19 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtInt TMP_tmp0_38 = ((PrtInt)0);
-            PrtBool TMP_tmp1_32 = ((PrtBool)false);
-            PrtString TMP_tmp2_31 = ((PrtString)"");
-            PrtString TMP_tmp3_30 = ((PrtString)"");
-            PrtString TMP_tmp4_29 = ((PrtString)"");
-            TMP_tmp0_38 = (PrtInt)(((PrtNamedTuple)resp_18)["comparisonToPrevious"]);
-            TMP_tmp1_32 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp0_38,((PrtInt)(1)))));
-            TMP_tmp2_31 = (PrtString)(((PrtString) String.Format("PSpec/HybridLogicalClockSpec.p:9:13")));
-            TMP_tmp3_30 = (PrtString)(((PrtString) String.Format("Timestamps are not monotonically increasing.")));
-            TMP_tmp4_29 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp2_31,TMP_tmp3_30)));
-            currentMachine.TryAssert(TMP_tmp1_32,"Assertion Failed: " + TMP_tmp4_29);
+            PrtInt TMP_tmp0_42 = ((PrtInt)0);
+            PrtBool TMP_tmp1_36 = ((PrtBool)false);
+            PrtString TMP_tmp2_35 = ((PrtString)"");
+            PrtString TMP_tmp3_34 = ((PrtString)"");
+            PrtString TMP_tmp4_32 = ((PrtString)"");
+            TMP_tmp0_42 = (PrtInt)(((PrtNamedTuple)resp_19)["comparisonToPrevious"]);
+            TMP_tmp1_36 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp0_42,((PrtInt)(1)))));
+            TMP_tmp2_35 = (PrtString)(((PrtString) String.Format("PSpec/HybridLogicalClockSpec.p:9:13")));
+            TMP_tmp3_34 = (PrtString)(((PrtString) String.Format("Timestamps are not monotonically increasing.")));
+            TMP_tmp4_32 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp2_35,TMP_tmp3_34)));
+            currentMachine.TryAssert(TMP_tmp1_36,"Assertion Failed: " + TMP_tmp4_32);
         }
         [Start]
         [OnEventDoAction(typeof(eGetNowResp), nameof(Anon_34))]
@@ -2751,45 +3046,45 @@ namespace PImplementation
         public void Anon_36(Event currentMachine_dequeuedEvent)
         {
             TestAppendingEntryToLog currentMachine = this;
-            PrtSet logHeads_1 = new PrtSet();
-            PrtString TMP_tmp0_39 = ((PrtString)"");
-            PrtString TMP_tmp1_33 = ((PrtString)"");
-            PrtSet TMP_tmp2_32 = new PrtSet();
-            PrtNamedTuple TMP_tmp3_31 = (new PrtNamedTuple(new string[]{"identityIn","logIdIn","logHeads"},((PrtString)""), ((PrtString)""), new PrtSet()));
-            PMachineValue TMP_tmp4_30 = null;
-            PrtBool TMP_tmp5_29 = ((PrtBool)false);
-            PrtBool TMP_tmp6_28 = ((PrtBool)false);
-            PMachineValue TMP_tmp7_23 = null;
-            PEvent TMP_tmp8_19 = null;
-            PMachineValue TMP_tmp9_14 = null;
-            PrtString TMP_tmp10_14 = ((PrtString)"");
-            PrtInt TMP_tmp11_10 = ((PrtInt)0);
-            PrtNamedTuple TMP_tmp12_8 = (new PrtNamedTuple(new string[]{"source","entryData","numReferences"},null, ((PrtString)""), ((PrtInt)0)));
+            PrtSeq logHeads_1 = new PrtSeq();
+            PrtString TMP_tmp0_43 = ((PrtString)"");
+            PrtString TMP_tmp1_37 = ((PrtString)"");
+            PrtSeq TMP_tmp2_36 = new PrtSeq();
+            PrtNamedTuple TMP_tmp3_35 = (new PrtNamedTuple(new string[]{"identityIn","logIdIn","logHeads"},((PrtString)""), ((PrtString)""), new PrtSeq()));
+            PMachineValue TMP_tmp4_33 = null;
+            PrtBool TMP_tmp5_31 = ((PrtBool)false);
+            PrtBool TMP_tmp6_30 = ((PrtBool)false);
+            PMachineValue TMP_tmp7_25 = null;
+            PEvent TMP_tmp8_22 = null;
+            PMachineValue TMP_tmp9_18 = null;
+            PrtString TMP_tmp10_19 = ((PrtString)"");
+            PrtInt TMP_tmp11_18 = ((PrtInt)0);
+            PrtNamedTuple TMP_tmp12_14 = (new PrtNamedTuple(new string[]{"source","entryData","numReferences"},null, ((PrtString)""), ((PrtInt)0)));
             numberOfEntriesToCreate = (PrtInt)(((PrtInt)(10)));
-            TMP_tmp0_39 = (PrtString)(((PrtString) String.Format("test1")));
-            TMP_tmp1_33 = (PrtString)(((PrtString) String.Format("test1")));
-            TMP_tmp2_32 = (PrtSet)(((PrtSet)((IPrtValue)logHeads_1)?.Clone()));
-            TMP_tmp3_31 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"identityIn","logIdIn","logHeads"}, TMP_tmp0_39, TMP_tmp1_33, TMP_tmp2_32)));
-            TMP_tmp4_30 = (PMachineValue)(currentMachine.CreateInterface<I_Log>( currentMachine, TMP_tmp3_31));
-            log_1 = TMP_tmp4_30;
+            TMP_tmp0_43 = (PrtString)(((PrtString) String.Format("test1")));
+            TMP_tmp1_37 = (PrtString)(((PrtString) String.Format("test1")));
+            TMP_tmp2_36 = (PrtSeq)(((PrtSeq)((IPrtValue)logHeads_1)?.Clone()));
+            TMP_tmp3_35 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"identityIn","logIdIn","logHeads"}, TMP_tmp0_43, TMP_tmp1_37, TMP_tmp2_36)));
+            TMP_tmp4_33 = (PMachineValue)(currentMachine.CreateInterface<I_Log>( currentMachine, TMP_tmp3_35));
+            log_1 = TMP_tmp4_33;
             while (((PrtBool)true))
             {
-                TMP_tmp5_29 = (PrtBool)((numberOfEntriesToCreate) > (((PrtInt)(0))));
-                TMP_tmp6_28 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp5_29)?.Clone()));
-                if (TMP_tmp6_28)
+                TMP_tmp5_31 = (PrtBool)((numberOfEntriesToCreate) > (((PrtInt)(0))));
+                TMP_tmp6_30 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp5_31)?.Clone()));
+                if (TMP_tmp6_30)
                 {
                 }
                 else
                 {
                     break;
                 }
-                TMP_tmp7_23 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
-                TMP_tmp8_19 = (PEvent)(new eAppendNewEntryToLogReq((new PrtNamedTuple(new string[]{"source","entryData","numReferences"},null, ((PrtString)""), ((PrtInt)0)))));
-                TMP_tmp9_14 = (PMachineValue)(currentMachine.self);
-                TMP_tmp10_14 = (PrtString)(GlobalFunctions.GetRandomString(currentMachine));
-                TMP_tmp11_10 = (PrtInt)(((PrtInt)(0)));
-                TMP_tmp12_8 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","entryData","numReferences"}, TMP_tmp9_14, TMP_tmp10_14, TMP_tmp11_10)));
-                currentMachine.TrySendEvent(TMP_tmp7_23, (Event)TMP_tmp8_19, TMP_tmp12_8);
+                TMP_tmp7_25 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
+                TMP_tmp8_22 = (PEvent)(new eAppendNewEntryToLogReq((new PrtNamedTuple(new string[]{"source","entryData","numReferences"},null, ((PrtString)""), ((PrtInt)0)))));
+                TMP_tmp9_18 = (PMachineValue)(currentMachine.self);
+                TMP_tmp10_19 = (PrtString)(GlobalFunctions.GetRandomString(currentMachine));
+                TMP_tmp11_18 = (PrtInt)(((PrtInt)(0)));
+                TMP_tmp12_14 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","entryData","numReferences"}, TMP_tmp9_18, TMP_tmp10_19, TMP_tmp11_18)));
+                currentMachine.TrySendEvent(TMP_tmp7_25, (Event)TMP_tmp8_22, TMP_tmp12_14);
             }
             currentMachine.TryGotoState<WaitForResponses>();
             return;
@@ -2797,45 +3092,45 @@ namespace PImplementation
         public void Anon_37(Event currentMachine_dequeuedEvent)
         {
             TestAppendingEntryToLog currentMachine = this;
-            PrtNamedTuple resp_19 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtNamedTuple resp_20 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
-            PrtSet rootEntries = new PrtSet();
-            tDefaultTraversalStopper traversalStopper = null;
-            tDefaultTraversalStopper TMP_tmp0_40 = null;
-            tDefaultTraversalStopper TMP_tmp1_34 = null;
-            PrtInt TMP_tmp2_33 = ((PrtInt)0);
-            PrtInt TMP_tmp3_32 = ((PrtInt)0);
-            tEntry TMP_tmp4_31 = null;
-            PrtInt TMP_tmp5_30 = ((PrtInt)0);
-            PrtBool TMP_tmp6_29 = ((PrtBool)false);
-            PMachineValue TMP_tmp7_24 = null;
-            PEvent TMP_tmp8_20 = null;
-            PMachineValue TMP_tmp9_15 = null;
-            PrtSet TMP_tmp10_15 = new PrtSet();
-            tDefaultTraversalStopper TMP_tmp11_11 = null;
-            PrtBool TMP_tmp12_9 = ((PrtBool)false);
-            PrtNamedTuple TMP_tmp13_4 = (new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSet(), null, ((PrtBool)false)));
-            PrtNamedTuple TMP_tmp14_4 = (new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSet(), null, ((PrtBool)false)));
-            TMP_tmp0_40 = (tDefaultTraversalStopper)(GlobalFunctions.CreateDefaultTraversalStopper(currentMachine));
-            TMP_tmp1_34 = (tDefaultTraversalStopper)(((tDefaultTraversalStopper)((tDefaultTraversalStopper)((IPrtValue)TMP_tmp0_40)?.Clone())));
-            traversalStopper = TMP_tmp1_34;
-            TMP_tmp2_33 = (PrtInt)(((PrtInt)(orderedResponses).Count));
-            TMP_tmp3_32 = (PrtInt)((TMP_tmp2_33) - (((PrtInt)(1))));
-            TMP_tmp4_31 = (tEntry)(((PrtNamedTuple)resp_19)["newEntry"]);
-            ((PrtSeq)orderedResponses).Insert(TMP_tmp3_32, TMP_tmp4_31);
-            TMP_tmp5_30 = (PrtInt)(((PrtInt)(orderedResponses).Count));
-            TMP_tmp6_29 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp5_30,numberOfEntriesToCreate)));
-            if (TMP_tmp6_29)
+            PrtSeq rootEntries_1 = new PrtSeq();
+            tTraversalStopper traversalStopper = null;
+            tTraversalStopper TMP_tmp0_44 = null;
+            tTraversalStopper TMP_tmp1_38 = null;
+            PrtInt TMP_tmp2_37 = ((PrtInt)0);
+            PrtInt TMP_tmp3_36 = ((PrtInt)0);
+            tEntry TMP_tmp4_34 = null;
+            PrtInt TMP_tmp5_32 = ((PrtInt)0);
+            PrtBool TMP_tmp6_31 = ((PrtBool)false);
+            PMachineValue TMP_tmp7_26 = null;
+            PEvent TMP_tmp8_23 = null;
+            PMachineValue TMP_tmp9_19 = null;
+            PrtSeq TMP_tmp10_20 = new PrtSeq();
+            tTraversalStopper TMP_tmp11_19 = null;
+            PrtBool TMP_tmp12_15 = ((PrtBool)false);
+            PrtNamedTuple TMP_tmp13_11 = (new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSeq(), null, ((PrtBool)false)));
+            PrtNamedTuple TMP_tmp14_11 = (new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSeq(), null, ((PrtBool)false)));
+            TMP_tmp0_44 = (tTraversalStopper)(GlobalFunctions.CreateDefaultTraversalStopper(currentMachine));
+            TMP_tmp1_38 = (tTraversalStopper)(((tTraversalStopper)((tTraversalStopper)((IPrtValue)TMP_tmp0_44)?.Clone())));
+            traversalStopper = TMP_tmp1_38;
+            TMP_tmp2_37 = (PrtInt)(((PrtInt)(orderedResponses).Count));
+            TMP_tmp3_36 = (PrtInt)((TMP_tmp2_37) - (((PrtInt)(1))));
+            TMP_tmp4_34 = (tEntry)(((PrtNamedTuple)resp_20)["newEntry"]);
+            ((PrtSeq)orderedResponses).Insert(TMP_tmp3_36, TMP_tmp4_34);
+            TMP_tmp5_32 = (PrtInt)(((PrtInt)(orderedResponses).Count));
+            TMP_tmp6_31 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp5_32,numberOfEntriesToCreate)));
+            if (TMP_tmp6_31)
             {
-                TMP_tmp7_24 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
-                TMP_tmp8_20 = (PEvent)(new eTraverseLogReq((new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSet(), null, ((PrtBool)false)))));
-                TMP_tmp9_15 = (PMachineValue)(currentMachine.self);
-                TMP_tmp10_15 = (PrtSet)(((PrtSet)((IPrtValue)rootEntries)?.Clone()));
-                TMP_tmp11_11 = (tDefaultTraversalStopper)(((tDefaultTraversalStopper)((IPrtValue)traversalStopper)?.Clone()));
-                TMP_tmp12_9 = (PrtBool)(((PrtBool)false));
-                TMP_tmp13_4 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"}, TMP_tmp9_15, TMP_tmp10_15, TMP_tmp11_11, TMP_tmp12_9)));
-                TMP_tmp14_4 = (PrtNamedTuple)(((PrtNamedTuple)((PrtNamedTuple)((IPrtValue)TMP_tmp13_4)?.Clone())));
-                currentMachine.TrySendEvent(TMP_tmp7_24, (Event)TMP_tmp8_20, TMP_tmp14_4);
+                TMP_tmp7_26 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
+                TMP_tmp8_23 = (PEvent)(new eTraverseLogReq((new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSeq(), null, ((PrtBool)false)))));
+                TMP_tmp9_19 = (PMachineValue)(currentMachine.self);
+                TMP_tmp10_20 = (PrtSeq)(((PrtSeq)((IPrtValue)rootEntries_1)?.Clone()));
+                TMP_tmp11_19 = (tTraversalStopper)(((tTraversalStopper)((IPrtValue)traversalStopper)?.Clone()));
+                TMP_tmp12_15 = (PrtBool)(((PrtBool)false));
+                TMP_tmp13_11 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"}, TMP_tmp9_19, TMP_tmp10_20, TMP_tmp11_19, TMP_tmp12_15)));
+                TMP_tmp14_11 = (PrtNamedTuple)(((PrtNamedTuple)((PrtNamedTuple)((IPrtValue)TMP_tmp13_11)?.Clone())));
+                currentMachine.TrySendEvent(TMP_tmp7_26, (Event)TMP_tmp8_23, TMP_tmp14_11);
                 currentMachine.TryGotoState<TryTraverseLog>();
                 return;
             }
@@ -2843,73 +3138,73 @@ namespace PImplementation
         public void Anon_38(Event currentMachine_dequeuedEvent)
         {
             TestAppendingEntryToLog currentMachine = this;
-            PrtNamedTuple resp_20 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
+            PrtNamedTuple resp_21 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
             this.gotoPayload = null;
             tEntry entryItr = null;
             PrtInt index_1 = ((PrtInt)0);
-            PrtSeq TMP_tmp0_41 = new PrtSeq();
+            PrtSeq TMP_tmp0_45 = new PrtSeq();
             PrtInt TMP_i_entryItr_tmp1 = ((PrtInt)0);
             PrtInt sizeof_entryItr_tmp2 = ((PrtInt)0);
-            PrtSeq TMP_tmp3_33 = new PrtSeq();
-            PrtSeq TMP_tmp4_32 = new PrtSeq();
-            PrtInt TMP_tmp5_31 = ((PrtInt)0);
-            PrtInt TMP_tmp6_30 = ((PrtInt)0);
-            PrtBool TMP_tmp7_25 = ((PrtBool)false);
-            PrtBool TMP_tmp8_21 = ((PrtBool)false);
-            PrtInt TMP_tmp9_16 = ((PrtInt)0);
-            tEntry TMP_tmp10_16 = null;
-            tEntry TMP_tmp11_12 = null;
-            tEntry TMP_tmp12_10 = null;
-            PrtBool TMP_tmp13_5 = ((PrtBool)false);
-            PrtString TMP_tmp14_5 = ((PrtString)"");
-            PrtString TMP_tmp15_5 = ((PrtString)"");
-            PrtString TMP_tmp16_5 = ((PrtString)"");
-            PrtString TMP_tmp17_5 = ((PrtString)"");
-            PrtInt TMP_tmp18_4 = ((PrtInt)0);
-            PrtBool TMP_tmp19_3 = ((PrtBool)false);
-            PrtString TMP_tmp20_3 = ((PrtString)"");
-            PrtString TMP_tmp21_3 = ((PrtString)"");
-            PrtString TMP_tmp22_3 = ((PrtString)"");
+            PrtSeq TMP_tmp3_37 = new PrtSeq();
+            PrtSeq TMP_tmp4_35 = new PrtSeq();
+            PrtInt TMP_tmp5_33 = ((PrtInt)0);
+            PrtInt TMP_tmp6_32 = ((PrtInt)0);
+            PrtBool TMP_tmp7_27 = ((PrtBool)false);
+            PrtBool TMP_tmp8_24 = ((PrtBool)false);
+            PrtInt TMP_tmp9_20 = ((PrtInt)0);
+            tEntry TMP_tmp10_21 = null;
+            tEntry TMP_tmp11_20 = null;
+            tEntry TMP_tmp12_16 = null;
+            PrtBool TMP_tmp13_12 = ((PrtBool)false);
+            PrtString TMP_tmp14_12 = ((PrtString)"");
+            PrtString TMP_tmp15_10 = ((PrtString)"");
+            PrtString TMP_tmp16_10 = ((PrtString)"");
+            PrtString TMP_tmp17_10 = ((PrtString)"");
+            PrtInt TMP_tmp18_10 = ((PrtInt)0);
+            PrtBool TMP_tmp19_10 = ((PrtBool)false);
+            PrtString TMP_tmp20_9 = ((PrtString)"");
+            PrtString TMP_tmp21_7 = ((PrtString)"");
+            PrtString TMP_tmp22_7 = ((PrtString)"");
             index_1 = (PrtInt)(((PrtInt)(0)));
-            TMP_tmp3_33 = (PrtSeq)(((PrtNamedTuple)resp_20)["traversedEntries"]);
-            TMP_tmp4_32 = (PrtSeq)(((PrtSeq)((IPrtValue)TMP_tmp3_33)?.Clone()));
-            TMP_tmp0_41 = TMP_tmp4_32;
+            TMP_tmp3_37 = (PrtSeq)(((PrtNamedTuple)resp_21)["traversedEntries"]);
+            TMP_tmp4_35 = (PrtSeq)(((PrtSeq)((IPrtValue)TMP_tmp3_37)?.Clone()));
+            TMP_tmp0_45 = TMP_tmp4_35;
             TMP_i_entryItr_tmp1 = (PrtInt)(((PrtInt)(-1)));
-            TMP_tmp5_31 = (PrtInt)(((PrtInt)(TMP_tmp0_41).Count));
-            sizeof_entryItr_tmp2 = TMP_tmp5_31;
+            TMP_tmp5_33 = (PrtInt)(((PrtInt)(TMP_tmp0_45).Count));
+            sizeof_entryItr_tmp2 = TMP_tmp5_33;
             while (((PrtBool)true))
             {
-                TMP_tmp6_30 = (PrtInt)((sizeof_entryItr_tmp2) - (((PrtInt)(1))));
-                TMP_tmp7_25 = (PrtBool)((TMP_i_entryItr_tmp1) < (TMP_tmp6_30));
-                TMP_tmp8_21 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp7_25)?.Clone()));
-                if (TMP_tmp8_21)
+                TMP_tmp6_32 = (PrtInt)((sizeof_entryItr_tmp2) - (((PrtInt)(1))));
+                TMP_tmp7_27 = (PrtBool)((TMP_i_entryItr_tmp1) < (TMP_tmp6_32));
+                TMP_tmp8_24 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp7_27)?.Clone()));
+                if (TMP_tmp8_24)
                 {
                 }
                 else
                 {
                     break;
                 }
-                TMP_tmp9_16 = (PrtInt)((TMP_i_entryItr_tmp1) + (((PrtInt)(1))));
-                TMP_i_entryItr_tmp1 = TMP_tmp9_16;
-                TMP_tmp10_16 = (tEntry)(((PrtSeq)TMP_tmp0_41)[TMP_i_entryItr_tmp1]);
-                TMP_tmp11_12 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp10_16)?.Clone()));
-                entryItr = TMP_tmp11_12;
-                TMP_tmp12_10 = (tEntry)(((PrtSeq)orderedResponses)[index_1]);
-                TMP_tmp13_5 = (PrtBool)((PrtValues.SafeEquals(entryItr,TMP_tmp12_10)));
-                TMP_tmp14_5 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:37:17")));
-                TMP_tmp15_5 = (PrtString)(((PrtString) String.Format("Entries not ordered correctly!")));
-                TMP_tmp16_5 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp14_5,TMP_tmp15_5)));
-                currentMachine.TryAssert(TMP_tmp13_5,"Assertion Failed: " + TMP_tmp16_5);
-                TMP_tmp17_5 = (PrtString)(((PrtString) String.Format("Entries equal!")));
-                currentMachine.LogLine("" + TMP_tmp17_5);
-                TMP_tmp18_4 = (PrtInt)((index_1) + (((PrtInt)(1))));
-                index_1 = TMP_tmp18_4;
+                TMP_tmp9_20 = (PrtInt)((TMP_i_entryItr_tmp1) + (((PrtInt)(1))));
+                TMP_i_entryItr_tmp1 = TMP_tmp9_20;
+                TMP_tmp10_21 = (tEntry)(((PrtSeq)TMP_tmp0_45)[TMP_i_entryItr_tmp1]);
+                TMP_tmp11_20 = (tEntry)(((tEntry)((IPrtValue)TMP_tmp10_21)?.Clone()));
+                entryItr = TMP_tmp11_20;
+                TMP_tmp12_16 = (tEntry)(((PrtSeq)orderedResponses)[index_1]);
+                TMP_tmp13_12 = (PrtBool)((PrtValues.SafeEquals(entryItr,TMP_tmp12_16)));
+                TMP_tmp14_12 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:37:17")));
+                TMP_tmp15_10 = (PrtString)(((PrtString) String.Format("Entries not ordered correctly!")));
+                TMP_tmp16_10 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp14_12,TMP_tmp15_10)));
+                currentMachine.TryAssert(TMP_tmp13_12,"Assertion Failed: " + TMP_tmp16_10);
+                TMP_tmp17_10 = (PrtString)(((PrtString) String.Format("Entries equal!")));
+                currentMachine.LogLine("" + TMP_tmp17_10);
+                TMP_tmp18_10 = (PrtInt)((index_1) + (((PrtInt)(1))));
+                index_1 = TMP_tmp18_10;
             }
-            TMP_tmp19_3 = (PrtBool)((PrtValues.SafeEquals(((PrtBool)false),((PrtBool)true))));
-            TMP_tmp20_3 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:41:13")));
-            TMP_tmp21_3 = (PrtString)(((PrtString) String.Format("Needed to exit execution with a log")));
-            TMP_tmp22_3 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp20_3,TMP_tmp21_3)));
-            currentMachine.TryAssert(TMP_tmp19_3,"Assertion Failed: " + TMP_tmp22_3);
+            TMP_tmp19_10 = (PrtBool)((PrtValues.SafeEquals(((PrtBool)false),((PrtBool)true))));
+            TMP_tmp20_9 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:41:13")));
+            TMP_tmp21_7 = (PrtString)(((PrtString) String.Format("Needed to exit execution with a log")));
+            TMP_tmp22_7 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp20_9,TMP_tmp21_7)));
+            currentMachine.TryAssert(TMP_tmp19_10,"Assertion Failed: " + TMP_tmp22_7);
         }
         [Start]
         [OnEntry(nameof(InitializeParametersFunction))]
@@ -2932,8 +3227,6 @@ namespace PImplementation
 }
 // TODO: Implement the Foreign Type tMemoryStorage
 // TODO: Implement the Foreign Type tTraversalStopper
-// TODO: Implement the Foreign Type tDefaultTraversalStopper
-// TODO: Implement the Foreign Type tGetReferencesTraversalStopper
 // TODO: Implement the Foreign Type tPhysicalTime
 // TODO: Implement the Foreign Type tHybridLogicalClock
 // TODO: Implement the Foreign Type tTimestamp

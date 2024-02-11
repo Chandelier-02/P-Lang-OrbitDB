@@ -11,6 +11,7 @@ machine EntryMachine {
         on eCreateEntryReq do (req: tCreateEntryReq) {
             var createdEntry: tEntry;
             createdEntry = CreateEntry(req.identity, req.id, req.entryData, req.clock, req.next, req.refs);
+            print format("Created new entry {0}", createdEntry);
             send req.source, eCreateEntryResp, (status= SUCCESS, createdEntry = createdEntry);
         }
     }

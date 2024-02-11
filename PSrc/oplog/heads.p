@@ -3,20 +3,20 @@ enum tRequestStatus {
     SUCCESS
 }
 
-type tPutEntriesInHeadsReq = (source: machine, entries: set[tEntry]);
+type tPutEntriesInHeadsReq = (source: machine, entries: seq[tEntry]);
 type tPutEntriesInHeadsResp = (status: tRequestStatus);
 
-type tSetEntriesInHeadsReq = (source: machine, entries: set[tEntry]);
+type tSetEntriesInHeadsReq = (source: machine, entries: seq[tEntry]);
 type tSetEntriesInHeadsResp = (status: tRequestStatus);
 
 type tAddEntryToHeadsReq = (source: machine, headEntry: tEntry);
-type tAddEntryToHeadsResp = (status: tRequestStatus, newHeads: set[tEntry]);
+type tAddEntryToHeadsResp = (status: tRequestStatus, newHeads: seq[tEntry]);
 
 type tClearAllEntriesFromHeadsReq = (source: machine);
 type tClearAllEntriesFromHeadsResp = (status: tRequestStatus);
 
 type tGetAllEntriesFromHeadsReq = (source: machine);
-type tGetAllEntriesFromHeadsResp = (status: tRequestStatus, retrivedValues: set[tEntry]);
+type tGetAllEntriesFromHeadsResp = (status: tRequestStatus, retrivedValues: seq[tEntry]);
 
 event ePutEntriesInHeadsReq : tPutEntriesInHeadsReq;
 event ePutEntriesInHeadsResp : tPutEntriesInHeadsResp;
@@ -37,7 +37,7 @@ machine Heads {
     var storage: MemoryStorage;
 
     start state Init {
-        entry (heads: set[tEntry]) {
+        entry (heads: seq[tEntry]) {
             storage = new MemoryStorage("Heads");
             PutHeads(storage, heads);
             goto Active;
@@ -56,7 +56,7 @@ machine Heads {
         }
 
         on eAddEntryToHeadsReq do (req: tAddEntryToHeadsReq) {
-            var newHeads: set[tEntry];
+            var newHeads: seq[tEntry];
             newHeads = AddHead(storage, req.headEntry);
             send req.source, eAddEntryToHeadsResp, (status = SUCCESS, newHeads = newHeads);
         }
@@ -67,14 +67,14 @@ machine Heads {
         }
 
         on eGetAllEntriesFromHeadsReq do (req: tGetAllEntriesFromHeadsReq) {
-            var allHeads: set[tEntry];
+            var allHeads: seq[tEntry];
             allHeads = GetAllHeads(storage);
             send req.source, eGetAllEntriesFromHeadsResp, (status = SUCCESS, retrivedValues = allHeads);
         }
     }
 
-    fun PutHeads(storage: machine, entries: set[tEntry]) {
-        var heads: set[tEntry];
+    fun PutHeads(storage: machine, entries: seq[tEntry]) {
+        var heads: seq[tEntry];
         var head: tEntry;
         var numToPut: int;
         heads = FindHeads(entries);
@@ -82,47 +82,49 @@ machine Heads {
             send storage, ePutValueInStorageReq, (source = this, key = GetHash(head), value = head);
             receive {
                 case ePutEntriesInHeadsResp: (resp: tPutValueInStorageResp) {
-                    assert resp.status == SUCCESS, "Failed to put head in storage."; 
+                    print format("Head {0} put in heads storage", head);
                 }
             }
         }
     }
 
-    fun SetHeads(storage: machine, entries: set[tEntry]) {
+    fun SetHeads(storage: machine, entries: seq[tEntry]) {
         send storage, eClearAllValuesFromStorageReq, (source = this, );
         receive {
             case eClearAllValuesFromStorageResp: (resp: tClearAllValuesFromStorageResp) {
-                assert resp.status == SUCCESS, "Failed to clear heads storage.";
+                print format("Cleared all heads from heads storage");
             }
         }
         PutHeads(storage, entries);
     }
 
-    fun GetAllHeads(storage: machine): set[tEntry] {
-        var returnValues: set[tEntry];
+    fun GetAllHeads(storage: machine): seq[tEntry] {
+        var returnValues: seq[tEntry];
         send storage, eGetAllValuesFromStorageReq, (source = this, );
         receive { 
             case eGetAllValuesFromStorageResp: (resp: tGetAllValuesFromStorageResp) {
-                assert resp.status == SUCCESS, "Failed to retrieve all heads from storage.";
-                returnValues = resp.retrivedValues as set[tEntry];
+                print format("Got {0} heads from heads storage", sizeof(resp.retrivedValues));
+                returnValues = resp.retrivedValues as seq[tEntry];
             }
         }
         return returnValues;
     }
 
-    fun AddHead(storage: machine, head: tEntry): set[tEntry] {
-        var retrievedHeads: set[tEntry];
-        var newHeads: set[tEntry];
-        var combinedHeadsToFind: set[tEntry];
+    fun AddHead(storage: machine, head: tEntry): seq[tEntry] {
+        var retrievedHeads: seq[tEntry];
+        var newHeads: seq[tEntry];
+        var combinedHeadsToFind: seq[tEntry];
         retrievedHeads = GetAllHeads(storage);
         combinedHeadsToFind = retrievedHeads;
         if (head in retrievedHeads) {
+            print format("Head {0} already in head storage", head);
             return retrievedHeads;
         }
         combinedHeadsToFind = retrievedHeads;
-        combinedHeadsToFind += (head);
+        combinedHeadsToFind += (0, head);
         newHeads = FindHeads(combinedHeadsToFind);
         SetHeads(storage, newHeads);
+        print format("Successfully added head {0} to heads storage", head);
         return newHeads;
     }
 
@@ -130,10 +132,10 @@ machine Heads {
         send storage, eClearAllValuesFromStorageReq, (source = this, );
         receive {
             case eClearAllValuesFromStorageResp: (resp: tClearAllValuesFromStorageResp) {
-                assert resp.status == SUCCESS, "Failed to clear heads storage.";
+                print format("Cleared all heads from heads storage");
             }
         }
     }
 }
 
-fun FindHeads(entries: set[tEntry]): set[tEntry];
+fun FindHeads(entries: seq[tEntry]): seq[tEntry];
