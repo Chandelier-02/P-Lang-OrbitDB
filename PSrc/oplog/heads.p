@@ -37,9 +37,9 @@ machine Heads {
     var storage: MemoryStorage;
 
     start state Init {
-        entry (heads: seq[tEntry]) {
-            storage = new MemoryStorage("Heads");
-            PutHeads(heads);
+        entry (init: (headsStorage: MemoryStorage, heads: seq[tEntry])) {
+            storage = init.headsStorage;
+            PutHeads(init.heads);
             goto Active;
         }
     }

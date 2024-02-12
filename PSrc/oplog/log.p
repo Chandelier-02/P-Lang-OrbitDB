@@ -86,13 +86,21 @@ machine Log {
     var heads: Heads;
 
     start state Init {
-        entry (init: (identityIn: string, logIdIn: string, logHeads: seq[tEntry])) {
-            identity = init.identityIn;
-            logId = init.logIdIn;
-            clock = new HybridLogicalClock(identity);
-            entries = new MemoryStorage("Entry Storage");
-            index = new MemoryStorage("Index Storage");
-            heads = new Heads(init.logHeads);
+        entry (init: (
+            identity: string, 
+            logId: string, 
+            logHeads: seq[tEntry], 
+            clock: HybridLogicalClock, 
+            entryStorage: MemoryStorage, 
+            headsStorage: MemoryStorage, 
+            indexStorage: MemoryStorage
+        )) {
+            identity = init.identity;
+            logId = init.logId;
+            clock = init.clock;
+            entries = init.entryStorage;
+            heads = new Heads((headsStorage = init.headsStorage, heads = init.logHeads));
+            index = init.indexStorage;
             goto WaitForRequest;
         }
     }

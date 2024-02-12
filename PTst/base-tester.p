@@ -31,7 +31,6 @@ machine TestAppendingEntryToLog {
             }
 
             if (sizeof(orderedResponses) == numberOfEntriesToCreate) {
-                //assert false == true, "This should break the execution";
                 send log, eTraverseLogReq, (source = this, rootEntries = rootEntries, stopper = traversalStopper, useRefs = false) as tTraverseLogReq;
                 receive {
                     case eTraverseLogResp: (resp: tTraverseLogResp) {

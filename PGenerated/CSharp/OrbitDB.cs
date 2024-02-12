@@ -452,6 +452,130 @@ namespace PImplementation
 }
 namespace PImplementation
 {
+    internal partial class Database : PMachine
+    {
+        private PMachineValue log = null;
+        public class ConstructorEvent : PEvent{public ConstructorEvent(IPrtValue val) : base(val) { }}
+        
+        protected override Event GetConstructorEvent(IPrtValue value) { return new ConstructorEvent((IPrtValue)value); }
+        public Database() {
+            this.sends.Add(nameof(eAddEntryToHeadsReq));
+            this.sends.Add(nameof(eAddEntryToHeadsResp));
+            this.sends.Add(nameof(eAppendNewEntryToLogReq));
+            this.sends.Add(nameof(eAppendNewEntryToLogResp));
+            this.sends.Add(nameof(eClearAllEntriesFromHeadsReq));
+            this.sends.Add(nameof(eClearAllEntriesFromHeadsResp));
+            this.sends.Add(nameof(eClearAllValuesFromStorageReq));
+            this.sends.Add(nameof(eClearAllValuesFromStorageResp));
+            this.sends.Add(nameof(eCreateEntryReq));
+            this.sends.Add(nameof(eCreateEntryResp));
+            this.sends.Add(nameof(eDeleteValueFromStorageReq));
+            this.sends.Add(nameof(eDeleteValueFromStorageResp));
+            this.sends.Add(nameof(eDoesLogHaveEntryReq));
+            this.sends.Add(nameof(eDoesLogHaveEntryResp));
+            this.sends.Add(nameof(eGetAllEntriesFromHeadsReq));
+            this.sends.Add(nameof(eGetAllEntriesFromHeadsResp));
+            this.sends.Add(nameof(eGetAllEntriesFromLogReq));
+            this.sends.Add(nameof(eGetAllEntriesFromLogResp));
+            this.sends.Add(nameof(eGetAllValuesFromStorageReq));
+            this.sends.Add(nameof(eGetAllValuesFromStorageResp));
+            this.sends.Add(nameof(eGetClockLastStateReq));
+            this.sends.Add(nameof(eGetClockLastStateResp));
+            this.sends.Add(nameof(eGetDictionaryFromMemoryStorageReq));
+            this.sends.Add(nameof(eGetDictionaryFromMemoryStorageResp));
+            this.sends.Add(nameof(eGetEntryFromLogReq));
+            this.sends.Add(nameof(eGetEntryFromLogResp));
+            this.sends.Add(nameof(eGetHeadsFromLogReq));
+            this.sends.Add(nameof(eGetHeadsFromLogResp));
+            this.sends.Add(nameof(eGetLastTimestampReq));
+            this.sends.Add(nameof(eGetLastTimestampResp));
+            this.sends.Add(nameof(eGetNowReq));
+            this.sends.Add(nameof(eGetNowResp));
+            this.sends.Add(nameof(eGetValueFromStorageReq));
+            this.sends.Add(nameof(eGetValueFromStorageResp));
+            this.sends.Add(nameof(eJoinEntryReq));
+            this.sends.Add(nameof(eJoinEntryResp));
+            this.sends.Add(nameof(eJoinLogReq));
+            this.sends.Add(nameof(eJoinLogResp));
+            this.sends.Add(nameof(ePutEntriesInHeadsReq));
+            this.sends.Add(nameof(ePutEntriesInHeadsResp));
+            this.sends.Add(nameof(ePutValueInStorageReq));
+            this.sends.Add(nameof(ePutValueInStorageResp));
+            this.sends.Add(nameof(eSetEntriesInHeadsReq));
+            this.sends.Add(nameof(eSetEntriesInHeadsResp));
+            this.sends.Add(nameof(eTraverseLogReq));
+            this.sends.Add(nameof(eTraverseLogResp));
+            this.sends.Add(nameof(eUpdateHlcReq));
+            this.sends.Add(nameof(eUpdateHlcResp));
+            this.sends.Add(nameof(PHalt));
+            this.receives.Add(nameof(eAddEntryToHeadsReq));
+            this.receives.Add(nameof(eAddEntryToHeadsResp));
+            this.receives.Add(nameof(eAppendNewEntryToLogReq));
+            this.receives.Add(nameof(eAppendNewEntryToLogResp));
+            this.receives.Add(nameof(eClearAllEntriesFromHeadsReq));
+            this.receives.Add(nameof(eClearAllEntriesFromHeadsResp));
+            this.receives.Add(nameof(eClearAllValuesFromStorageReq));
+            this.receives.Add(nameof(eClearAllValuesFromStorageResp));
+            this.receives.Add(nameof(eCreateEntryReq));
+            this.receives.Add(nameof(eCreateEntryResp));
+            this.receives.Add(nameof(eDeleteValueFromStorageReq));
+            this.receives.Add(nameof(eDeleteValueFromStorageResp));
+            this.receives.Add(nameof(eDoesLogHaveEntryReq));
+            this.receives.Add(nameof(eDoesLogHaveEntryResp));
+            this.receives.Add(nameof(eGetAllEntriesFromHeadsReq));
+            this.receives.Add(nameof(eGetAllEntriesFromHeadsResp));
+            this.receives.Add(nameof(eGetAllEntriesFromLogReq));
+            this.receives.Add(nameof(eGetAllEntriesFromLogResp));
+            this.receives.Add(nameof(eGetAllValuesFromStorageReq));
+            this.receives.Add(nameof(eGetAllValuesFromStorageResp));
+            this.receives.Add(nameof(eGetClockLastStateReq));
+            this.receives.Add(nameof(eGetClockLastStateResp));
+            this.receives.Add(nameof(eGetDictionaryFromMemoryStorageReq));
+            this.receives.Add(nameof(eGetDictionaryFromMemoryStorageResp));
+            this.receives.Add(nameof(eGetEntryFromLogReq));
+            this.receives.Add(nameof(eGetEntryFromLogResp));
+            this.receives.Add(nameof(eGetHeadsFromLogReq));
+            this.receives.Add(nameof(eGetHeadsFromLogResp));
+            this.receives.Add(nameof(eGetLastTimestampReq));
+            this.receives.Add(nameof(eGetLastTimestampResp));
+            this.receives.Add(nameof(eGetNowReq));
+            this.receives.Add(nameof(eGetNowResp));
+            this.receives.Add(nameof(eGetValueFromStorageReq));
+            this.receives.Add(nameof(eGetValueFromStorageResp));
+            this.receives.Add(nameof(eJoinEntryReq));
+            this.receives.Add(nameof(eJoinEntryResp));
+            this.receives.Add(nameof(eJoinLogReq));
+            this.receives.Add(nameof(eJoinLogResp));
+            this.receives.Add(nameof(ePutEntriesInHeadsReq));
+            this.receives.Add(nameof(ePutEntriesInHeadsResp));
+            this.receives.Add(nameof(ePutValueInStorageReq));
+            this.receives.Add(nameof(ePutValueInStorageResp));
+            this.receives.Add(nameof(eSetEntriesInHeadsReq));
+            this.receives.Add(nameof(eSetEntriesInHeadsResp));
+            this.receives.Add(nameof(eTraverseLogReq));
+            this.receives.Add(nameof(eTraverseLogResp));
+            this.receives.Add(nameof(eUpdateHlcReq));
+            this.receives.Add(nameof(eUpdateHlcResp));
+            this.receives.Add(nameof(PHalt));
+        }
+        
+        public void Anon(Event currentMachine_dequeuedEvent)
+        {
+            Database currentMachine = this;
+        }
+        [Start]
+        [OnEntry(nameof(InitializeParametersFunction))]
+        [OnEventGotoState(typeof(ConstructorEvent), typeof(Init))]
+        class __InitState__ : State { }
+        
+        [OnEntry(nameof(Anon))]
+        class Init : State
+        {
+        }
+    }
+}
+namespace PImplementation
+{
     internal partial class MemoryStorage : PMachine
     {
         private tMemoryStorage memoryStorage = null;
@@ -560,7 +684,7 @@ namespace PImplementation
             this.receives.Add(nameof(PHalt));
         }
         
-        public void Anon(Event currentMachine_dequeuedEvent)
+        public void Anon_1(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtString name_1 = (PrtString)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -574,7 +698,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_1(Event currentMachine_dequeuedEvent)
+        public void Anon_2(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -584,7 +708,7 @@ namespace PImplementation
             currentMachine.TryGotoState<PuttingValueInStorage>(TMP_tmp0_1);
             return;
         }
-        public void Anon_2(Event currentMachine_dequeuedEvent)
+        public void Anon_3(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_1 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -594,7 +718,7 @@ namespace PImplementation
             currentMachine.TryGotoState<DeletingValueFromStorage>(TMP_tmp0_2);
             return;
         }
-        public void Anon_3(Event currentMachine_dequeuedEvent)
+        public void Anon_4(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_2 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -604,7 +728,7 @@ namespace PImplementation
             currentMachine.TryGotoState<GettingValueFromStorage>(TMP_tmp0_3);
             return;
         }
-        public void Anon_4(Event currentMachine_dequeuedEvent)
+        public void Anon_5(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_3 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -614,7 +738,7 @@ namespace PImplementation
             currentMachine.TryGotoState<ClearingAllDataFromStorage>(TMP_tmp0_4);
             return;
         }
-        public void Anon_5(Event currentMachine_dequeuedEvent)
+        public void Anon_6(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_4 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -624,7 +748,7 @@ namespace PImplementation
             currentMachine.TryGotoState<GettingAllDataFromStorage>(TMP_tmp0_5);
             return;
         }
-        public void Anon_6(Event currentMachine_dequeuedEvent)
+        public void Anon_7(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_5 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -634,7 +758,7 @@ namespace PImplementation
             currentMachine.TryGotoState<GettingDictionayFromMemoryStorage>(TMP_tmp0_6);
             return;
         }
-        public void Anon_7(Event currentMachine_dequeuedEvent)
+        public void Anon_8(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_6 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -671,7 +795,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_8(Event currentMachine_dequeuedEvent)
+        public void Anon_9(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_7 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -735,7 +859,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_9(Event currentMachine_dequeuedEvent)
+        public void Anon_10(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_8 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -800,7 +924,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_10(Event currentMachine_dequeuedEvent)
+        public void Anon_11(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_9 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -829,7 +953,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_11(Event currentMachine_dequeuedEvent)
+        public void Anon_12(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_10 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -865,7 +989,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public void Anon_12(Event currentMachine_dequeuedEvent)
+        public void Anon_13(Event currentMachine_dequeuedEvent)
         {
             MemoryStorage currentMachine = this;
             PrtNamedTuple req_11 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -897,40 +1021,40 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Init))]
         class __InitState__ : State { }
         
-        [OnEntry(nameof(Anon))]
+        [OnEntry(nameof(Anon_1))]
         class Init : State
         {
         }
-        [OnEventDoAction(typeof(ePutValueInStorageReq), nameof(Anon_1))]
-        [OnEventDoAction(typeof(eDeleteValueFromStorageReq), nameof(Anon_2))]
-        [OnEventDoAction(typeof(eGetValueFromStorageReq), nameof(Anon_3))]
-        [OnEventDoAction(typeof(eClearAllValuesFromStorageReq), nameof(Anon_4))]
-        [OnEventDoAction(typeof(eGetAllValuesFromStorageReq), nameof(Anon_5))]
-        [OnEventDoAction(typeof(eGetDictionaryFromMemoryStorageReq), nameof(Anon_6))]
+        [OnEventDoAction(typeof(ePutValueInStorageReq), nameof(Anon_2))]
+        [OnEventDoAction(typeof(eDeleteValueFromStorageReq), nameof(Anon_3))]
+        [OnEventDoAction(typeof(eGetValueFromStorageReq), nameof(Anon_4))]
+        [OnEventDoAction(typeof(eClearAllValuesFromStorageReq), nameof(Anon_5))]
+        [OnEventDoAction(typeof(eGetAllValuesFromStorageReq), nameof(Anon_6))]
+        [OnEventDoAction(typeof(eGetDictionaryFromMemoryStorageReq), nameof(Anon_7))]
         class WaitForRequest : State
         {
         }
-        [OnEntry(nameof(Anon_7))]
+        [OnEntry(nameof(Anon_8))]
         class PuttingValueInStorage : State
         {
         }
-        [OnEntry(nameof(Anon_8))]
+        [OnEntry(nameof(Anon_9))]
         class DeletingValueFromStorage : State
         {
         }
-        [OnEntry(nameof(Anon_9))]
+        [OnEntry(nameof(Anon_10))]
         class GettingValueFromStorage : State
         {
         }
-        [OnEntry(nameof(Anon_10))]
+        [OnEntry(nameof(Anon_11))]
         class ClearingAllDataFromStorage : State
         {
         }
-        [OnEntry(nameof(Anon_11))]
+        [OnEntry(nameof(Anon_12))]
         class GettingAllDataFromStorage : State
         {
         }
-        [OnEntry(nameof(Anon_12))]
+        [OnEntry(nameof(Anon_13))]
         class GettingDictionayFromMemoryStorage : State
         {
         }
@@ -1046,7 +1170,7 @@ namespace PImplementation
             this.creates.Add(nameof(I_MemoryStorage));
         }
         
-        public async Task Anon_13(Event currentMachine_dequeuedEvent)
+        public async Task Anon_14(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtSeq heads = (PrtSeq)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1062,7 +1186,7 @@ namespace PImplementation
             currentMachine.TryGotoState<Active>();
             return;
         }
-        public async Task Anon_14(Event currentMachine_dequeuedEvent)
+        public async Task Anon_15(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtNamedTuple req_12 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1082,7 +1206,7 @@ namespace PImplementation
             TMP_tmp5_6 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp4_6)));
             currentMachine.TrySendEvent(TMP_tmp2_7, (Event)TMP_tmp3_6, TMP_tmp5_6);
         }
-        public async Task Anon_15(Event currentMachine_dequeuedEvent)
+        public async Task Anon_16(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtNamedTuple req_13 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1102,7 +1226,7 @@ namespace PImplementation
             TMP_tmp5_7 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp4_7)));
             currentMachine.TrySendEvent(TMP_tmp2_8, (Event)TMP_tmp3_7, TMP_tmp5_7);
         }
-        public async Task Anon_16(Event currentMachine_dequeuedEvent)
+        public async Task Anon_17(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtNamedTuple req_14 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1127,7 +1251,7 @@ namespace PImplementation
             TMP_tmp7_6 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","newHeads"}, TMP_tmp5_8, TMP_tmp6_6)));
             currentMachine.TrySendEvent(TMP_tmp3_8, (Event)TMP_tmp4_8, TMP_tmp7_6);
         }
-        public async Task Anon_17(Event currentMachine_dequeuedEvent)
+        public async Task Anon_18(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtNamedTuple req_15 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1145,7 +1269,7 @@ namespace PImplementation
             TMP_tmp4_9 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp3_9)));
             currentMachine.TrySendEvent(TMP_tmp1_11, (Event)TMP_tmp2_10, TMP_tmp4_9);
         }
-        public async Task Anon_18(Event currentMachine_dequeuedEvent)
+        public async Task Anon_19(Event currentMachine_dequeuedEvent)
         {
             Heads currentMachine = this;
             PrtNamedTuple req_16 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1382,15 +1506,15 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Init))]
         class __InitState__ : State { }
         
-        [OnEntry(nameof(Anon_13))]
+        [OnEntry(nameof(Anon_14))]
         class Init : State
         {
         }
-        [OnEventDoAction(typeof(ePutEntriesInHeadsReq), nameof(Anon_14))]
-        [OnEventDoAction(typeof(eSetEntriesInHeadsReq), nameof(Anon_15))]
-        [OnEventDoAction(typeof(eAddEntryToHeadsReq), nameof(Anon_16))]
-        [OnEventDoAction(typeof(eClearAllEntriesFromHeadsReq), nameof(Anon_17))]
-        [OnEventDoAction(typeof(eGetAllEntriesFromHeadsReq), nameof(Anon_18))]
+        [OnEventDoAction(typeof(ePutEntriesInHeadsReq), nameof(Anon_15))]
+        [OnEventDoAction(typeof(eSetEntriesInHeadsReq), nameof(Anon_16))]
+        [OnEventDoAction(typeof(eAddEntryToHeadsReq), nameof(Anon_17))]
+        [OnEventDoAction(typeof(eClearAllEntriesFromHeadsReq), nameof(Anon_18))]
+        [OnEventDoAction(typeof(eGetAllEntriesFromHeadsReq), nameof(Anon_19))]
         class Active : State
         {
         }
@@ -1513,7 +1637,7 @@ namespace PImplementation
             this.creates.Add(nameof(I_MemoryStorage));
         }
         
-        public void Anon_19(Event currentMachine_dequeuedEvent)
+        public void Anon_20(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple init = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1551,7 +1675,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public async Task Anon_20(Event currentMachine_dequeuedEvent)
+        public async Task Anon_21(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_17 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1574,7 +1698,7 @@ namespace PImplementation
             TMP_tmp6_13 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp4_17, TMP_tmp5_15)));
             currentMachine.TrySendEvent(TMP_tmp2_18, (Event)TMP_tmp3_17, TMP_tmp6_13);
         }
-        public async Task Anon_21(Event currentMachine_dequeuedEvent)
+        public async Task Anon_22(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_18 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1597,7 +1721,7 @@ namespace PImplementation
             TMP_tmp6_14 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","heads"}, TMP_tmp4_18, TMP_tmp5_16)));
             currentMachine.TrySendEvent(TMP_tmp2_19, (Event)TMP_tmp3_18, TMP_tmp6_14);
         }
-        public async Task Anon_22(Event currentMachine_dequeuedEvent)
+        public async Task Anon_23(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_19 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1620,7 +1744,7 @@ namespace PImplementation
             TMP_tmp6_15 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","entries"}, TMP_tmp4_19, TMP_tmp5_17)));
             currentMachine.TrySendEvent(TMP_tmp2_20, (Event)TMP_tmp3_19, TMP_tmp6_15);
         }
-        public async Task Anon_23(Event currentMachine_dequeuedEvent)
+        public async Task Anon_24(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_20 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1667,7 +1791,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public async Task Anon_24(Event currentMachine_dequeuedEvent)
+        public async Task Anon_25(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_21 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1714,7 +1838,7 @@ namespace PImplementation
             currentMachine.TryGotoState<WaitForRequest>();
             return;
         }
-        public async Task Anon_25(Event currentMachine_dequeuedEvent)
+        public async Task Anon_26(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_22 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1741,7 +1865,7 @@ namespace PImplementation
             TMP_tmp8_10 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","newEntry"}, TMP_tmp6_18, TMP_tmp7_13)));
             currentMachine.TrySendEvent(TMP_tmp4_22, (Event)TMP_tmp5_20, TMP_tmp8_10);
         }
-        public async Task Anon_26(Event currentMachine_dequeuedEvent)
+        public async Task Anon_27(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_23 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1761,7 +1885,7 @@ namespace PImplementation
             TMP_tmp5_21 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status"}, TMP_tmp4_23)));
             currentMachine.TrySendEvent(TMP_tmp2_24, (Event)TMP_tmp3_23, TMP_tmp5_21);
         }
-        public async Task Anon_27(Event currentMachine_dequeuedEvent)
+        public async Task Anon_28(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_24 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -1786,7 +1910,7 @@ namespace PImplementation
             TMP_tmp7_14 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","couldJoin"}, TMP_tmp5_22, TMP_tmp6_19)));
             currentMachine.TrySendEvent(TMP_tmp3_24, (Event)TMP_tmp4_24, TMP_tmp7_14);
         }
-        public async Task Anon_28(Event currentMachine_dequeuedEvent)
+        public async Task Anon_29(Event currentMachine_dequeuedEvent)
         {
             Log currentMachine = this;
             PrtNamedTuple req_25 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -2267,7 +2391,7 @@ namespace PImplementation
             currentMachine.LogLine("" + TMP_tmp61);
             return ((tEntry)((IPrtValue)createdEntry)?.Clone());
         }
-        public async Task JoinLog(PMachineValue log)
+        public async Task JoinLog(PMachineValue log_1)
         {
             Log currentMachine = this;
             PrtSeq otherLogHeads = new PrtSeq();
@@ -2296,7 +2420,7 @@ namespace PImplementation
             PrtString TMP_tmp20_5 = ((PrtString)"");
             TMP_tmp0_40 = (PrtString)(((PrtString) String.Format("JOINING OTHER LOG TO LOG")));
             currentMachine.LogLine("" + TMP_tmp0_40);
-            TMP_tmp1_34 = (PMachineValue)(((PMachineValue)((IPrtValue)log)?.Clone()));
+            TMP_tmp1_34 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
             TMP_tmp2_33 = (PEvent)(new eGetHeadsFromLogReq((new PrtNamedTuple(new string[]{"source"},null))));
             TMP_tmp3_32 = (PMachineValue)(currentMachine.self);
             TMP_tmp4_32 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source"}, TMP_tmp3_32)));
@@ -2526,19 +2650,19 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Init))]
         class __InitState__ : State { }
         
-        [OnEntry(nameof(Anon_19))]
+        [OnEntry(nameof(Anon_20))]
         class Init : State
         {
         }
-        [OnEventDoAction(typeof(eGetClockLastStateReq), nameof(Anon_20))]
-        [OnEventDoAction(typeof(eGetHeadsFromLogReq), nameof(Anon_21))]
-        [OnEventDoAction(typeof(eGetAllEntriesFromLogReq), nameof(Anon_22))]
-        [OnEventDoAction(typeof(eGetEntryFromLogReq), nameof(Anon_23))]
-        [OnEventDoAction(typeof(eDoesLogHaveEntryReq), nameof(Anon_24))]
-        [OnEventDoAction(typeof(eAppendNewEntryToLogReq), nameof(Anon_25))]
-        [OnEventDoAction(typeof(eJoinLogReq), nameof(Anon_26))]
-        [OnEventDoAction(typeof(eJoinEntryReq), nameof(Anon_27))]
-        [OnEventDoAction(typeof(eTraverseLogReq), nameof(Anon_28))]
+        [OnEventDoAction(typeof(eGetClockLastStateReq), nameof(Anon_21))]
+        [OnEventDoAction(typeof(eGetHeadsFromLogReq), nameof(Anon_22))]
+        [OnEventDoAction(typeof(eGetAllEntriesFromLogReq), nameof(Anon_23))]
+        [OnEventDoAction(typeof(eGetEntryFromLogReq), nameof(Anon_24))]
+        [OnEventDoAction(typeof(eDoesLogHaveEntryReq), nameof(Anon_25))]
+        [OnEventDoAction(typeof(eAppendNewEntryToLogReq), nameof(Anon_26))]
+        [OnEventDoAction(typeof(eJoinLogReq), nameof(Anon_27))]
+        [OnEventDoAction(typeof(eJoinEntryReq), nameof(Anon_28))]
+        [OnEventDoAction(typeof(eTraverseLogReq), nameof(Anon_29))]
         class WaitForRequest : State
         {
         }
@@ -2654,7 +2778,7 @@ namespace PImplementation
             this.receives.Add(nameof(PHalt));
         }
         
-        public void Anon_29(Event currentMachine_dequeuedEvent)
+        public void Anon_30(Event currentMachine_dequeuedEvent)
         {
             HybridLogicalClock currentMachine = this;
             PrtString id_1 = (PrtString)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -2718,7 +2842,7 @@ namespace PImplementation
             TMP_tmp22_4 = (PrtString)(((PrtString) String.Format("Created new Hybrid Logical Clock {0}",TMP_tmp21_6)));
             currentMachine.LogLine("" + TMP_tmp22_4);
         }
-        public void Anon_30(Event currentMachine_dequeuedEvent)
+        public void Anon_31(Event currentMachine_dequeuedEvent)
         {
             HybridLogicalClock currentMachine = this;
             PrtNamedTuple req_26 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -2745,7 +2869,7 @@ namespace PImplementation
             TMP_tmp8_21 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","lastTimestamp"}, TMP_tmp6_29, TMP_tmp7_24)));
             currentMachine.TrySendEvent(TMP_tmp4_36, (Event)TMP_tmp5_34, TMP_tmp8_21);
         }
-        public void Anon_31(Event currentMachine_dequeuedEvent)
+        public void Anon_32(Event currentMachine_dequeuedEvent)
         {
             HybridLogicalClock currentMachine = this;
             PrtNamedTuple req_27 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -2811,7 +2935,7 @@ namespace PImplementation
             TMP_tmp23_3 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"status","now","comparisonToPrevious"}, TMP_tmp20_8, TMP_tmp21_7, TMP_tmp22_5)));
             currentMachine.TrySendEvent(TMP_tmp18_8, (Event)TMP_tmp19_8, TMP_tmp23_3);
         }
-        public void Anon_32(Event currentMachine_dequeuedEvent)
+        public void Anon_33(Event currentMachine_dequeuedEvent)
         {
             HybridLogicalClock currentMachine = this;
             PrtNamedTuple req_28 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -2884,10 +3008,10 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Active))]
         class __InitState__ : State { }
         
-        [OnEntry(nameof(Anon_29))]
-        [OnEventDoAction(typeof(eGetLastTimestampReq), nameof(Anon_30))]
-        [OnEventDoAction(typeof(eGetNowReq), nameof(Anon_31))]
-        [OnEventDoAction(typeof(eUpdateHlcReq), nameof(Anon_32))]
+        [OnEntry(nameof(Anon_30))]
+        [OnEventDoAction(typeof(eGetLastTimestampReq), nameof(Anon_31))]
+        [OnEventDoAction(typeof(eGetNowReq), nameof(Anon_32))]
+        [OnEventDoAction(typeof(eUpdateHlcReq), nameof(Anon_33))]
         class Active : State
         {
         }
@@ -3001,7 +3125,7 @@ namespace PImplementation
             this.receives.Add(nameof(PHalt));
         }
         
-        public void Anon_33(Event currentMachine_dequeuedEvent)
+        public void Anon_34(Event currentMachine_dequeuedEvent)
         {
             EntryMachine currentMachine = this;
             PrtNamedTuple req_29 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -3046,7 +3170,7 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Active))]
         class __InitState__ : State { }
         
-        [OnEventDoAction(typeof(eCreateEntryReq), nameof(Anon_33))]
+        [OnEventDoAction(typeof(eCreateEntryReq), nameof(Anon_34))]
         class Active : State
         {
         }
@@ -3061,7 +3185,7 @@ namespace PImplementation
             observes.Add(nameof(eUpdateHlcResp));
         }
         
-        public void Anon_34(Event currentMachine_dequeuedEvent)
+        public void Anon_35(Event currentMachine_dequeuedEvent)
         {
             TimestampsAreMonotonicallyIncreasing currentMachine = this;
             PrtNamedTuple resp_17 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -3078,7 +3202,7 @@ namespace PImplementation
             TMP_tmp4_40 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp2_41,TMP_tmp3_40)));
             currentMachine.TryAssert(TMP_tmp1_42,"Assertion Failed: " + TMP_tmp4_40);
         }
-        public void Anon_35(Event currentMachine_dequeuedEvent)
+        public void Anon_36(Event currentMachine_dequeuedEvent)
         {
             TimestampsAreMonotonicallyIncreasing currentMachine = this;
             PrtNamedTuple resp_18 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -3096,8 +3220,8 @@ namespace PImplementation
             currentMachine.TryAssert(TMP_tmp1_43,"Assertion Failed: " + TMP_tmp4_41);
         }
         [Start]
-        [OnEventDoAction(typeof(eGetNowResp), nameof(Anon_34))]
-        [OnEventDoAction(typeof(eUpdateHlcResp), nameof(Anon_35))]
+        [OnEventDoAction(typeof(eGetNowResp), nameof(Anon_35))]
+        [OnEventDoAction(typeof(eUpdateHlcResp), nameof(Anon_36))]
         class Init : State
         {
         }
@@ -3107,7 +3231,7 @@ namespace PImplementation
 {
     internal partial class TestAppendingEntryToLog : PMachine
     {
-        private PMachineValue log_1 = null;
+        private PMachineValue log_2 = null;
         private PrtSeq orderedResponses = new PrtSeq();
         private PrtSeq orderedEntriesResp = new PrtSeq();
         private PrtInt numberOfEntriesToCreate = ((PrtInt)0);
@@ -3217,7 +3341,7 @@ namespace PImplementation
             this.creates.Add(nameof(I_Log));
         }
         
-        public void Anon_36(Event currentMachine_dequeuedEvent)
+        public void Anon_37(Event currentMachine_dequeuedEvent)
         {
             TestAppendingEntryToLog currentMachine = this;
             PrtSeq logHeads_1 = new PrtSeq();
@@ -3242,7 +3366,7 @@ namespace PImplementation
             TMP_tmp2_43 = (PrtSeq)(((PrtSeq)((IPrtValue)logHeads_1)?.Clone()));
             TMP_tmp3_42 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"identityIn","logIdIn","logHeads"}, TMP_tmp0_50, TMP_tmp1_44, TMP_tmp2_43)));
             TMP_tmp4_42 = (PMachineValue)(currentMachine.CreateInterface<I_Log>( currentMachine, TMP_tmp3_42));
-            log_1 = TMP_tmp4_42;
+            log_2 = TMP_tmp4_42;
             while (((PrtBool)true))
             {
                 TMP_tmp5_38 = (PrtBool)((numberOfEntriesCreated) <= (numberOfEntriesToCreate));
@@ -3254,7 +3378,7 @@ namespace PImplementation
                 {
                     break;
                 }
-                TMP_tmp7_28 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
+                TMP_tmp7_28 = (PMachineValue)(((PMachineValue)((IPrtValue)log_2)?.Clone()));
                 TMP_tmp8_25 = (PEvent)(new eAppendNewEntryToLogReq((new PrtNamedTuple(new string[]{"source","entryData","numReferences"},null, ((PrtString)""), ((PrtInt)0)))));
                 TMP_tmp9_20 = (PMachineValue)(currentMachine.self);
                 TMP_tmp10_17 = (PrtString)(GlobalFunctions.GetRandomString(currentMachine));
@@ -3265,7 +3389,7 @@ namespace PImplementation
                 numberOfEntriesCreated = TMP_tmp13_15;
             }
         }
-        public async Task Anon_37(Event currentMachine_dequeuedEvent)
+        public async Task Anon_38(Event currentMachine_dequeuedEvent)
         {
             TestAppendingEntryToLog currentMachine = this;
             PrtNamedTuple resp_19 = (PrtNamedTuple)(gotoPayload ?? ((PEvent)currentMachine_dequeuedEvent).Payload);
@@ -3337,7 +3461,7 @@ namespace PImplementation
             TMP_tmp9_21 = (PrtBool)((PrtValues.SafeEquals(TMP_tmp8_26,numberOfEntriesToCreate)));
             if (TMP_tmp9_21)
             {
-                TMP_tmp10_18 = (PMachineValue)(((PMachineValue)((IPrtValue)log_1)?.Clone()));
+                TMP_tmp10_18 = (PMachineValue)(((PMachineValue)((IPrtValue)log_2)?.Clone()));
                 TMP_tmp11_18 = (PEvent)(new eTraverseLogReq((new PrtNamedTuple(new string[]{"source","rootEntries","stopper","useRefs"},null, new PrtSeq(), null, ((PrtBool)false)))));
                 TMP_tmp12_18 = (PMachineValue)(currentMachine.self);
                 TMP_tmp13_16 = (PrtSeq)(((PrtSeq)((IPrtValue)rootEntries_1)?.Clone()));
@@ -3376,7 +3500,7 @@ namespace PImplementation
                             entryItr = TMP_tmp29_2;
                             TMP_tmp30_2 = (tEntry)(((PrtSeq)orderedResponses)[index_1]);
                             TMP_tmp31_2 = (PrtBool)((PrtValues.SafeEquals(entryItr,TMP_tmp30_2)));
-                            TMP_tmp32_2 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:39:29")));
+                            TMP_tmp32_2 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:38:29")));
                             TMP_tmp33_2 = (PrtString)(((PrtString) String.Format("Entries not ordered correctly!")));
                             TMP_tmp34_2 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp32_2,TMP_tmp33_2)));
                             currentMachine.TryAssert(TMP_tmp31_2,"Assertion Failed: " + TMP_tmp34_2);
@@ -3386,7 +3510,7 @@ namespace PImplementation
                             index_1 = TMP_tmp36_2;
                         }
                         TMP_tmp37_2 = (PrtBool)((PrtValues.SafeEquals(((PrtBool)false),((PrtBool)true))));
-                        TMP_tmp38_2 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:43:25")));
+                        TMP_tmp38_2 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:42:25")));
                         TMP_tmp39_2 = (PrtString)(((PrtString) String.Format("Needed to exit execution with a log")));
                         TMP_tmp40_2 = (PrtString)(((PrtString) String.Format("{0} {1}",TMP_tmp38_2,TMP_tmp39_2)));
                         currentMachine.TryAssert(TMP_tmp37_2,"Assertion Failed: " + TMP_tmp40_2);
@@ -3399,8 +3523,8 @@ namespace PImplementation
         [OnEventGotoState(typeof(ConstructorEvent), typeof(Init))]
         class __InitState__ : State { }
         
-        [OnEntry(nameof(Anon_36))]
-        [OnEventDoAction(typeof(eAppendNewEntryToLogResp), nameof(Anon_37))]
+        [OnEntry(nameof(Anon_37))]
+        [OnEventDoAction(typeof(eAppendNewEntryToLogResp), nameof(Anon_38))]
         class Init : State
         {
         }
@@ -3482,6 +3606,10 @@ namespace PImplementation
 // TODO: NamedModule MemoryStorage_1
 namespace PImplementation
 {
+    public class I_Database : PMachineValue {
+        public I_Database (ActorId machine, List<string> permissions) : base(machine, permissions) { }
+    }
+    
     public class I_MemoryStorage : PMachineValue {
         public I_MemoryStorage (ActorId machine, List<string> permissions) : base(machine, permissions) { }
     }
@@ -3509,6 +3637,7 @@ namespace PImplementation
     public partial class PHelper {
         public static void InitializeInterfaces() {
             PInterfaces.Clear();
+            PInterfaces.AddInterface(nameof(I_Database), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
             PInterfaces.AddInterface(nameof(I_MemoryStorage), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
             PInterfaces.AddInterface(nameof(I_Heads), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
             PInterfaces.AddInterface(nameof(I_Log), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));

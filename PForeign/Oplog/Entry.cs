@@ -25,7 +25,7 @@ namespace PImplementation {
             Clock = clock;
             Next = next;
             Refs = refs;
-            Hash = HashPayload(payload);
+            Hash = HashPayload(payload); // Hashing the payload only due to weird hashing issues
         }
 
         #nullable enable
