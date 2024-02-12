@@ -21,10 +21,6 @@ Invariants:
 - Log should not be modified while reading
 - Log should not be read while being modified
 **************************************************/
-enum ShouldStopFnName {
-    DEFAULT
-} 
-
 type tTraversalStopper;
 
 type tGetClockLastStateReq = (source: machine);
@@ -80,8 +76,6 @@ event eJoinEntryResp : tJoinEntryResp;
 
 event eTraverseLogReq : tTraverseLogReq;
 event eTraverseLogResp : tTraverseLogResp;
-
-// TODO: wherever there is an async await in JS, use the send/receive commands in this to model blocking on a single thread
 
 machine Log {
     var identity: string;
@@ -197,7 +191,8 @@ machine Log {
         send heads, eGetAllEntriesFromHeadsReq, (source = this, );
         receive {
             case eGetAllEntriesFromHeadsResp: (resp: tGetAllEntriesFromHeadsResp) {
-                headsToReturn = Sorted(resp.retrivedValues, true);
+                print format("Received {0} heads from Heads", sizeof(resp.retrievedValues));
+                headsToReturn = Sorted(resp.retrievedValues, true);
                 print format("Received {0} heads from Heads", sizeof(headsToReturn));
             }
         }
@@ -282,8 +277,6 @@ machine Log {
         }
 
         totalNumReferences = numReferences + sizeof(logHeads);
-        print format("Size of log heads: {0}", sizeof(logHeads));
-        print format("Total Number of References: {0}", totalNumReferences);
         refs = GetReferences(logHeads, dictionary, totalNumReferences);
 
         send clock, eGetNowReq, (source = this, );
@@ -319,6 +312,7 @@ machine Log {
         }
 
         print format("SUCCESSFULLY APPENDED ENTRY TO LOG");
+
         return createdEntry;
     }
 

@@ -13,7 +13,7 @@ type tClearAllValuesFromStorageReq = (source: machine);
 type tClearAllValuesFromStorageResp = (status: tRequestStatus);
 
 type tGetAllValuesFromStorageReq = (source: machine);
-type tGetAllValuesFromStorageResp = (status: tRequestStatus, retrivedValues: seq[any]);
+type tGetAllValuesFromStorageResp = (status: tRequestStatus, retrievedValues: seq[any]);
 
 type tGetDictionaryFromMemoryStorageReq = (source: machine);
 type tGetDictionaryFromMemoryStorageResp = (status: tRequestStatus, dictionary: map[string, any]);
@@ -88,6 +88,7 @@ machine MemoryStorage {
             var deleteResp: ( couldDelete: bool, memoryStorage: tMemoryStorage );
             deleteResp = DeleteValueFromMemoryStorage(memoryStorage, req.key);
             if (deleteResp.couldDelete) {
+                memoryStorage = deleteResp.memoryStorage;
                 print format("Deleted {0} from {1}", req.key, name);
                 send req.source, eDeleteValueFromStorageResp, (status = SUCCESS, );
                 goto WaitForRequest;
@@ -124,10 +125,10 @@ machine MemoryStorage {
 
     state GettingAllDataFromStorage {
         entry (req: tGetAllValuesFromStorageReq) {
-            var retrivedValues: seq[any];
-            retrivedValues = GetAllValuesFromMemoryStorage(memoryStorage) as seq[any];
-            print format("Retrieved {0} values from {1}", sizeof(retrivedValues), name);
-            send req.source, eGetAllValuesFromStorageResp, (status = SUCCESS, retrivedValues = retrivedValues);
+            var retrievedValues: seq[any];
+            retrievedValues = GetAllValuesFromMemoryStorage(memoryStorage) as seq[any];
+            print format("Retrieved {0} values from {1}", sizeof(retrievedValues), name);
+            send req.source, eGetAllValuesFromStorageResp, (status = SUCCESS, retrievedValues = retrievedValues);
             goto WaitForRequest;
         }
     }

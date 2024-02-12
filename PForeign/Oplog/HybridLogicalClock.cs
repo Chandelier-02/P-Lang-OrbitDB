@@ -52,7 +52,8 @@ namespace PImplementation {
 
         public override string ToString()
         {
-            return $@"
+            return 
+            $@"
                 Id: {Id}
                 Time: {Time}
                 Counter: {Counter}
