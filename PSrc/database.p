@@ -6,14 +6,10 @@ type tApplyOperationResp = (status: tRequestStatus);
 
 machine Database {
     var log: Log;
-    // var sync: Sync;
+    var sync: Sync;
     var identity: string;
     var address: string;
     var name: string;
-    var clock: HybridLogicalClock; 
-    var entryStorage: MemoryStorage;
-    var headsStorage: MemoryStorage;
-    var indexStorage: MemoryStorage;
     var referenceCount: int;
 
     start state Init {
@@ -27,14 +23,22 @@ machine Database {
             indexStorage: MemoryStorage,
             referenceCount: int
         )) {
+            var logHeads: seq[tEntry];
+
             identity = init.identity;
             address = init.address;
             name = init.name;
-            clock = init.clock;
-            entryStorage = init.entryStorage;
-            headsStorage = init.headsStorage;
-            indexStorage = init.indexStorage;
             referenceCount = referenceCount;
+            log = new Log((
+                identity = identity, 
+                logId = address, 
+                logHeads = logHeads,
+                clock = init.clock, 
+                entryStorage = init.entryStorage, 
+                headsStorage = init.headsStorage, 
+                indexStorage = init.indexStorage
+            ));
+            sync = new Sync();
         }
     }
 
