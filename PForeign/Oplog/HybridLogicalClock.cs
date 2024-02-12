@@ -149,12 +149,12 @@ namespace PImplementation {
             return new tPhysicalTime(offset);
         }
 
-        public static int GetPhysicalTimeNow(tPhysicalTime physicalTime, PMachine _) {
+        public static long GetPhysicalTimeNow(tPhysicalTime physicalTime, PMachine _) {
             long now = physicalTime.Now();
-            return (int)now;
+            return now;
         }
 
-        public static tTimestamp CreateTimestamp(int time, int counter, string id, PMachine _) {
+        public static tTimestamp CreateTimestamp(long time, int counter, string id, PMachine _) {
             tTimestamp newTimestamp = new tTimestamp(time, counter, id);
             return newTimestamp;
         }

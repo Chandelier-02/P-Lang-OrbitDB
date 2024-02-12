@@ -6,7 +6,7 @@ machine TestAppendingEntryToLog {
     start state Init {
         entry {
             var logHeads: seq[tEntry];
-            numberOfEntriesToCreate = 10;
+            numberOfEntriesToCreate = 100;
             log = new Log((identityIn = "test1", logIdIn = "test1", logHeads = logHeads));
             while (numberOfEntriesToCreate > 0) {
                 send log, eAppendNewEntryToLogReq, (source = this, entryData = GetRandomString(), numReferences = 0);
@@ -20,7 +20,11 @@ machine TestAppendingEntryToLog {
             var rootEntries: seq[tEntry];
             var traversalStopper: tTraversalStopper;
             traversalStopper = CreateDefaultTraversalStopper() as tTraversalStopper;
-            orderedResponses += (sizeof(orderedResponses) - 1, resp.newEntry);
+            if (sizeof(orderedResponses) == 0) {
+                orderedResponses += (0, resp.newEntry);
+            } else {
+                orderedResponses += (sizeof(orderedResponses) - 1, resp.newEntry);
+            }
             if (sizeof(orderedResponses) == numberOfEntriesToCreate) {
                 send log, eTraverseLogReq, (source = this, rootEntries = rootEntries, stopper = traversalStopper, useRefs = false) as tTraverseLogReq;
                 goto TryTraverseLog;

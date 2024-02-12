@@ -137,6 +137,7 @@ machine MemoryStorage {
             var dictionary: map[string, any];
             dictionary = GetDictionaryFromMemoryStorage(memoryStorage);
             send req.source, eGetDictionaryFromMemoryStorageResp, (status = SUCCESS, dictionary = dictionary);
+            goto WaitForRequest;
         }
     }
 }

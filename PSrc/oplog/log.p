@@ -151,13 +151,26 @@ machine Log {
         }
     
         on eJoinLogReq do (req: tJoinLogReq) {
+            JoinLog(req.log);
+            send req.source, eJoinLogResp, (status = SUCCESS, );
         }
     
         on eJoinEntryReq do (req: tJoinEntryReq) {
+            var didJoinEntry: bool;
+            didJoinEntry = JoinEntry(req.entryToJoin);
+            send req.source, eJoinEntryResp, (status = SUCCESS, couldJoin = didJoinEntry);
         }
     
         on eTraverseLogReq do (req: tTraverseLogReq) {
+            var traversedEntries: seq[tEntry];
+            var dictionary: map[string, tEntry];
+
+            dictionary = GetDictionaryFromMemoryStorage() as map[string, tEntry];
+
+            traversedEntries = Traverse(req.rootEntries, dictionary, req.stopper, req.useRefs);
+            print format("Traversed over {0} entries in log", sizeof(traversedEntries));
             
+            send req.source, eTraverseLogResp, (status = SUCCESS, traversedEntries = traversedEntries);
         }
     }
 
@@ -269,6 +282,8 @@ machine Log {
         }
 
         totalNumReferences = numReferences + sizeof(logHeads);
+        print format("Size of log heads: {0}", sizeof(logHeads));
+        print format("Total Number of References: {0}", totalNumReferences);
         refs = GetReferences(logHeads, dictionary, totalNumReferences);
 
         send clock, eGetNowReq, (source = this, );
@@ -310,6 +325,23 @@ machine Log {
     fun JoinLog(log: Log) {
         var otherLogHeads: seq[tEntry];
         var otherLogEntry: tEntry;
+        var couldJoinEntry: bool;
+
+        print format("JOINING OTHER LOG TO LOG");
+
+        send log, eGetHeadsFromLogReq, (source = this, );
+        receive { 
+            case eGetHeadsFromLogResp: (resp: tGetHeadsFromLogResp) {
+                otherLogHeads = resp.heads;
+                print format("Received {0} heads from other log", sizeof(otherLogHeads));
+            }
+        } 
+
+        foreach (otherLogEntry in otherLogHeads) {
+            JoinEntry(otherLogEntry);
+        }
+
+        print format("SUCCESSFULLY JOINED OTHER LOG TO LOG");
     }
 
     fun JoinEntry(entryToJoin: tEntry): bool {
