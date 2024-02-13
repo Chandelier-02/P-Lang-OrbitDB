@@ -10,7 +10,7 @@ event eAddEntryToSyncResp : tAddEntryToSyncResp;
 event eUpdateLogReq : tUpdateLogReq;
 event eUpdateLogResp : tUpdateLogResp;
 
-// Everything is pass by value, so I need to somehow update the sync's log whenever the log gets modified. GROSS
+// Everything is pass by value, so I need to somehow update the sync's log whenever the log gets modified. GROSS. Need to modify the log to update the sync upon changes.
 machine Sync {
     var peers: set[string];
     var log: Log;
