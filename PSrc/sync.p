@@ -1,26 +1,14 @@
-type tAddEntryToSyncReq = (source: machine, entryToAdd: tEntry);
-type tAddEntryToSyncResp = (status: tRequestStatus);
+// type tUpdateSyncLogFromDatabaseReq = (source: machine);
+// type tUpdateSyncLogFromDatabaseResp = (status: tRequestStatus);
 
-type tUpdateSyncLogFromDatabaseReq = (source: machine);
-type tUpdateSyncLogFromDatabaseResp = (status: tRequestStatus);
-
-type tUpdateDatabaseLogFromSyncReq = (source: machine, updatedLog: Log);
-type tUpdateDatabaseLogFromSyncResp = (status: tRequestStatus);
+// type tUpdateDatabaseLogFromSyncReq = (source: machine, updatedLog: Log);
+// type tUpdateDatabaseLogFromSyncResp = (status: tRequestStatus);
 
 type tGetOtherSyncStreamReq = (source: machine);
 type tGetOtherSyncStreamResp = (status: tRequestStatus, otherSyncStream: seq[tEntry]);
 
-type tStartSyncReq = (source: machine);
-type tStartSyncResp = (status: tRequestStatus);
-
-type tStopSyncReq = (source: machine);
-type tStopSyncResp = (status: tRequestStatus);
-
-type tReceiveHeadsFromSelfReq = (source: machine, headsToReceive: seq[tEntry]);
-type tReceiveHeadsFromSelfResp = (status: tRequestStatus);
-
-event eAddEntryToSyncReq : tAddEntryToSyncReq;
-event eAddEntryToSyncResp : tAddEntryToSyncResp;
+// type tReceiveHeadsFromSelfReq = (source: machine, headsToReceive: seq[tEntry]);
+// type tReceiveHeadsFromSelfResp = (status: tRequestStatus);
 
 event eUpdateSyncLogFromDatabaseReq : tUpdateSyncLogFromDatabaseReq;
 event eUpdateSyncLogFromDatabaseResp : tUpdateSyncLogFromDatabaseResp;
@@ -31,12 +19,6 @@ event eUpdateDatabaseLogFromSyncResp : tUpdateDatabaseLogFromSyncResp;
 event eGetOtherSyncStreamReq : tGetOtherSyncStreamReq;
 event eGetOtherSyncStreamResp : tGetOtherSyncStreamResp;
 
-event eStartSyncReq : tStartSyncReq;
-event eStartSyncResp : tStartSyncResp;
-
-event eStopSyncReq : tStopSyncReq;
-event eStopSyncResp : tStopSyncResp;
-
 event eReceiveHeadsFromSelfReq : tReceiveHeadsFromSelfReq;
 event eReceiveHeadsFromSelfResp : tReceiveHeadsFromSelfResp;
 
@@ -44,6 +26,11 @@ type tQueue;
 
 // Everything is pass by value, so I need to somehow update the sync's log whenever the log gets modified. GROSS. Need to modify the log to update the sync upon changes.
 // The sync's view of the log can also get changed, so that is rather gross.
+
+// I need some sort of sync manager that serves as a higher level abstraction over the Sync machine. The sync manager keeps track
+// of the Sync machines and sends and receives events from them.
+// Because everything is pass by value, I need to separate database actions from sync actions. 
+
 machine Sync {
     var peers: map[string, Sync];
     var log: Log;
@@ -65,11 +52,15 @@ machine Sync {
     }
 
     state Started {
-        on eNewPeerSubscribedReq do (req: tNewPeerSubscribedReq) {
+        on ePeerSubscribedReq do (req: tPeerSubscribedReq) {
+            handlePeerSubscribed();
+        }
+
+        on ePeerUnsubscribedReq do (req: tPeerUnsubscribedReq) {
 
         }
 
-        on eHandlePeerUpdateReq do (req: tHandlePeerUpdateReq) {
+        on eHandleUpdateFromPeerReq do (req: tHandleUpdateFromPeerReq) {
 
         }
 
@@ -78,12 +69,12 @@ machine Sync {
         }
 
         on eUpdateSyncLogFromDatabaseReq do (req: tUpdateDatabaseLogFromSyncReq) {
-            
+
         }
     }
 
     state Stopping {
-
+        
     }
 
     fun sendHeads(): seq[tEntry] {
@@ -139,6 +130,12 @@ machine Sync {
                     print format("Peer {0} received heads from peer {1}", name, peerKeyItr);
                 }
             }
+        }
+    }
+
+    fun handlePeerSubscribed(peerId: string, peer: Sync, database: machine) {
+        if (peerId in peers) {
+
         }
     }
 }
