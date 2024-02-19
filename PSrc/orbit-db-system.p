@@ -107,7 +107,6 @@ machine OrbitDbSystem {
                 print format("Sync {0} already stopped!", req.identity);
                 return;
             }
-            // StopSync(req);
             activeSyncs -= (req.identity);
         }
     }
@@ -116,8 +115,6 @@ machine OrbitDbSystem {
         var headsFromOtherPeersToReceive: map[string, seq[tEntry]];
         var dialingPeersKeyItr: map[string, seq[tEntry]];
         var updatedHeads: seq[tEntry];
-
-        // send syncs[req.identity], eGotoSyncStartingReq, (source = this, );
 
         headsFromOtherPeersToReceive = getSubscribedPeersHeads(req.identity);
 
@@ -135,7 +132,6 @@ machine OrbitDbSystem {
 
     fun AddOperation(opData: string, identity: string, source: machine) {
         var createdEntry: tEntry;
-        var activeSyncItr: string;
 
         send logs[identity], eAppendNewEntryToLogReq, (source = this, entryData = opData, numReferences = numReferences);
         receive { 
@@ -145,10 +141,15 @@ machine OrbitDbSystem {
         }
         send source, eAddOperationResp, (status = SUCCESS, hash = GetHash(createdEntry));
 
-        // Propogate the newly created entry to subscibed logs
+        propogateAddedEntry(createdEntry, identity);
+    }
+
+    fun propogateAddedEntry(addedEntry: tEntry, addingPeerIdentity: string) {
+        var activeSyncItr: string;
+
         foreach (activeSyncItr in activeSyncs) {
-            if (activeSyncItr != identity) {
-                ApplyOperation(createdEntry, activeSyncItr);
+            if (activeSyncItr != addingPeerIdentity) {
+                ApplyOperation(addedEntry, activeSyncItr);
             }
         }
     }
