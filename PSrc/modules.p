@@ -1,3 +1,4 @@
+module OrbitDbSystem = { OrbitDbSystem };
 module Log = { Log };
 module HybridLogicalClock = { HybridLogicalClock };
 module Heads = { Heads };

@@ -4052,12 +4052,294 @@ namespace PImplementation
         }
     }
 }
+namespace PImplementation
+{
+    internal partial class TestFullyConnectedPeers : PMachine
+    {
+        private PrtInt numberOfPeersToCreate = ((PrtInt)0);
+        private PrtSeq identities = new PrtSeq();
+        private PMachineValue system = null;
+        public class ConstructorEvent : PEvent{public ConstructorEvent(IPrtValue val) : base(val) { }}
+        
+        protected override Event GetConstructorEvent(IPrtValue value) { return new ConstructorEvent((IPrtValue)value); }
+        public TestFullyConnectedPeers() {
+            this.sends.Add(nameof(eAddEntryToHeadsReq));
+            this.sends.Add(nameof(eAddEntryToHeadsResp));
+            this.sends.Add(nameof(eAddOperationReq));
+            this.sends.Add(nameof(eAddOperationResp));
+            this.sends.Add(nameof(eAppendNewEntryToLogReq));
+            this.sends.Add(nameof(eAppendNewEntryToLogResp));
+            this.sends.Add(nameof(eApplyOperationReq));
+            this.sends.Add(nameof(eApplyOperationResp));
+            this.sends.Add(nameof(eClearAllEntriesFromHeadsReq));
+            this.sends.Add(nameof(eClearAllEntriesFromHeadsResp));
+            this.sends.Add(nameof(eClearAllValuesFromStorageReq));
+            this.sends.Add(nameof(eClearAllValuesFromStorageResp));
+            this.sends.Add(nameof(eCreateEntryReq));
+            this.sends.Add(nameof(eCreateEntryResp));
+            this.sends.Add(nameof(eDeleteValueFromStorageReq));
+            this.sends.Add(nameof(eDeleteValueFromStorageResp));
+            this.sends.Add(nameof(eDoesLogHaveEntryReq));
+            this.sends.Add(nameof(eDoesLogHaveEntryResp));
+            this.sends.Add(nameof(eGetAllEntriesFromHeadsReq));
+            this.sends.Add(nameof(eGetAllEntriesFromHeadsResp));
+            this.sends.Add(nameof(eGetAllEntriesFromLogReq));
+            this.sends.Add(nameof(eGetAllEntriesFromLogResp));
+            this.sends.Add(nameof(eGetAllValuesFromStorageReq));
+            this.sends.Add(nameof(eGetAllValuesFromStorageResp));
+            this.sends.Add(nameof(eGetClockLastStateReq));
+            this.sends.Add(nameof(eGetClockLastStateResp));
+            this.sends.Add(nameof(eGetDictionaryFromMemoryStorageReq));
+            this.sends.Add(nameof(eGetDictionaryFromMemoryStorageResp));
+            this.sends.Add(nameof(eGetEntryFromLogReq));
+            this.sends.Add(nameof(eGetEntryFromLogResp));
+            this.sends.Add(nameof(eGetHeadsFromLogReq));
+            this.sends.Add(nameof(eGetHeadsFromLogResp));
+            this.sends.Add(nameof(eGetLastTimestampReq));
+            this.sends.Add(nameof(eGetLastTimestampResp));
+            this.sends.Add(nameof(eGetNowReq));
+            this.sends.Add(nameof(eGetNowResp));
+            this.sends.Add(nameof(eGetValueFromStorageReq));
+            this.sends.Add(nameof(eGetValueFromStorageResp));
+            this.sends.Add(nameof(eJoinEntryReq));
+            this.sends.Add(nameof(eJoinEntryResp));
+            this.sends.Add(nameof(eJoinLogReq));
+            this.sends.Add(nameof(eJoinLogResp));
+            this.sends.Add(nameof(ePutEntriesInHeadsReq));
+            this.sends.Add(nameof(ePutEntriesInHeadsResp));
+            this.sends.Add(nameof(ePutValueInStorageReq));
+            this.sends.Add(nameof(ePutValueInStorageResp));
+            this.sends.Add(nameof(eSetEntriesInHeadsReq));
+            this.sends.Add(nameof(eSetEntriesInHeadsResp));
+            this.sends.Add(nameof(eStartSyncReq));
+            this.sends.Add(nameof(eStartSyncResp));
+            this.sends.Add(nameof(eStopSyncReq));
+            this.sends.Add(nameof(eStopSyncResp));
+            this.sends.Add(nameof(eTraverseLogReq));
+            this.sends.Add(nameof(eTraverseLogResp));
+            this.sends.Add(nameof(eUpdateHlcReq));
+            this.sends.Add(nameof(eUpdateHlcResp));
+            this.sends.Add(nameof(PHalt));
+            this.receives.Add(nameof(eAddEntryToHeadsReq));
+            this.receives.Add(nameof(eAddEntryToHeadsResp));
+            this.receives.Add(nameof(eAddOperationReq));
+            this.receives.Add(nameof(eAddOperationResp));
+            this.receives.Add(nameof(eAppendNewEntryToLogReq));
+            this.receives.Add(nameof(eAppendNewEntryToLogResp));
+            this.receives.Add(nameof(eApplyOperationReq));
+            this.receives.Add(nameof(eApplyOperationResp));
+            this.receives.Add(nameof(eClearAllEntriesFromHeadsReq));
+            this.receives.Add(nameof(eClearAllEntriesFromHeadsResp));
+            this.receives.Add(nameof(eClearAllValuesFromStorageReq));
+            this.receives.Add(nameof(eClearAllValuesFromStorageResp));
+            this.receives.Add(nameof(eCreateEntryReq));
+            this.receives.Add(nameof(eCreateEntryResp));
+            this.receives.Add(nameof(eDeleteValueFromStorageReq));
+            this.receives.Add(nameof(eDeleteValueFromStorageResp));
+            this.receives.Add(nameof(eDoesLogHaveEntryReq));
+            this.receives.Add(nameof(eDoesLogHaveEntryResp));
+            this.receives.Add(nameof(eGetAllEntriesFromHeadsReq));
+            this.receives.Add(nameof(eGetAllEntriesFromHeadsResp));
+            this.receives.Add(nameof(eGetAllEntriesFromLogReq));
+            this.receives.Add(nameof(eGetAllEntriesFromLogResp));
+            this.receives.Add(nameof(eGetAllValuesFromStorageReq));
+            this.receives.Add(nameof(eGetAllValuesFromStorageResp));
+            this.receives.Add(nameof(eGetClockLastStateReq));
+            this.receives.Add(nameof(eGetClockLastStateResp));
+            this.receives.Add(nameof(eGetDictionaryFromMemoryStorageReq));
+            this.receives.Add(nameof(eGetDictionaryFromMemoryStorageResp));
+            this.receives.Add(nameof(eGetEntryFromLogReq));
+            this.receives.Add(nameof(eGetEntryFromLogResp));
+            this.receives.Add(nameof(eGetHeadsFromLogReq));
+            this.receives.Add(nameof(eGetHeadsFromLogResp));
+            this.receives.Add(nameof(eGetLastTimestampReq));
+            this.receives.Add(nameof(eGetLastTimestampResp));
+            this.receives.Add(nameof(eGetNowReq));
+            this.receives.Add(nameof(eGetNowResp));
+            this.receives.Add(nameof(eGetValueFromStorageReq));
+            this.receives.Add(nameof(eGetValueFromStorageResp));
+            this.receives.Add(nameof(eJoinEntryReq));
+            this.receives.Add(nameof(eJoinEntryResp));
+            this.receives.Add(nameof(eJoinLogReq));
+            this.receives.Add(nameof(eJoinLogResp));
+            this.receives.Add(nameof(ePutEntriesInHeadsReq));
+            this.receives.Add(nameof(ePutEntriesInHeadsResp));
+            this.receives.Add(nameof(ePutValueInStorageReq));
+            this.receives.Add(nameof(ePutValueInStorageResp));
+            this.receives.Add(nameof(eSetEntriesInHeadsReq));
+            this.receives.Add(nameof(eSetEntriesInHeadsResp));
+            this.receives.Add(nameof(eStartSyncReq));
+            this.receives.Add(nameof(eStartSyncResp));
+            this.receives.Add(nameof(eStopSyncReq));
+            this.receives.Add(nameof(eStopSyncResp));
+            this.receives.Add(nameof(eTraverseLogReq));
+            this.receives.Add(nameof(eTraverseLogResp));
+            this.receives.Add(nameof(eUpdateHlcReq));
+            this.receives.Add(nameof(eUpdateHlcResp));
+            this.receives.Add(nameof(PHalt));
+            this.creates.Add(nameof(I_OrbitDbSystem));
+        }
+        
+        public void Anon_41(Event currentMachine_dequeuedEvent)
+        {
+            TestFullyConnectedPeers currentMachine = this;
+            PrtInt numCreatedIdentities = ((PrtInt)0);
+            PrtString identity_5 = ((PrtString)"");
+            PrtInt itr = ((PrtInt)0);
+            PrtBool TMP_tmp0_63 = ((PrtBool)false);
+            PrtBool TMP_tmp1_52 = ((PrtBool)false);
+            PrtString TMP_tmp2_50 = ((PrtString)"");
+            PrtString TMP_tmp3_53 = ((PrtString)"");
+            PrtInt TMP_tmp4_53 = ((PrtInt)0);
+            PrtSeq TMP_tmp5_49 = new PrtSeq();
+            PrtNamedTuple TMP_tmp6_42 = (new PrtNamedTuple(new string[]{"identities"},new PrtSeq()));
+            PMachineValue TMP_tmp7_37 = null;
+            PrtBool TMP_tmp8_33 = ((PrtBool)false);
+            PrtBool TMP_tmp9_28 = ((PrtBool)false);
+            PMachineValue TMP_tmp10_25 = null;
+            PEvent TMP_tmp11_25 = null;
+            PMachineValue TMP_tmp12_25 = null;
+            PrtString TMP_tmp13_20 = ((PrtString)"");
+            PrtString TMP_tmp14_19 = ((PrtString)"");
+            PrtNamedTuple TMP_tmp15_16 = (new PrtNamedTuple(new string[]{"source","opData","identity"},null, ((PrtString)""), ((PrtString)"")));
+            PrtInt TMP_tmp16_16 = ((PrtInt)0);
+            PrtBool TMP_tmp17_15 = ((PrtBool)false);
+            PrtString TMP_tmp18_13 = ((PrtString)"");
+            numCreatedIdentities = (PrtInt)(((PrtInt)(0)));
+            numberOfPeersToCreate = (PrtInt)(((PrtInt)(10)));
+            while (((PrtBool)true))
+            {
+                TMP_tmp0_63 = (PrtBool)((numCreatedIdentities) < (numberOfPeersToCreate));
+                TMP_tmp1_52 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp0_63)?.Clone()));
+                if (TMP_tmp1_52)
+                {
+                }
+                else
+                {
+                    break;
+                }
+                TMP_tmp2_50 = (PrtString)(GlobalFunctions.GetRandomString(currentMachine));
+                identity_5 = TMP_tmp2_50;
+                TMP_tmp3_53 = (PrtString)(((PrtString)((IPrtValue)identity_5)?.Clone()));
+                ((PrtSeq)identities).Insert(((PrtInt)(0)), TMP_tmp3_53);
+                TMP_tmp4_53 = (PrtInt)((numCreatedIdentities) + (((PrtInt)(1))));
+                numCreatedIdentities = TMP_tmp4_53;
+            }
+            TMP_tmp5_49 = (PrtSeq)(((PrtSeq)((IPrtValue)identities)?.Clone()));
+            TMP_tmp6_42 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"identities"}, TMP_tmp5_49)));
+            TMP_tmp7_37 = (PMachineValue)(currentMachine.CreateInterface<I_OrbitDbSystem>( currentMachine, TMP_tmp6_42));
+            system = TMP_tmp7_37;
+            while (((PrtBool)true))
+            {
+                TMP_tmp8_33 = (PrtBool)((itr) < (((PrtInt)(100))));
+                TMP_tmp9_28 = (PrtBool)(((PrtBool)((IPrtValue)TMP_tmp8_33)?.Clone()));
+                if (TMP_tmp9_28)
+                {
+                }
+                else
+                {
+                    break;
+                }
+                TMP_tmp10_25 = (PMachineValue)(((PMachineValue)((IPrtValue)system)?.Clone()));
+                TMP_tmp11_25 = (PEvent)(new eAddOperationReq((new PrtNamedTuple(new string[]{"source","opData","identity"},null, ((PrtString)""), ((PrtString)"")))));
+                TMP_tmp12_25 = (PMachineValue)(currentMachine.self);
+                TMP_tmp13_20 = (PrtString)(GlobalFunctions.GetRandomString(currentMachine));
+                TMP_tmp14_19 = (PrtString)(((PrtString)currentMachine.TryRandom(identities)));
+                TMP_tmp15_16 = (PrtNamedTuple)((new PrtNamedTuple(new string[]{"source","opData","identity"}, TMP_tmp12_25, TMP_tmp13_20, TMP_tmp14_19)));
+                currentMachine.TrySendEvent(TMP_tmp10_25, (Event)TMP_tmp11_25, TMP_tmp15_16);
+                TMP_tmp16_16 = (PrtInt)((itr) + (((PrtInt)(1))));
+                itr = TMP_tmp16_16;
+            }
+            TMP_tmp17_15 = (PrtBool)((PrtValues.SafeEquals(((PrtBool)false),((PrtBool)true))));
+            TMP_tmp18_13 = (PrtString)(((PrtString) String.Format("PTst/base-tester.p:83:13")));
+            currentMachine.TryAssert(TMP_tmp17_15,"Assertion Failed: " + TMP_tmp18_13);
+        }
+        [Start]
+        [OnEntry(nameof(InitializeParametersFunction))]
+        [OnEventGotoState(typeof(ConstructorEvent), typeof(Active))]
+        class __InitState__ : State { }
+        
+        [OnEntry(nameof(Anon_41))]
+        class Active : State
+        {
+        }
+    }
+}
 // TODO: Implement the Foreign Type tMemoryStorage
 // TODO: Implement the Foreign Type tTraversalStopper
 // TODO: Implement the Foreign Type tPhysicalTime
 // TODO: Implement the Foreign Type tHybridLogicalClock
 // TODO: Implement the Foreign Type tTimestamp
 // TODO: Implement the Foreign Type tEntry
+namespace PImplementation
+{
+    public class testFullyConnectedPeers {
+        public static void InitializeLinkMap() {
+            PModule.linkMap.Clear();
+            PModule.linkMap[nameof(I_OrbitDbSystem)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_OrbitDbSystem)].Add(nameof(I_HybridLogicalClock), nameof(I_HybridLogicalClock));
+            PModule.linkMap[nameof(I_OrbitDbSystem)].Add(nameof(I_Log), nameof(I_Log));
+            PModule.linkMap[nameof(I_OrbitDbSystem)].Add(nameof(I_MemoryStorage), nameof(I_MemoryStorage));
+            PModule.linkMap[nameof(I_Log)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_Log)].Add(nameof(I_Heads), nameof(I_Heads));
+            PModule.linkMap[nameof(I_Heads)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_HybridLogicalClock)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_MemoryStorage)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_TestFullyConnectedPeers)] = new Dictionary<string, string>();
+            PModule.linkMap[nameof(I_TestFullyConnectedPeers)].Add(nameof(I_OrbitDbSystem), nameof(I_OrbitDbSystem));
+        }
+        
+        public static void InitializeInterfaceDefMap() {
+            PModule.interfaceDefinitionMap.Clear();
+            PModule.interfaceDefinitionMap.Add(nameof(I_OrbitDbSystem), typeof(OrbitDbSystem));
+            PModule.interfaceDefinitionMap.Add(nameof(I_Log), typeof(Log));
+            PModule.interfaceDefinitionMap.Add(nameof(I_Heads), typeof(Heads));
+            PModule.interfaceDefinitionMap.Add(nameof(I_HybridLogicalClock), typeof(HybridLogicalClock));
+            PModule.interfaceDefinitionMap.Add(nameof(I_MemoryStorage), typeof(MemoryStorage));
+            PModule.interfaceDefinitionMap.Add(nameof(I_TestFullyConnectedPeers), typeof(TestFullyConnectedPeers));
+        }
+        
+        public static void InitializeMonitorObserves() {
+            PModule.monitorObserves.Clear();
+            PModule.monitorObserves[nameof(TimestampsAreMonotonicallyIncreasing)] = new List<string>();
+            PModule.monitorObserves[nameof(TimestampsAreMonotonicallyIncreasing)].Add(nameof(eGetNowResp));
+            PModule.monitorObserves[nameof(TimestampsAreMonotonicallyIncreasing)].Add(nameof(eUpdateHlcResp));
+        }
+        
+        public static void InitializeMonitorMap(IActorRuntime runtime) {
+            PModule.monitorMap.Clear();
+            PModule.monitorMap[nameof(I_OrbitDbSystem)] = new List<Type>();
+            PModule.monitorMap[nameof(I_OrbitDbSystem)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            PModule.monitorMap[nameof(I_Log)] = new List<Type>();
+            PModule.monitorMap[nameof(I_Log)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            PModule.monitorMap[nameof(I_Heads)] = new List<Type>();
+            PModule.monitorMap[nameof(I_Heads)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            PModule.monitorMap[nameof(I_HybridLogicalClock)] = new List<Type>();
+            PModule.monitorMap[nameof(I_HybridLogicalClock)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            PModule.monitorMap[nameof(I_MemoryStorage)] = new List<Type>();
+            PModule.monitorMap[nameof(I_MemoryStorage)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            PModule.monitorMap[nameof(I_TestFullyConnectedPeers)] = new List<Type>();
+            PModule.monitorMap[nameof(I_TestFullyConnectedPeers)].Add(typeof(TimestampsAreMonotonicallyIncreasing));
+            runtime.RegisterMonitor<TimestampsAreMonotonicallyIncreasing>();
+        }
+        
+        
+        [PChecker.SystematicTesting.Test]
+        public static void Execute(IActorRuntime runtime) {
+            runtime.RegisterLog(new PLogFormatter());
+            runtime.RegisterLog(new PJsonFormatter());
+            PModule.runtime = runtime;
+            PHelper.InitializeInterfaces();
+            PHelper.InitializeEnums();
+            InitializeLinkMap();
+            InitializeInterfaceDefMap();
+            InitializeMonitorMap(runtime);
+            InitializeMonitorObserves();
+            runtime.CreateActor(typeof(_GodMachine), new _GodMachine.Config(typeof(TestFullyConnectedPeers)));
+        }
+    }
+}
+// TODO: NamedModule OrbitDbSystem_1
 // TODO: NamedModule Log_1
 // TODO: NamedModule HybridLogicalClock_1
 // TODO: NamedModule Heads_1
@@ -4088,6 +4370,10 @@ namespace PImplementation
         public I_EntryMachine (ActorId machine, List<string> permissions) : base(machine, permissions) { }
     }
     
+    public class I_TestFullyConnectedPeers : PMachineValue {
+        public I_TestFullyConnectedPeers (ActorId machine, List<string> permissions) : base(machine, permissions) { }
+    }
+    
     public partial class PHelper {
         public static void InitializeInterfaces() {
             PInterfaces.Clear();
@@ -4097,6 +4383,7 @@ namespace PImplementation
             PInterfaces.AddInterface(nameof(I_Log), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAddOperationReq), nameof(eAddOperationResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eApplyOperationReq), nameof(eApplyOperationResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eStartSyncReq), nameof(eStartSyncResp), nameof(eStopSyncReq), nameof(eStopSyncResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
             PInterfaces.AddInterface(nameof(I_HybridLogicalClock), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAddOperationReq), nameof(eAddOperationResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eApplyOperationReq), nameof(eApplyOperationResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eStartSyncReq), nameof(eStartSyncResp), nameof(eStopSyncReq), nameof(eStopSyncResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
             PInterfaces.AddInterface(nameof(I_EntryMachine), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAddOperationReq), nameof(eAddOperationResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eApplyOperationReq), nameof(eApplyOperationResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eStartSyncReq), nameof(eStartSyncResp), nameof(eStopSyncReq), nameof(eStopSyncResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
+            PInterfaces.AddInterface(nameof(I_TestFullyConnectedPeers), nameof(eAddEntryToHeadsReq), nameof(eAddEntryToHeadsResp), nameof(eAddOperationReq), nameof(eAddOperationResp), nameof(eAppendNewEntryToLogReq), nameof(eAppendNewEntryToLogResp), nameof(eApplyOperationReq), nameof(eApplyOperationResp), nameof(eClearAllEntriesFromHeadsReq), nameof(eClearAllEntriesFromHeadsResp), nameof(eClearAllValuesFromStorageReq), nameof(eClearAllValuesFromStorageResp), nameof(eCreateEntryReq), nameof(eCreateEntryResp), nameof(eDeleteValueFromStorageReq), nameof(eDeleteValueFromStorageResp), nameof(eDoesLogHaveEntryReq), nameof(eDoesLogHaveEntryResp), nameof(eGetAllEntriesFromHeadsReq), nameof(eGetAllEntriesFromHeadsResp), nameof(eGetAllEntriesFromLogReq), nameof(eGetAllEntriesFromLogResp), nameof(eGetAllValuesFromStorageReq), nameof(eGetAllValuesFromStorageResp), nameof(eGetClockLastStateReq), nameof(eGetClockLastStateResp), nameof(eGetDictionaryFromMemoryStorageReq), nameof(eGetDictionaryFromMemoryStorageResp), nameof(eGetEntryFromLogReq), nameof(eGetEntryFromLogResp), nameof(eGetHeadsFromLogReq), nameof(eGetHeadsFromLogResp), nameof(eGetLastTimestampReq), nameof(eGetLastTimestampResp), nameof(eGetNowReq), nameof(eGetNowResp), nameof(eGetValueFromStorageReq), nameof(eGetValueFromStorageResp), nameof(eJoinEntryReq), nameof(eJoinEntryResp), nameof(eJoinLogReq), nameof(eJoinLogResp), nameof(ePutEntriesInHeadsReq), nameof(ePutEntriesInHeadsResp), nameof(ePutValueInStorageReq), nameof(ePutValueInStorageResp), nameof(eSetEntriesInHeadsReq), nameof(eSetEntriesInHeadsResp), nameof(eStartSyncReq), nameof(eStartSyncResp), nameof(eStopSyncReq), nameof(eStopSyncResp), nameof(eTraverseLogReq), nameof(eTraverseLogResp), nameof(eUpdateHlcReq), nameof(eUpdateHlcResp), nameof(PHalt));
         }
     }
     

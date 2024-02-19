@@ -46,3 +46,41 @@
 //         }
 //     }
 // }
+
+// Need to randomly call AddOperation for certain peers. Can also call AddOperation with different entry data but concurrently for the same head
+
+// Need to simulate syncs going offline and network partitions
+
+// Need to simulate a new sync joining after being offline for a while
+
+// Need to simulate things running in the wost conditions
+
+machine TestFullyConnectedPeers {
+    var numberOfPeersToCreate: int;
+    var identities: seq[string];
+    var system: OrbitDbSystem;
+    
+    start state Active {
+        entry {
+            var numCreatedIdentities: int;
+            var identity: string;
+            var itr: int;
+
+            numCreatedIdentities = 0;
+            numberOfPeersToCreate = 10;
+            while (numCreatedIdentities < numberOfPeersToCreate) {
+                identity = GetRandomString();
+                identities += (0, identity);
+                numCreatedIdentities = numCreatedIdentities + 1;
+            }
+            system = new OrbitDbSystem((identities = identities, ));
+
+            while (itr < 100) {
+                send system, eAddOperationReq, (source = this, opData = GetRandomString(), identity = choose(identities));
+                itr = itr + 1;
+            }
+
+            assert false == true;
+        }
+    }
+}
