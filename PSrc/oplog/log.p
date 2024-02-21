@@ -179,13 +179,15 @@ machine Log {
     fun GetClockLastState(): tTimestamp {
         var lastTimestamp: tTimestamp;
 
-        print format("GETTING CLOCK LAST STATE");
+        print format("\n");
+        print format("GETTING CLOCK LAST STATE FOR LOG WITH IDENTITY {0}", identity);
 
         send clock, eGetLastTimestampReq, (source = this, );
         receive { 
             case eGetLastTimestampResp: (resp: tGetLastTimestampResp) {
                 lastTimestamp = resp.lastTimestamp;
-                print format("Clock last state is {0}", lastTimestamp);
+                print format("CLOCK LAST STATE FOR LOG WITH IDENTITY {0} IS {1}", identity, lastTimestamp);
+                print format("\n");
             }
         }
         return lastTimestamp;
@@ -194,14 +196,16 @@ machine Log {
     fun GetHeadsFromLog(): seq[tEntry] {
         var headsToReturn: seq[tEntry];
 
-        print format("GETTING LOG HEADS");
+        print format("\n");
+        print format("GETTING LOG HEADS FROM LOG WITH IDENTITY {0}", identity);
 
         send heads, eGetAllEntriesFromHeadsReq, (source = this, );
         receive {
             case eGetAllEntriesFromHeadsResp: (resp: tGetAllEntriesFromHeadsResp) {
-                print format("Received {0} heads from Heads", sizeof(resp.retrievedValues));
+                print format("RECEIEVED {0} HEADS FROM LOG WITH IDENTITY {1}", sizeof(resp.retrievedValues), identity);
                 headsToReturn = Sorted(resp.retrievedValues, true);
-                print format("Received {0} heads from Heads", sizeof(headsToReturn));
+                print format("HEADS FOR LOG WITH IDENTITY {0}: \n\t{1}", identity, headsToReturn);
+                print format("\n");
             }
         }
         return headsToReturn;
@@ -215,7 +219,7 @@ machine Log {
         var stopper: tTraversalStopper;
         var traversedEntry: tEntry;
 
-        print format("GETTING ALL ENTRIES IN LOG");
+        print format("GETTING ALL ENTRIES FROM LOG WITH IDENTITY {0}", identity);
 
         stopper = CreateDefaultTraversalStopper();
         rootEntries = GetHeadsFromLog();

@@ -13,6 +13,12 @@ type tStartSyncResp = (status: tRequestStatus);
 type tStopSyncReq = (source: machine, identity: string);
 type tStopSyncResp = (status: tRequestStatus);
 
+type tTraverseLogFromSystemReq = (source: machine, identity: string, rootEntries: seq[tEntry], stopper: tTraversalStopper, useRefs: bool);
+type tTraverseLogFromSystemResp = (status: tRequestStatus, traversedEntries: seq[tEntry]);
+
+event eTraverseLogFromSystemReq : tTraverseLogFromSystemReq;
+event eTraverseLogFromSystemResp : tTraverseLogFromSystemResp;
+
 // type tSubscribePeerReq = (source: machine, identity: string);
 // type tSubscribePeerResp = (status: tRequestStatus);
 
@@ -62,7 +68,7 @@ machine OrbitDbSystem {
             numReferences = 16;
 
             while (numInstancesCreated < sizeof(init.identities)) {
-                identity = init.identities[sizeof(init.identities) - 1];
+                identity = init.identities[numInstancesCreated];
                 address = GetRandomString();
                 name = GetRandomString();
                 name = format("Database_{0}", numInstancesCreated);
@@ -82,6 +88,8 @@ machine OrbitDbSystem {
                 )));
 
                 allSyncs += (identity);
+
+                numInstancesCreated = numInstancesCreated + 1;
             }
         }
 
@@ -96,10 +104,12 @@ machine OrbitDbSystem {
         on eStartSyncReq do (req: tStartSyncReq) {
             if (req.identity in activeSyncs) {
                 print format("Sync {0} already started!", req.identity);
+                send req.source, eStartSyncResp, (status = ERROR, );
                 return;
             }
             StartSync(req);
             activeSyncs += (req.identity);
+            send req.source, eStartSyncResp, (status = SUCCESS, );
         }
         
         on eStopSyncReq do (req: tStopSyncReq) {
@@ -108,6 +118,16 @@ machine OrbitDbSystem {
                 return;
             }
             activeSyncs -= (req.identity);
+        }
+
+        on eTraverseLogFromSystemReq do (req: tTraverseLogFromSystemReq) {
+            send logs[req.identity], eTraverseLogReq, (source = this, rootEntries = req.rootEntries, stopper = req.stopper, useRefs = req.useRefs);
+            receive { 
+                case eTraverseLogResp: (resp: tTraverseLogResp) {
+                    print format("Request from system traversed over {0} entries", sizeof(resp.traversedEntries));
+                    send req.source, eTraverseLogFromSystemResp, (status = SUCCESS, traversedEntries = resp.traversedEntries);
+                }
+            }
         }
     }
 
@@ -118,6 +138,9 @@ machine OrbitDbSystem {
 
         headsFromOtherPeersToReceive = getSubscribedPeersHeads(req.identity);
 
+        if (!(sizeof(headsFromOtherPeersToReceive) > 0)) {
+            return;
+        }
         updateSubscribingPeerHeads(headsFromOtherPeersToReceive);
 
         send logs[req.identity], eGetHeadsFromLogReq, (source = this, );
@@ -156,28 +179,35 @@ machine OrbitDbSystem {
 
     fun ApplyOperation(opEntry: tEntry, identity: string) {
         send logs[identity], eJoinEntryReq, (source = this, entryToJoin = opEntry);
-            receive { 
-                case eJoinEntryResp: (resp: tJoinEntryResp) {
-                    print format("Applied operation with entry {0}", opEntry);
-                }
+        receive { 
+            case eJoinEntryResp: (resp: tJoinEntryResp) {
+                print format("Applied operation with entry {0}", opEntry);
             }
+        }
     }
 
     fun getSubscribedPeersHeads(identity: string): map[string, seq[tEntry]] {
         var headsFromOtherPeersToReceive: map[string, seq[tEntry]];
         var logKeysItr: string;
+        var numberOfHeads: int;
         foreach (logKeysItr in keys(logs)) {
             if (identity == logKeysItr) {
                 continue;
             } else {
+
                 send logs[logKeysItr], eGetHeadsFromLogReq, (source = this, );
                 receive { 
                     case eGetHeadsFromLogResp: (resp: tGetHeadsFromLogResp) {
-                        headsFromOtherPeersToReceive += (logKeysItr, resp.heads);
+                        if (sizeof(resp.heads) > 0) {
+                            headsFromOtherPeersToReceive += (logKeysItr, resp.heads);
+                            numberOfHeads = numberOfHeads + 1;
+                        }
                     }
                 }
             }
         }
+
+        print format("Found {0} heads from other peers", numberOfHeads);
         return headsFromOtherPeersToReceive;
     }
 
@@ -187,6 +217,7 @@ machine OrbitDbSystem {
         var otherLogHeads: seq[tEntry];
 
         foreach (keysItr in keys(otherPeerHeads)) {
+            print format("Processing heads from other peer with id {0}", keysItr);
             send logs[keysItr], eGetHeadsFromLogReq, (source = this, );
             receive { 
                 case eGetHeadsFromLogResp: (resp: tGetHeadsFromLogResp) {
@@ -196,7 +227,6 @@ machine OrbitDbSystem {
             foreach (entryItr in otherLogHeads) {
                 ApplyOperation(entryItr, keysItr);
             }
-            
         }
     }
 

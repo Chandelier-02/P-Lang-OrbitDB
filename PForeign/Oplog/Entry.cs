@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace PImplementation {
     public class tEntry : IPrtValue {
@@ -111,6 +112,75 @@ namespace PImplementation {
 
         public static PrtString GetRandomString(PMachine _) {
             return (PrtString)Guid.NewGuid().ToString();
+        }
+    }
+
+    public struct PhysicalTime {
+        public int Offset { set; get; }
+        public long Now { get => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + Offset; }
+
+        public PhysicalTime(int offset) {
+            Offset = offset;
+        }
+    }
+
+    public class Timestamp {
+        public long Time { get; }
+        public string Id { get; }
+        public int Counter { set; get; }
+
+        public Timestamp(long time, int counter, string id) {
+            Time = time;
+            Counter = counter;
+            Id = id;
+        }
+    }
+
+    public class HybridLogicalClock {
+        public string Id { get; }
+        public PhysicalTime PhysicalTime { get; }
+        public Timestamp LastTimestamp { set; get; }
+        public HybridLogicalClock(string id, PhysicalTime? physicalTime = null) {
+            Id = id;
+            PhysicalTime = physicalTime ?? new PhysicalTime(0);
+            LastTimestamp = new Timestamp(PhysicalTime.Now, 0, Id);
+        }
+
+        public Timestamp Now() {
+            long physNow = PhysicalTime.Now;
+            if (physNow > LastTimestamp.Time) {
+                LastTimestamp = new Timestamp(physNow, 0, Id);
+            } else {
+                LastTimestamp.Counter += 1;
+            }
+
+            return LastTimestamp;
+        }
+
+        public Timestamp New() {
+            return new Timestamp(PhysicalTime.Now, 0, Id);
+        }
+
+        public Timestamp Update(Timestamp remoteTimestamp) {
+            Timestamp newTimestamp = New();
+            Timestamp[] timestampsToSort = new Timestamp[] { remoteTimestamp, newTimestamp, LastTimestamp };
+            Array.Sort(timestampsToSort, CompareTimestamps);
+            Timestamp winningTimestamp = timestampsToSort[^1];
+            LastTimestamp = new Timestamp(winningTimestamp.Time, winningTimestamp.Counter, Id);
+            return LastTimestamp;
+        }
+    }
+
+    public readonly struct Entry {
+        readonly string Id { get; }
+        readonly string Payload { get; }
+        readonly List<string> Next { get; }
+        readonly List<string> Refs { get; }
+        readonly Timestamp Clock { get; }
+        readonly string Identity { get; }
+
+        public Entry(string identity, string id, string payload, Timestamp? clock = null, List<string>? next = null, List<string>? refs = null) {
+            clock = clock || new HybridLogicalClock(identity).
         }
     }
 }

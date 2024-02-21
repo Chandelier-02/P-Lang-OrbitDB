@@ -41,9 +41,9 @@ machine MemoryStorage {
     var name: string;
 
     start state Init {
-        entry (name: string) {
-            memoryStorage = CreateMemoryStorage(name);
-            name = name;
+        entry (nameIn: string) {
+            memoryStorage = CreateMemoryStorage(nameIn);
+            name = nameIn;
             goto WaitForRequest;
         }
     }
@@ -76,8 +76,9 @@ machine MemoryStorage {
 
     state PuttingValueInStorage {
         entry (req: tPutValueInStorageReq) {
+            print format("PUTTING KEY {0} WITH VALUE {1}, IN {2}", req.key, req.value, name);
             memoryStorage = PutValueInMemoryStorage(memoryStorage, req.key, req.value);
-            print format("Put key {0} with value {1} in {2}", req.key, req.value, name);
+            print format("PUT KEY {0} WITH VALUE {1} IN {2}", req.key, req.value, name);
             send req.source, ePutValueInStorageResp, (status = SUCCESS, );
             goto WaitForRequest;
         }
@@ -86,14 +87,15 @@ machine MemoryStorage {
     state DeletingValueFromStorage {
         entry (req: tDeleteValueFromStorageReq) {
             var deleteResp: ( couldDelete: bool, memoryStorage: tMemoryStorage );
+            print format("TRYING TO DELETE KEY {0} FROM {1}", req.key, name);
             deleteResp = DeleteValueFromMemoryStorage(memoryStorage, req.key);
             if (deleteResp.couldDelete) {
                 memoryStorage = deleteResp.memoryStorage;
-                print format("Deleted {0} from {1}", req.key, name);
+                print format("DELETED KEY-VALUE-PAIR WITH KEY {0} FROM {1}", req.key, name);
                 send req.source, eDeleteValueFromStorageResp, (status = SUCCESS, );
                 goto WaitForRequest;
             }
-            print format("{0} not in {1}", req.key, name);
+            print format("COULD NOT DELETE KEY {0} FROM {1} BECAUSE IT IS NOT STORED", req.key, name);
             send req.source, eDeleteValueFromStorageResp, (status = ERROR, );
             goto WaitForRequest;
         }
@@ -102,13 +104,14 @@ machine MemoryStorage {
     state GettingValueFromStorage {
         entry (req: tGetValueFromStorageReq) {
             var value: any;
+            print format("ATTEMPTING TO KEY VALUE FOR KEY {0} IN {1}", req.key, name);
             value = GetValueFromMemoryStorage(memoryStorage, req.key);
             if (value == false) {
-                print format("No value associated with key {0} in {1}", req.key, name);
+                print format("NO VALUE ASSOCIATED WITH KEY {0} IN {1}", req.key, name);
                 send req.source, eGetValueFromStorageResp, (status = ERROR, value = value);
                 goto WaitForRequest;
             }
-            print format("Got value {0} for key {1} in {2}", value, req.key, name);
+            print format("GOT VALUE {0} FOR KEY {1} IN {2}", value, req.key, name);
             send req.source, eGetValueFromStorageResp, (status = SUCCESS, value = value);
             goto WaitForRequest;
         }
