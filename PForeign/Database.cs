@@ -1,65 +1,42 @@
-// using System;
-// using System.Runtime;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.IO;
-// using Plang.CSharpRuntime;
-// using Plang.CSharpRuntime.Values;
-// using Plang.CSharpRuntime.Exceptions;
-// using System.Threading;
-// using System.Threading.Tasks;
-// using System.Security.Principal;
-// using System.Dynamic;
-// using System.Runtime.InteropServices;
-// using System.Collections;
-// using System.Security;
-// using System.Text.Json;
-// using System.Security.Cryptography;
-// using System.Text;
-// using System.Reflection.Metadata;
-// using System.Runtime.CompilerServices;
+using Plang.CSharpRuntime.Values;
 
-// #pragma warning disable 162, 219, 414
-// namespace PImplementation {
-//     public class tDatabase : IPrtValue {
-//         private readonly int defaultReferencesCount = 16;
-//         public readonly int ReferencesCount;
-//         public readonly tMemoryStorage<tEntry> EntryStorage;
-//         public readonly tMemoryStorage<bool> IndexStorage;
-//         public readonly tHeads HeadsStorage;
-//         public readonly string Name;
-//         public readonly string Identity;
-//         public readonly string Address;
-//         public readonly bool SyncAutomatically;
-//         public readonly tHybridLogicalClock Clock;
-//         public readonly tOpLog Log;
-//         private readonly TaskQueue Queue;
+namespace PImplementation {
+    # nullable enable
+    public class Database : IPrtValue {
+        public Log Log { get; }
+        public int ReferencesCount { get; }
 
-//         #nullable enable
-//         public tDatabase(
-//             string identity, 
-//             string address, 
-//             string name, 
-//             tHybridLogicalClock? clock,
-//             tMemoryStorage<tEntry>? headsStorage,
-//             tMemoryStorage<tEntry>? entryStorage,
-//             tMemoryStorage<bool>? indexStorage,
-//             int? referencesCount,
-//             bool syncAutomatically = true
-//         ) {
-//             Identity = identity;
-//             Address = address;
-//             Name = name;
-//             SyncAutomatically = syncAutomatically;
-//             ReferencesCount = referencesCount ?? defaultReferencesCount;
-//             EntryStorage = entryStorage ?? new tMemoryStorage<tEntry>();
-//             IndexStorage = indexStorage ?? new tMemoryStorage<bool>();
-//             Clock = clock ?? new tHybridLogicalClock(identity, null, null);
-//             Log = new tOpLog(identity, address, null, logClock: Clock, entryStorage, headsStorage, indexStorage, null);
-//         }
-        
-//         public string AddOperation(string op) {
-//             tEntry entry = Log.AppendEntry(op, ReferencesCount);
-//         }
-//     }
-// }
+        public Database(
+            string identity,
+            string address,
+            HybridLogicalClock? clock,
+            MemoryStorage<Entry>? headsStorage,
+            MemoryStorage<Entry>? entryStorage,
+            MemoryStorage<bool>? indexStorage,
+            int referencesCount = 16
+        ) {
+            Log = new Log(identity, address, null, clock, entryStorage, headsStorage, indexStorage);
+            ReferencesCount = referencesCount;
+        }
+
+        public Entry AddOperation(string data) {
+            return Log.Append(data, ReferencesCount);
+        }
+
+        public bool ApplyOperation(Entry entry) {
+            return Log.JoinEntry(entry);
+        }
+
+        public bool Equals(IPrtValue? other) {
+            if (other is Database otherDatabase) {
+                return otherDatabase.Log.Equals(Log);
+            }
+            return false;
+        }
+
+        // TODO: Verify that this is correctly cloning everything.
+        public IPrtValue Clone() {
+            return new Database(Log.Identity, Log.Id, Log._Clock, Log._Heads.memoryStorage, Log._Entries, Log._Index, ReferencesCount);
+        }
+    }
+}

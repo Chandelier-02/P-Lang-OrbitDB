@@ -1,19 +1,18 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Plang.CSharpRuntime.Values;
 
 namespace PImplementation {
     #nullable enable
-    public class Log {
+    public class Log : IPrtValue {
         public string Identity { get; }
         public string Id { get; }
-        private HybridLogicalClock _Clock { get; }
-        private MemoryStorage<Entry> _Entries { get; }
-        private MemoryStorage<bool> _Index { get; }
-        private Heads _Heads { get; } 
-        private TimestampComparer SortFnComparer { get; }
+        public HybridLogicalClock _Clock { get; }
+        public MemoryStorage<Entry> _Entries { get; }
+        public MemoryStorage<bool> _Index { get; }
+        public Heads _Heads { get; } 
+        public TimestampComparer SortFnComparer { get; }
 
         public Log(
             string identity, 
@@ -166,6 +165,17 @@ namespace PImplementation {
             refs = (List<string>)Traverse(heads, shouldStopTraversal, false).Select(e => e.Hash);
             refs = refs.GetRange(heads.Count + 1, amount);
             return refs;
+        }
+
+        public bool Equals(IPrtValue? other) {
+            if (other is Log otherLog) {
+                return otherLog.Id == Id;
+            }
+            return false;
+        }
+
+        public IPrtValue Clone() {
+            return new Log(Identity, Id, Heads(), _Clock, _Entries, null, _Index, SortFnComparer);
         }
     }
 }

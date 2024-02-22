@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace PImplementation {
     # nullable enable
     public class Heads {
-        private readonly MemoryStorage<Entry> memoryStorage;
+        public readonly MemoryStorage<Entry> memoryStorage;
 
         public Heads(MemoryStorage<Entry>? memoryStorage = null, List<Entry>? heads = null) {
             this.memoryStorage = memoryStorage ?? new MemoryStorage<Entry>();

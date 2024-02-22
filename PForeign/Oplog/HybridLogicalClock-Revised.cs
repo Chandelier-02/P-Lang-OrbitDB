@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PImplementation {
     # nullable enable
-    public struct PhysicalTime {
+    public class PhysicalTime {
         public int Offset { set; get; }
         public long Now { get => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + Offset; }
 
@@ -65,7 +65,6 @@ namespace PImplementation {
             if (timestamp1 == null || timestamp2 == null) {
                 throw new ArgumentException("Timestamps to compare cannot be null!");
             }
-
             if (timestamp1.Time > timestamp2.Time) {
                 return 1;
             }

@@ -67,3 +67,14 @@
 //         }
 //     }
 // }
+
+using System.Collections.Generic;
+
+namespace PImplementation {
+    public class Sync {
+        public HashSet<Database> peers { get; }
+        public bool Started { get; }
+
+        public Sync()
+    }
+}
